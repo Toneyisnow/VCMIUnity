@@ -328,3 +328,8 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+UnityClient/Library/metadata/
+UnityClient/Library/PackageCache/
+UnityClient/Library/ShaderCache/
+UnityClient/Library/StateCache/
+UnityClient/Temp/
