@@ -14,10 +14,20 @@ namespace H3Console
     {
         static void Main(string[] args)
         {
-            TestRetrieveAnimation();
+            TestRetrieveFile();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
+        }
+
+        static void TestRetrieveFile()
+        {
+            Engine engine = Engine.GetInstance();
+
+            engine.LoadArchiveFile(@"D:\Toney\Personal\Git\toneyisnow\HeroesIII\External\HeroesIII_Data\H3ab_bmp.lod");
+            byte[] h3cFile = engine.RetrieveFileData("ab.h3c");
+            StreamHelper.WriteBytesToFile(@"D:\Temp\ab.h3c", h3cFile);
+
         }
 
         static void TestRetrieveImage()

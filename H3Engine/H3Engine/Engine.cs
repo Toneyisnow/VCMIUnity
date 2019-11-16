@@ -1,4 +1,5 @@
-﻿using H3Engine.FileSystem;
+﻿using H3Engine.Campaign;
+using H3Engine.FileSystem;
 using H3Engine.GUI;
 using H3Engine.Mapping;
 using System;
@@ -41,6 +42,11 @@ namespace H3Engine
 
         }
 
+        public byte[] RetrieveFileData(string fileName)
+        {
+            return gameResourceStorage.ExtractFileData(fileName);
+        }
+
         /// <summary>
         /// Retrive the H3Map data from data
         /// </summary>
@@ -48,6 +54,13 @@ namespace H3Engine
         /// <returns></returns>
         public H3Map ReteiveMap(string mapName)
         {
+            return null;
+        }
+
+        public H3Campaign RetrieveScenario(string fileName)
+        {
+            byte[] data = gameResourceStorage.ExtractFileData(fileName);
+
             return null;
         }
 
@@ -74,45 +87,7 @@ namespace H3Engine
             }
             
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="imageName"></param>
-        /// <returns></returns>
-        public ImageData RetrieveImageTest()
-        {
-            string imageName = "Bo53Muck.pcx";
-            return gameResourceStorage.ExtractImage(imageName);
-
-            /*
-            using (FileStream file = new FileStream(@"D:\PlayGround\H3sprite\CABEHE.def", FileMode.Open, FileAccess.Read))
-            {
-                H3DefFileHandler def = new H3DefFileHandler(file);
-
-                def.LoadAllFrames();
-
-                AnimationDefinition animation = def.GetAnimation();
-
-                for (int g = 0; g < animation.Groups.Count; g++)
-                {
-                    for (int i = 0; i < animation.Groups[g].Frames.Count; i++)
-                    {
-                        ImageData image = animation.ComposeFrameImage(g, i);
-                        return image;
-
-                        //string filename = string.Format(@"D:\PlayGround\H3sprite\cabehe.{0:00}.{1:00}.png", g, i);
-                        //using (FileStream outputFile = new FileStream(filename, FileMode.Create, FileAccess.Write))
-                        {
-                        //    image.SaveAsPNGStream(outputFile);
-                        }
-                    }
-                }
-            }
-
-            return null;
-            */
-        }
+        
 
         public ImageData RetrieveImage(string imageName)
         {

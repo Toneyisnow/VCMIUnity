@@ -50,6 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Campaign\H3Campaign.cs" />
     <Compile Include="Common\GameConstants.cs" />
     <Compile Include="Components\ArtifactSet.cs" />
     <Compile Include="Components\CreatureSet.cs" />
