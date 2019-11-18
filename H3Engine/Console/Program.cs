@@ -14,7 +14,7 @@ namespace H3Console
     {
         static void Main(string[] args)
         {
-            TestRetrieveFile();
+            TestRetrieveCampaign();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -24,7 +24,7 @@ namespace H3Console
         {
             Engine engine = Engine.GetInstance();
 
-            engine.LoadArchiveFile(@"D:\Toney\Personal\Git\toneyisnow\HeroesIII\External\HeroesIII_Data\H3ab_bmp.lod");
+            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3ab_bmp.lod");
             byte[] h3cFile = engine.RetrieveFileData("ab.h3c");
             StreamHelper.WriteBytesToFile(@"D:\Temp\ab.h3c", h3cFile);
 
@@ -57,5 +57,39 @@ namespace H3Console
                 }
             }
         }
+
+        static void TestRetrieveCampaign()
+        {
+            Engine engine = Engine.GetInstance();
+            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3ab_bmp.lod");
+
+            engine.RetrieveCampaign("ab.h3c");
+
+
+        }
+
+        static void TestUnZip()
+        {
+            Engine engine = Engine.GetInstance();
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-0", @"D:\PlayGround\H3ab_bmp\ab");
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-1", @"D:\PlayGround\H3ab_bmp\ab");
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-2", @"D:\PlayGround\H3ab_bmp\ab");
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-3", @"D:\PlayGround\H3ab_bmp\ab");
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-4", @"D:\PlayGround\H3ab_bmp\ab");
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-5", @"D:\PlayGround\H3ab_bmp\ab");
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-6", @"D:\PlayGround\H3ab_bmp\ab");
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-7", @"D:\PlayGround\H3ab_bmp\ab");
+            engine.UnZipFile(@"D:\PlayGround\H3ab_bmp\ab\out-8", @"D:\PlayGround\H3ab_bmp\ab");
+
+            // engine.UnZipFile(@"D:\PlayGround\AVLXsu07.zip", @"D:\PlayGround");
+
+        }
+
+        static void TestSplitH3C()
+        {
+            Engine engine = Engine.GetInstance();
+            engine.HandleH3CFile(@"D:\PlayGround\H3ab_bmp\ab.h3c", @"D:\PlayGround\H3ab_bmp\ab");
+        }
+
     }
 }

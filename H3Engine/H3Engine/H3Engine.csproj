@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,9 +37,17 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SevenZip, Version=19.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SevenZip.19.0.0\lib\net20\SevenZip.dll</HintPath>
+    </Reference>
+    <Reference Include="SevenZipSharp, Version=0.64.3890.29348, Culture=neutral, PublicKeyToken=20de82c62b055c88, processorArchitecture=MSIL">
+      <HintPath>..\packages\SevenZipSharp.0.64\lib\SevenZipSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,7 +60,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Campaign\CampaignHeader.cs" />
+    <Compile Include="Campaign\CampaignScenario.cs" />
     <Compile Include="Campaign\H3Campaign.cs" />
+    <Compile Include="Campaign\H3CampaignLoader.cs" />
     <Compile Include="Common\GameConstants.cs" />
     <Compile Include="Components\ArtifactSet.cs" />
     <Compile Include="Components\CreatureSet.cs" />
@@ -62,6 +75,7 @@
     <Compile Include="Core\H3Spell.cs" />
     <Compile Include="Core\MapPosition.cs" />
     <Compile Include="Core\PlayerInfo.cs" />
+    <Compile Include="FileSystem\GZipStreamHelper.cs" />
     <Compile Include="GameResourceStorage.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="FileSystem\BinaryReaderExtension.cs" />
@@ -101,4 +115,11 @@
   <PropertyGroup>
     <PostBuildEvent>copy $(TargetDir)*.dll $(SolutionDir)..\UnityClient\Assets\Plugins /Y</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\SevenZipSharp.Interop.19.0.0\build\SevenZipSharp.Interop.targets" Condition="Exists('..\packages\SevenZipSharp.Interop.19.0.0\build\SevenZipSharp.Interop.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\SevenZipSharp.Interop.19.0.0\build\SevenZipSharp.Interop.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SevenZipSharp.Interop.19.0.0\build\SevenZipSharp.Interop.targets'))" />
+  </Target>
 </Project>

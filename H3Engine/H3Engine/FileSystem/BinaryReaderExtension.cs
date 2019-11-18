@@ -105,7 +105,7 @@ namespace H3Engine.FileSystem
 
             return Encoding.ASCII.GetString(result);
         }
-
+        
 
     }
 }

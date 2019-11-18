@@ -274,7 +274,7 @@ namespace H3Engine.FileSystem
 
 
 
-        private void DecompressStream(Stream inputStream, Stream ouputStream, bool isGZip = false)
+        public static void DecompressStream(Stream inputStream, Stream ouputStream, bool isGZip = false)
         {
             if (inputStream == null || !inputStream.CanRead)
             {
