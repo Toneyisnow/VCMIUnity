@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using H3Engine.FileSystem;
+using H3Engine.Mapping;
 using H3Engine.Utils;
 
 namespace H3Engine.Campaign
@@ -34,9 +35,10 @@ namespace H3Engine.Campaign
 
             ExtractRawBytesData();
             
-            using (MemoryStream headerBytes = new MemoryStream(campaignHeaderBytes))
+            // Load the Campaign Data
+            using (MemoryStream headerStream = new MemoryStream(campaignHeaderBytes))
             {
-                using (BinaryReader reader = new BinaryReader(headerBytes))
+                using (BinaryReader reader = new BinaryReader(headerStream))
                 {
                     campaignObject.Header = ReadHeader(reader);
                     campaignObject.Header.FileName = campaignFileName;
@@ -45,11 +47,15 @@ namespace H3Engine.Campaign
 
                     for(int g = 0; g < campaignMapBytes.Count; g++)
                     {
+                        // Load the Scenario Configs
                         CampaignScenario scenario = ReadScenario(reader, campaignObject.Header.Version, campaignObject.Header.MapVersion);
+
+                        // Load the H3M Map Data
+                        H3MapLoader mapLoader = new H3MapLoader(campaignMapBytes[g]);
+                        scenario.MapData = mapLoader.LoadMap();
+
                         campaignObject.PushScenario(scenario);
                     }
-
-                    int scenarioId = 0;
                 }
             }
 
@@ -139,6 +145,7 @@ namespace H3Engine.Campaign
             header.Version = (ECampaignVersion)reader.ReadUInt32();
             header.MapVersion = reader.ReadByte() - 1;  //change range of it from [1, 20] to [0, 19]
             header.Name = reader.ReadStringWithLength();
+            header.Description = reader.ReadStringWithLength();
 
             if (header.Version > ECampaignVersion.RoE)
             {

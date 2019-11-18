@@ -61,7 +61,7 @@ namespace H3Console
         static void TestRetrieveCampaign()
         {
             Engine engine = Engine.GetInstance();
-            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3ab_bmp.lod");
+            engine.LoadArchiveFile(@"D:\Toney\Personal\Git\toneyisnow\HeroesIII\External\HeroesIII_Data\H3ab_bmp.lod");
 
             engine.RetrieveCampaign("ab.h3c");
 

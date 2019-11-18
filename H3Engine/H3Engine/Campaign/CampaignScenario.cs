@@ -1,4 +1,5 @@
-﻿using System;
+﻿using H3Engine.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -163,6 +164,11 @@ namespace H3Engine.Campaign
         }
 
         public ScenarioTravelOption TravelOptions
+        {
+            get; set;
+        }
+
+        public H3Map MapData
         {
             get; set;
         }

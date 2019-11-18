@@ -17,21 +17,29 @@ namespace H3Engine.Mapping
     public class H3MapLoader
     {
         private H3Map mapObject = null;
+        
+        private byte[] mapData = null;
 
-        private string h3mFileFullPath = null;
-
-        public H3MapLoader(string fileFullPath)
+        public H3MapLoader(string h3mFileFullPath)
         {
-            this.h3mFileFullPath = fileFullPath;
+            using (FileStream file = new FileStream(h3mFileFullPath, FileMode.Open, FileAccess.Read))
+            {
+                mapData = StreamHelper.ReadToEnd(file);
+            }
+        }
+
+        public H3MapLoader(byte[] rawData)
+        {
+            mapData = rawData;
         }
 
         public H3Map LoadMap()
         {
             mapObject = new H3Map();
 
-            using (FileStream file = new FileStream(h3mFileFullPath, FileMode.Open, FileAccess.Read))
+            using (MemoryStream streamData = new MemoryStream(mapData))
             {
-                using (BinaryReader reader = new BinaryReader(file))
+                using (BinaryReader reader = new BinaryReader(streamData))
                 {
 
                     ReadHeader(reader);
@@ -449,6 +457,11 @@ namespace H3Engine.Mapping
                 HashSet<int> allowedList = new HashSet<int>();
                 reader.ReadBitMask(allowedList, bytes, GameConstants.ARTIFACTS_QUANTITY);
             }
+
+            if (mapObject.Header.Version == EMapFormat.ROE || mapObject.Header.Version == EMapFormat.AB)
+            {
+
+            }
         }
 
         private void ReadAllowedSpellsAbilities(BinaryReader reader)
@@ -590,28 +603,33 @@ namespace H3Engine.Mapping
             int mapLevel = mapObject.Header.IsTwoLevel ? 2 : 1;
             uint mapHeight = mapObject.Header.Height;
             uint mapWidth = mapObject.Header.Width;
-            
+
+            mapObject.TerrianTiles = new TerrianTile[mapLevel, mapWidth, mapHeight];
             for (int a = 0; a < mapLevel; a++)
             {
                 for (int yy = 0; yy < mapHeight; yy++)
                 {
-                    StringBuilder builder = new StringBuilder();
                     for (int xx = 0; xx < mapWidth; xx++)
                     {
-                        int terrainType = reader.ReadByte();
-                        int terrainView = reader.ReadByte();
+                        int terrianType = reader.ReadByte();
+                        int terrianView = reader.ReadByte();
                         int riverType = reader.ReadByte();
                         int riverDir = reader.ReadByte();
                         int roadType = reader.ReadByte();
                         int roadDir = reader.ReadByte();
                         int extTileFlags = reader.ReadByte();
 
-                        builder.AppendFormat("[{0},{1}]", terrainType, terrainView);
-                        ////Console.WriteLine("Terrain at [{0}, {1}]: type={2} view={3} riverType={4} riverDir={5} roadType={6} roadDir={7}",
-                        ////    xx, yy, terrainType, terrainView, riverType, riverDir, roadType, roadDir);
-                    }
+                        TerrianTile tile = new TerrianTile();
+                        tile.TerrianType = terrianType;
+                        tile.TerrianView = terrianView;
+                        tile.RiverType = riverType;
+                        tile.RiverDir = riverDir;
+                        tile.RoadType = roadType;
+                        tile.RoadDir = roadDir;
+                        tile.ExtTileFlags = extTileFlags;
 
-                    Console.WriteLine(builder.ToString());
+                        mapObject.TerrianTiles[a, yy, xx] = tile;
+                    }
                 }
             }
         }
