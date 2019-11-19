@@ -194,7 +194,7 @@ namespace H3Engine
         /// </summary>
         /// <param name="animationName">The name of the .def file, not including the ext name</param>
         /// <returns></returns>
-        public AnimationDefinition RetrieveAnimation(string animationName)
+        public BundleImageDefinition RetrieveBundleImage(string animationName)
         {
             byte[] animationRawData = gameResourceStorage.ExtractFileData(animationName);
             if (animationRawData == null)
@@ -208,7 +208,7 @@ namespace H3Engine
 
                 defHandler.LoadAllFrames();
 
-                return defHandler.GetAnimation();
+                return defHandler.GetBundleImage();
             }
             
         }

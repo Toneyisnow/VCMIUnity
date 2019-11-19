@@ -25,11 +25,11 @@ namespace H3Engine.GUI
     /// <summary>
     /// This is the data structure from .DEF file
     /// </summary>
-    public class AnimationDefinition
+    public class BundleImageDefinition
     {
-        public AnimationDefinition()
+        public BundleImageDefinition()
         {
-            this.Groups = new List<AnimationGroup>();
+            this.Groups = new List<BundleImageGroup>();
         }
 
         public string Name
@@ -39,7 +39,7 @@ namespace H3Engine.GUI
 
 
         /// <summary>
-        /// The type of the animation
+        /// The type of the bundleImage
         /// </summary>
         public EAnimationDefType Type
         {
@@ -61,7 +61,7 @@ namespace H3Engine.GUI
             get; set;
         }
 
-        public List<AnimationGroup> Groups
+        public List<BundleImageGroup> Groups
         {
             get; set;
         }
@@ -74,7 +74,7 @@ namespace H3Engine.GUI
                 return null;
             }
 
-            AnimationFrame frame = this.Groups[groupIndex].Frames[frameIndex];
+            BundleImageFrame frame = this.Groups[groupIndex].Frames[frameIndex];
             ImageData image = new ImageData(Width, Height);
 
             byte[] imageData = this.Groups[groupIndex].Frames[frameIndex].Data;

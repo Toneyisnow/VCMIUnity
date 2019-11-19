@@ -46,12 +46,12 @@ namespace H3Console
             Engine engine = Engine.GetInstance();
             engine.LoadArchiveFile(@"D:\Toney\Personal\Git\toneyisnow\HeroesIII\External\HeroesIII_Data\H3ab_spr.lod");
 
-            AnimationDefinition animation = engine.RetrieveAnimation("AVG2ele.def");
-            for (int g = 0; g < animation.Groups.Count; g++)
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("AVG2ele.def");
+            for (int g = 0; g < bundleImage.Groups.Count; g++)
             {
-                for (int i = 0; i < animation.Groups[g].Frames.Count; i++)
+                for (int i = 0; i < bundleImage.Groups[g].Frames.Count; i++)
                 {
-                    ImageData image = animation.ComposeFrameImage(g, i);
+                    ImageData image = bundleImage.ComposeFrameImage(g, i);
                     byte[] imageBytes = image.GetPNGData();
                     StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\AVG2ele-{0}-{1}.png", g, i), imageBytes);
                 }

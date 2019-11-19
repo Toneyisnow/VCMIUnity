@@ -78,9 +78,9 @@
     <Compile Include="FileSystem\H3DefFileHandler.cs" />
     <Compile Include="FileSystem\ImageData.cs" />
     <Compile Include="FileSystem\ImageFileHandler.cs" />
-    <Compile Include="GUI\AnimationDefinition.cs" />
-    <Compile Include="GUI\AnimationFrame.cs" />
-    <Compile Include="GUI\AnimationGroup.cs" />
+    <Compile Include="GUI\BundleImageDefinition.cs" />
+    <Compile Include="GUI\BundleImageFrame.cs" />
+    <Compile Include="GUI\BundleImageGroup.cs" />
     <Compile Include="MapObjects\ArmedInstance.cs" />
     <Compile Include="MapObjects\CGCreature.cs" />
     <Compile Include="MapObjects\CGDwelling.cs" />

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace H3Engine.GUI
 {
-    public class AnimationFrame
+    public class BundleImageFrame
     {
-        public AnimationFrame()
+        public BundleImageFrame()
         {
 
         }

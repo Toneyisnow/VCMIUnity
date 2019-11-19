@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace H3Engine.GUI
 {
-    public class AnimationGroup
+    public class BundleImageGroup
     {
-        public AnimationGroup()
+        public BundleImageGroup()
         {
-            this.Frames = new List<AnimationFrame>();
+            this.Frames = new List<BundleImageFrame>();
 
         }
 
@@ -24,7 +24,7 @@ namespace H3Engine.GUI
             get; set;
         }
 
-        public List<AnimationFrame> Frames
+        public List<BundleImageFrame> Frames
         {
             get;set;
         }

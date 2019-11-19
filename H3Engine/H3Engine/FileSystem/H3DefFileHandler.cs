@@ -55,14 +55,14 @@ namespace H3Engine.FileSystem
         /// </summary>
         private Color[] h3Palette = null;
 
-        private AnimationDefinition animation = null;
+        private BundleImageDefinition bundleImage = null;
 
         public H3DefFileHandler(Stream fileStream)
         {
             this.inputStream = fileStream;
             this.offsets = new List<List<UInt32>>();
 
-            this.animation = new AnimationDefinition();
+            this.bundleImage = new BundleImageDefinition();
 
             InitializePalete();
 
@@ -70,9 +70,9 @@ namespace H3Engine.FileSystem
             LoadHeader();
         }
         
-        public AnimationDefinition GetAnimation()
+        public BundleImageDefinition GetBundleImage()
         {
-            return animation;
+            return bundleImage;
         }
 
         private void InitializePalete()
@@ -94,9 +94,9 @@ namespace H3Engine.FileSystem
         {
             BinaryReader reader = new BinaryReader(inputStream);
 
-            animation.Type = (EAnimationDefType)reader.ReadUInt32();
-            animation.Width = (int)reader.ReadUInt32();
-            animation.Height = (int)reader.ReadUInt32();
+            bundleImage.Type = (EAnimationDefType)reader.ReadUInt32();
+            bundleImage.Width = (int)reader.ReadUInt32();
+            bundleImage.Height = (int)reader.ReadUInt32();
 
             var groupCount = (int)reader.ReadUInt32();
 
@@ -110,7 +110,7 @@ namespace H3Engine.FileSystem
                 palette[i] = Color.FromArgb(red, green, blue);
             }
 
-            switch(animation.Type)
+            switch(bundleImage.Type)
             {
                 case EAnimationDefType.SPELL:
                     palette[0] = h3Palette[0];
@@ -158,8 +158,8 @@ namespace H3Engine.FileSystem
                     break;
             }
 
-            animation.Palette = palette;
-            Console.WriteLine(string.Format("Type: {0} Width: {1} Height: {2} GroupCount: {3}", animation.Type, animation.Width, animation.Height, groupCount));
+            bundleImage.Palette = palette;
+            Console.WriteLine(string.Format("Type: {0} Width: {1} Height: {2} GroupCount: {3}", bundleImage.Type, bundleImage.Width, bundleImage.Height, groupCount));
 
             for(int i = 0; i < groupCount; i++)
             {
@@ -186,30 +186,30 @@ namespace H3Engine.FileSystem
 
         public void LoadAllFrames()
         {
-            if (animation == null)
+            if (bundleImage == null)
             {
                 return;
             }
 
-            animation.Groups = new List<AnimationGroup>(this.offsets.Count);
+            bundleImage.Groups = new List<BundleImageGroup>(this.offsets.Count);
 
             for(int groupIndex = 0; groupIndex < this.offsets.Count; groupIndex++)
             {
-                AnimationGroup group = new AnimationGroup();
+                BundleImageGroup group = new BundleImageGroup();
                 for (int fIndex = 0; fIndex < this.offsets[groupIndex].Count; fIndex++)
                 {
-                    AnimationFrame frame = LoadFrame(groupIndex, fIndex);
+                    BundleImageFrame frame = LoadFrame(groupIndex, fIndex);
                     if (frame != null)
                     {
                         group.Frames.Add(frame);
                     }
                 }
 
-                animation.Groups.Add(group);
+                bundleImage.Groups.Add(group);
             }
         }
 
-        private AnimationFrame LoadFrame(int groupIndex, int frameIndex)
+        private BundleImageFrame LoadFrame(int groupIndex, int frameIndex)
         {
             if (groupIndex >= offsets.Count)
             {
@@ -227,7 +227,7 @@ namespace H3Engine.FileSystem
             inputStream.Seek(offset, SeekOrigin.Begin);
             BinaryReader reader = new BinaryReader(inputStream);
 
-            AnimationFrame frame = new AnimationFrame();
+            BundleImageFrame frame = new BundleImageFrame();
             UInt32 size = reader.ReadUInt32();
             int format = (int)reader.ReadUInt32();
             frame.FullWidth = (int)reader.ReadUInt32();
