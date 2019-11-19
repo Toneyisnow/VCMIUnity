@@ -50,9 +50,16 @@ namespace H3Engine.Campaign
                         // Load the Scenario Configs
                         CampaignScenario scenario = ReadScenario(reader, campaignObject.Header.Version, campaignObject.Header.MapVersion);
 
-                        // Load the H3M Map Data
-                        H3MapLoader mapLoader = new H3MapLoader(campaignMapBytes[g]);
-                        scenario.MapData = mapLoader.LoadMap();
+                        try
+                        {
+                            // Load the H3M Map Data
+                            H3MapLoader mapLoader = new H3MapLoader(campaignMapBytes[g]);
+                            scenario.MapData = mapLoader.LoadMap();
+                        }
+                        catch(Exception ex)
+                        {
+                            int here = 0;
+                        }
 
                         campaignObject.PushScenario(scenario);
                     }

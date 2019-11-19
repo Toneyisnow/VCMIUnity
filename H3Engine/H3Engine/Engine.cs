@@ -35,17 +35,6 @@ namespace H3Engine
             gameResourceStorage = new GameResourceStorage();
         }
 
-        private void UnZipFile_7z(string fileFullPath, string targetDirectoryPath)
-        {
-            var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Environment.Is64BitProcess ? "x64" : "x86", "7z.dll");
-            SevenZip.SevenZipBase.SetLibraryPath(path);
-            SevenZip.SevenZipExtractor.SetLibraryPath(path);
-            using (var extractor = new SevenZip.SevenZipExtractor(fileFullPath))
-            {
-                extractor.ExtractArchive(targetDirectoryPath);
-            }
-        }
-
         private void UnZipFile_CompressedStream(string fileFullPath, string targetDirectoryPath)
         {
             using (FileStream file = new FileStream(fileFullPath, FileMode.Open, FileAccess.Read))
