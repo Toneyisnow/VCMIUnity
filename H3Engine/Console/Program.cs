@@ -17,7 +17,7 @@ namespace H3Console
     {
         static void Main(string[] args)
         {
-            TestRetrieveTerrainImage();
+            TestRetrieveCampaign();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -73,7 +73,16 @@ namespace H3Console
 
             H3Map map1 = campaign.Scenarios[0].MapData;
 
-            TerrainTile tile = map1.TerrainTiles[0, 0, 0];
+            for (int xx = 0; xx < map1.Header.Width; xx++)
+            {
+                for (int yy = 0; yy < map1.Header.Height; yy++)
+                {
+                    TerrainTile tile = map1.TerrainTiles[0, xx, yy];
+                    ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
+
+                    StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\tiles\tile-{0}-{1}.png", xx, yy), tileImage.GetPNGData());
+                }
+            }
 
         }
 

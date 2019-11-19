@@ -76,7 +76,7 @@ namespace H3Engine.FileSystem
                 uint csize = reader.ReadUInt32();
                 
                 ArchivedFileInfo info = new ArchivedFileInfo();
-                info.FileName = filename;
+                info.FileName = filename.ToLower();
                 info.Offset = offset;
                 info.Size = size;
                 info.CSize = csize;
@@ -193,7 +193,7 @@ namespace H3Engine.FileSystem
 
             if (fileInfo == null)
             {
-                throw new FileNotFoundException();
+                return null;
             }
 
             return ExtractFileData(fileInfo);
