@@ -54,6 +54,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\ResourceHandler.cs" />
+    <Compile Include="API\ResourceUsage.cs" />
     <Compile Include="Campaign\CampaignHeader.cs" />
     <Compile Include="Campaign\CampaignScenario.cs" />
     <Compile Include="Campaign\H3Campaign.cs" />
@@ -70,7 +72,7 @@
     <Compile Include="Core\MapPosition.cs" />
     <Compile Include="Core\PlayerInfo.cs" />
     <Compile Include="FileSystem\GZipStreamHelper.cs" />
-    <Compile Include="GameResourceStorage.cs" />
+    <Compile Include="API\ResourceStorage.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="FileSystem\BinaryReaderExtension.cs" />
     <Compile Include="FileSystem\CompressedStreamReader.cs" />

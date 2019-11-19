@@ -27,6 +27,7 @@ namespace H3Engine.GUI
     /// </summary>
     public class BundleImageDefinition
     {
+
         public BundleImageDefinition()
         {
             this.Groups = new List<BundleImageGroup>();
@@ -66,8 +67,7 @@ namespace H3Engine.GUI
             get; set;
         }
 
-
-        public ImageData ComposeFrameImage(int groupIndex, int frameIndex)
+        public ImageData GetImageData(int groupIndex, int frameIndex)
         {
             if (groupIndex >= this.Groups.Count || frameIndex >= this.Groups[groupIndex].Frames.Count)
             {
@@ -75,33 +75,38 @@ namespace H3Engine.GUI
             }
 
             BundleImageFrame frame = this.Groups[groupIndex].Frames[frameIndex];
-            ImageData image = new ImageData(Width, Height);
-
-            byte[] imageData = this.Groups[groupIndex].Frames[frameIndex].Data;
-            for (int j = 0; j < this.Height; j++)
+            if (frame.ImageData == null)
             {
-                for (int i = 0; i < this.Width; i++)
+                ImageData image = new ImageData(Width, Height);
+
+                byte[] imageData = this.Groups[groupIndex].Frames[frameIndex].RawData;
+                for (int j = 0; j < this.Height; j++)
                 {
-                    if (i < frame.LeftMargin || j < frame.TopMargin || i >= frame.LeftMargin + frame.Width || j >= frame.TopMargin + frame.Height)
+                    for (int i = 0; i < this.Width; i++)
                     {
-                        image.WriteColor(Palette[0]);
-                    }
-                    else
-                    {
-                        byte index = imageData[(j - frame.TopMargin) * frame.Width + i - frame.LeftMargin];
-                        image.WriteColor(Palette[index]);
+                        if (i < frame.LeftMargin || j < frame.TopMargin || i >= frame.LeftMargin + frame.Width || j >= frame.TopMargin + frame.Height)
+                        {
+                            image.WriteColor(Palette[0]);
+                        }
+                        else
+                        {
+                            byte index = imageData[(j - frame.TopMargin) * frame.Width + i - frame.LeftMargin];
+                            image.WriteColor(Palette[index]);
+                        }
                     }
                 }
+
+                frame.ImageData = image;
             }
 
-            return image;
+            return frame.ImageData;
         }
 
         public ImageData ComposeFrameImage2(int groupIndex, int frameIndex)
         {
             ImageData image = new ImageData(Width, Height);
 
-            byte[] data = this.Groups[groupIndex].Frames[frameIndex].Data;
+            byte[] data = this.Groups[groupIndex].Frames[frameIndex].RawData;
 
             for (int i = 0; i < data.Length; i++)
             {

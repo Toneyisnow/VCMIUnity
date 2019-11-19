@@ -604,7 +604,7 @@ namespace H3Engine.Mapping
             uint mapHeight = mapObject.Header.Height;
             uint mapWidth = mapObject.Header.Width;
 
-            mapObject.TerrianTiles = new TerrianTile[mapLevel, mapWidth, mapHeight];
+            mapObject.TerrainTiles = new TerrainTile[mapLevel, mapWidth, mapHeight];
             for (int a = 0; a < mapLevel; a++)
             {
                 for (int yy = 0; yy < mapHeight; yy++)
@@ -619,16 +619,16 @@ namespace H3Engine.Mapping
                         int roadDir = reader.ReadByte();
                         int extTileFlags = reader.ReadByte();
 
-                        TerrianTile tile = new TerrianTile();
-                        tile.TerrianType = terrianType;
-                        tile.TerrianView = terrianView;
+                        TerrainTile tile = new TerrainTile();
+                        tile.TerrainType = terrianType;
+                        tile.TerrainView = terrianView;
                         tile.RiverType = riverType;
                         tile.RiverDir = riverDir;
                         tile.RoadType = roadType;
                         tile.RoadDir = roadDir;
                         tile.ExtTileFlags = extTileFlags;
 
-                        mapObject.TerrianTiles[a, yy, xx] = tile;
+                        mapObject.TerrainTiles[a, yy, xx] = tile;
                     }
                 }
             }

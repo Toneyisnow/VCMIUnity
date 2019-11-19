@@ -345,7 +345,7 @@ namespace H3Engine.FileSystem
                     break;
             }
 
-            frame.Data = dataStream.ToArray();
+            frame.RawData = dataStream.ToArray();
             //Console.WriteLine("Total Data Length: " + frame.Data.Length);
 
             return frame;

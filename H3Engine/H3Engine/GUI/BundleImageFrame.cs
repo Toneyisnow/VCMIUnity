@@ -11,7 +11,7 @@ namespace H3Engine.GUI
     {
         public BundleImageFrame()
         {
-
+            this.ImageData = null;
         }
 
         public int Width
@@ -44,10 +44,14 @@ namespace H3Engine.GUI
             get; set;
         }
 
-        public byte[] Data
+        public byte[] RawData
         {
             get; set;
         }
 
+        public ImageData ImageData
+        {
+            get; set;
+        }
     }
 }

@@ -55,6 +55,10 @@ namespace H3Engine.FileSystem
             this.rawData[this.dataIndex++] = color.A;
         }
 
+        /// <summary>
+        /// This should not be used any more, it's replaced by GetPNGData()
+        /// </summary>
+        /// <param name="outputStream"></param>
         public void SaveAsPNGStream(Stream outputStream)
         {
             if (outputStream == null)
@@ -73,16 +77,7 @@ namespace H3Engine.FileSystem
                 }
             }
         }
-
-        public byte[] ExportAsPNG()
-        {
-            using (Stream outputStream = new MemoryStream())
-            {
-                this.SaveAsPNGStream(outputStream);
-                return StreamHelper.ReadToEnd(outputStream);
-            }
-        }
-
+        
         public byte[] GetPNGData()
         {
             if (pngData == null)
@@ -96,8 +91,5 @@ namespace H3Engine.FileSystem
 
             return pngData;
         }
-
-
-
     }
 }

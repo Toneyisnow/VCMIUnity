@@ -1,4 +1,6 @@
-﻿using H3Engine.Campaign;
+﻿using H3Engine.API;
+using H3Engine.Campaign;
+using H3Engine.Common;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
 using H3Engine.Mapping;
@@ -18,7 +20,12 @@ namespace H3Engine
     {
         private static Engine engineInstance = null;
 
-        private GameResourceStorage gameResourceStorage = null;
+        private ResourceStorage resourceStorage = null;
+
+        private ResourceHandler resourceHandler = null;
+
+        private ResourceUsage resourceUsage = null;
+
 
         public static Engine GetInstance()
         {
@@ -32,8 +39,37 @@ namespace H3Engine
 
         private Engine()
         {
-            gameResourceStorage = new GameResourceStorage();
+            resourceStorage = new ResourceStorage();
+
+            resourceHandler = new ResourceHandler(resourceStorage);
+
+            resourceUsage = new ResourceUsage(resourceHandler);
         }
+
+        public ResourceStorage ResourceStorage
+        {
+            get
+            {
+                return this.resourceStorage;
+            }
+        }
+
+        public ResourceHandler ResourceHandler
+        {
+            get
+            {
+                return this.resourceHandler;
+            }
+        }
+
+        public ResourceUsage ResourceUsage
+        {
+            get
+            {
+                return this.resourceUsage;
+            }
+        }
+
 
         private void UnZipFile_CompressedStream(string fileFullPath, string targetDirectoryPath)
         {
@@ -71,82 +107,14 @@ namespace H3Engine
                 }
             }
         }
-
-        public void HandleH3CFile(string fileFullPath, string targetDirectoryPath)
-        {
-            using (FileStream file = new FileStream(fileFullPath, FileMode.Open, FileAccess.Read))
-            {
-                byte[] rawBytes = StreamHelper.ReadToEnd(file);
-
-                List<byte> fileBytes = new List<byte>();
-                int outFileIndex = 0;
-
-                long index = 0;
-                while (index < rawBytes.Length)
-                {
-                    if (rawBytes[index] == 0x1F)
-                    {
-                        if (rawBytes[index + 1] == 0x8B)
-                        {
-                            if (rawBytes[index + 2] == 0x08)
-                            {
-                                if (rawBytes[index + 3] == 0x00)
-                                {
-                                    if (fileBytes.Count > 0)
-                                    {
-                                        // Save the current bytes into file
-                                        string outFileName = Path.Combine(targetDirectoryPath, string.Format(@"out-{0}", outFileIndex ++));
-                                        StreamHelper.WriteBytesToFile(outFileName, fileBytes.ToArray());
-                                    }
-
-                                    fileBytes = new List<byte>() { 0x1F, 0x8B, 0x08, 0x00 };
-                                    index += 4;
-                                }
-                                else
-                                {
-                                    fileBytes.Add(rawBytes[index]);
-                                    fileBytes.Add(rawBytes[index + 1]);
-                                    fileBytes.Add(rawBytes[index + 2]);
-                                    index += 3;
-                                }
-                            }
-                            else
-                            {
-                                fileBytes.Add(rawBytes[index]);
-                                fileBytes.Add(rawBytes[index + 1]);
-                                index += 2;
-                            }
-                        }
-                        else
-                        {
-                            fileBytes.Add(rawBytes[index]);
-                            index ++;
-                        }
-                    }
-                    else
-                    {
-                        fileBytes.Add(rawBytes[index]);
-                        index++;
-                    }
-                }
-
-                if (fileBytes.Count > 0)
-                {
-                    // Save the current bytes into file
-                    string outFileName = Path.Combine(targetDirectoryPath, string.Format(@"out-{0}", outFileIndex));
-                    StreamHelper.WriteBytesToFile(outFileName, fileBytes.ToArray());
-                }
-            }
-        }
-
-        public void UnZipFile(string fileFullPath, string targetDirectoryPath)
+        
+        private void UnZipFile(string fileFullPath, string targetDirectoryPath)
         {
             UnZipFile_GZip(fileFullPath, targetDirectoryPath);
-
-
-
-            //// ZipFile.ExtractToDirectory(fileFullPath, targetDirectoryPath);
         }
+
+
+        ///////// API from Storage Layer //////////
 
         /// <summary>
         /// Loading the archive files (LOD, etc.) to the memory
@@ -154,15 +122,37 @@ namespace H3Engine
         /// <param name="fileFullPath"></param>
         public void LoadArchiveFile(string fileFullPath)
         {
-            gameResourceStorage.LoadArchive(fileFullPath);
-
+            resourceStorage.LoadArchive(fileFullPath);
         }
 
+        /// <summary>
+        /// This is a most common low level method, that could return the byte array of a given file.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public byte[] RetrieveFileData(string fileName)
         {
-            return gameResourceStorage.ExtractFileData(fileName);
+            return resourceStorage.ExtractFileData(fileName);
+        }
+        
+        public ImageData RetrieveImage(string imageName)
+        {
+            return resourceStorage.ExtractImage(imageName);
         }
 
+
+        ///////// API from Handler Layer //////////
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mapFileFullPath"></param>
+        /// <returns></returns>
+        public H3Map LoadH3MapFile(string mapFileFullPath)
+        {
+            return null;
+        }
+        
         /// <summary>
         /// Retrive the H3Map data from data
         /// </summary>
@@ -180,44 +170,28 @@ namespace H3Engine
         /// <returns></returns>
         public H3Campaign RetrieveCampaign(string fileName)
         {
-            byte[] data = gameResourceStorage.ExtractFileData(fileName);
-
-            H3CampaignLoader loader = new H3CampaignLoader(fileName, data);
-
-            H3Campaign campaign = loader.LoadCampaign();
-
-            return campaign;
+            return resourceHandler.RetrieveCampaign(fileName);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="animationName">The name of the .def file, not including the ext name</param>
+        /// <param name="defFileName">The name of the .def file, not including the ext name</param>
         /// <returns></returns>
-        public BundleImageDefinition RetrieveBundleImage(string animationName)
+        public BundleImageDefinition RetrieveBundleImage(string defFileName)
         {
-            byte[] animationRawData = gameResourceStorage.ExtractFileData(animationName);
-            if (animationRawData == null)
-            {
-                return null;
-            }
-
-            using (MemoryStream animationStream = new MemoryStream(animationRawData))
-            {
-                H3DefFileHandler defHandler = new H3DefFileHandler(animationStream);
-
-                defHandler.LoadAllFrames();
-
-                return defHandler.GetBundleImage();
-            }
-            
+            return resourceHandler.RetrieveBundleImage(defFileName);
         }
+
+
+        ////// Resource Usage Layer ///////
         
-
-        public ImageData RetrieveImage(string imageName)
+        /// <summary>
+        /// 
+        /// </summary>
+        public ImageData RetrieveTerrainImage(ETerrainType terrainType, int terrainIndex)
         {
-            return gameResourceStorage.ExtractImage(imageName);
+            return resourceUsage.RetrieveTerrainImage(terrainType, terrainIndex);
         }
-
     }
 }

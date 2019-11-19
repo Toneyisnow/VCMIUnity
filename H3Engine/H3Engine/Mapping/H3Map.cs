@@ -74,7 +74,7 @@ namespace H3Engine.Mapping
             get; set;
         }
 
-        public TerrianTile[,,] TerrianTiles
+        public TerrainTile[,,] TerrainTiles
         {
             get; set;
         }
@@ -110,41 +110,4 @@ namespace H3Engine.Mapping
         }
     }
 
-    public class TerrianTile
-    {
-        public int TerrianType
-        {
-            get; set;
-        }
-
-        public int TerrianView
-        {
-            get; set;
-        }
-
-        public int RiverType
-        {
-            get; set;
-        }
-
-        public int RiverDir
-        {
-            get; set;
-        }
-
-        public int RoadType
-        {
-            get; set;
-        }
-
-        public int RoadDir
-        {
-            get; set;
-        }
-
-        public int ExtTileFlags
-        {
-            get; set;
-        }
-    }
 }
