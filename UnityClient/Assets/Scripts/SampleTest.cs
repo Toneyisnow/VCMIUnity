@@ -82,19 +82,11 @@ public class SampleTest : MonoBehaviour
         H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
 
         H3Map map1 = campaign.Scenarios[0].MapData;
-        TerrainTile tile = map1.TerrainTiles[0, 3, 4];
+        //TerrainTile tile = map1.TerrainTiles[0, 3, 4];
         //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
-        ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
-        Sprite sprite = CreateSpriteFromBytes(tileImage.GetPNGData());
-
-        GameObject g = new GameObject(string.Format(@"TerrainObject-{0}-{1}", 3, 4));
-        g.transform.position = new Vector3(3 * 32, 4 * 32, 0);
-
-        SpriteRenderer renderer = gObject.AddComponent<SpriteRenderer>();
-        renderer.sprite = sprite;
-
-        /*
+        
+        
         for (int xx = 0; xx < map1.Header.Width; xx++)
         {
             for (int yy = 0; yy < map1.Header.Height; yy++)
@@ -105,10 +97,10 @@ public class SampleTest : MonoBehaviour
                 ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
                 Sprite sprite = CreateSpriteFromBytes(tileImage.GetPNGData());
 
-                gObject = new GameObject(string.Format(@"TerrainObject-{0}-{1}", xx, yy));
-                gObject.transform.position = new Vector3(xx * 32, yy * 32, 0);
+                GameObject g = new GameObject(string.Format(@"TerrainObject-{0}-{1}", xx, yy));
+                g.transform.position = new Vector3(xx * 32, yy * 32, 0);
 
-                SpriteRenderer renderer = gObject.AddComponent<SpriteRenderer>();
+                SpriteRenderer renderer = g.AddComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
 
                 //StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\tiles\tile-{0}-{1}.png", xx, yy), tileImage.GetPNGData());
@@ -131,10 +123,9 @@ public class SampleTest : MonoBehaviour
                         StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\rivers\river-{0}-{1}.png", xx, yy), riverImage.GetPNGData());
                     }
                 }
-                * /
+                */
             }
         }
-        */
     }
 
 

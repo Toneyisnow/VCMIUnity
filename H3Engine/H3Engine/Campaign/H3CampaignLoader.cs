@@ -45,7 +45,8 @@ namespace H3Engine.Campaign
 
                     int scenarioCount = 8;      // Read from CampText.txt, currently hard coded for AB.h3c
 
-                    for(int g = 0; g < campaignMapBytes.Count; g++)
+                    for (int g = 0; g < 1; g++)
+                    //// for (int g = 0; g < campaignMapBytes.Count; g++)
                     {
                         // Load the Scenario Configs
                         CampaignScenario scenario = ReadScenario(reader, campaignObject.Header.Version, campaignObject.Header.MapVersion);

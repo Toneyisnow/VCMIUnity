@@ -17,7 +17,7 @@ namespace H3Console
     {
         static void Main(string[] args)
         {
-            TestRetrieveRiverBundleImage();
+            TestRetrieveCampaign();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
