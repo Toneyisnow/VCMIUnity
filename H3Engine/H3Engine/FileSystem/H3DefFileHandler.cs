@@ -302,6 +302,39 @@ namespace H3Engine.FileSystem
 
                     break;
                 case 2:
+
+                    currentOffset = reader.ReadUInt16();
+                    inputStream.Seek(basePosition + currentOffset, SeekOrigin.Begin);
+
+                    for (int i = 0; i < frame.Height; i++)
+                    {
+                        totalRowLength = 0;
+                        while (totalRowLength < frame.Width)
+                        {
+                            
+                            byte segment = reader.ReadByte();
+                            byte code = (byte)((int)segment >> 5);
+                            byte llength = (byte)((segment & 31) + 1);
+                            currentOffset++;
+                            
+                            if (code == 7)  // Raw Data
+                            {
+                                data = new byte[llength];
+                                data = reader.ReadBytes(llength);
+                                dataStream.Write(data, 0, llength);
+                                currentOffset += (uint)llength;
+                            }
+                            else
+                            {
+                                for (int k = 0; k < llength; k++)
+                                {
+                                    dataStream.WriteByte(code);
+                                }
+                                
+                            }
+                            totalRowLength += (uint)llength;
+                        }
+                    }
                     break;
                 case 3:
 

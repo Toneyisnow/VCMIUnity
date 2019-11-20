@@ -17,7 +17,7 @@ namespace H3Console
     {
         static void Main(string[] args)
         {
-            TestRetrieveCampaign();
+            TestRetrieveRiverBundleImage();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -61,6 +61,23 @@ namespace H3Console
             }
         }
 
+        static void TestRetrieveRiverBundleImage()
+        {
+            Engine engine = Engine.GetInstance();
+            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3sprite.lod");
+
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("dirtrd.def");
+            for (int g = 0; g < bundleImage.Groups.Count; g++)
+            {
+                for (int i = 0; i < bundleImage.Groups[g].Frames.Count; i++)
+                {
+                    ImageData image = bundleImage.GetImageData(g, i);
+                    byte[] imageBytes = image.GetPNGData();
+                    StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\dirtrd-{0}-{1}.png", g, i), imageBytes);
+                }
+            }
+        }
+
         static void TestRetrieveCampaign()
         {
             Engine engine = Engine.GetInstance();
@@ -78,9 +95,28 @@ namespace H3Console
                 for (int yy = 0; yy < map1.Header.Height; yy++)
                 {
                     TerrainTile tile = map1.TerrainTiles[0, xx, yy];
-                    ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
+                    //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
-                    StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\tiles\tile-{0}-{1}.png", xx, yy), tileImage.GetPNGData());
+                    //ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
+                    //StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\tiles\tile-{0}-{1}.png", xx, yy), tileImage.GetPNGData());
+
+                    if ((H3Engine.Common.ERoadType)tile.RoadType != H3Engine.Common.ERoadType.NO_ROAD)
+                    {
+                        ImageData roadImage = engine.RetrieveRoadImage((H3Engine.Common.ERoadType)tile.RoadType, tile.RoadDir);
+                        if (roadImage != null)
+                        {
+                            StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\roads\road-{0}-{1}.png", xx, yy), roadImage.GetPNGData());
+                        }
+                    }
+
+                    if ((H3Engine.Common.ERiverType)tile.RiverType != H3Engine.Common.ERiverType.NO_RIVER)
+                    {
+                        ImageData riverImage = engine.RetrieveRiverImage((H3Engine.Common.ERiverType)tile.RiverType, tile.RiverDir);
+                        if (riverImage != null)
+                        {
+                            StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\rivers\river-{0}-{1}.png", xx, yy), riverImage.GetPNGData());
+                        }
+                    }
                 }
             }
 

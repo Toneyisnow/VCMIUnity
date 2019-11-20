@@ -193,5 +193,21 @@ namespace H3Engine
         {
             return resourceUsage.RetrieveTerrainImage(terrainType, terrainIndex);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roadType"></param>
+        /// <param name="roadDir"></param>
+        /// <returns></returns>
+        public ImageData RetrieveRoadImage(ERoadType roadType, int roadDir)
+        {
+            return resourceUsage.RetrieveRoadImage(roadType, roadDir);
+        }
+
+        public ImageData RetrieveRiverImage(ERiverType riverType, int riverDir)
+        {
+            return resourceUsage.RetrieveRiverImage(riverType, riverDir);
+        }
     }
 }

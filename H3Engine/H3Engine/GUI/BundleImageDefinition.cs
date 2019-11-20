@@ -90,8 +90,11 @@ namespace H3Engine.GUI
                         }
                         else
                         {
-                            byte index = imageData[(j - frame.TopMargin) * frame.Width + i - frame.LeftMargin];
-                            image.WriteColor(Palette[index]);
+                            if (imageData.Count() > 0)
+                            {
+                                byte index = imageData[(j - frame.TopMargin) * frame.Width + i - frame.LeftMargin];
+                                image.WriteColor(Palette[index]);
+                            }
                         }
                     }
                 }

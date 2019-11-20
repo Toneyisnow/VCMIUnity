@@ -628,7 +628,7 @@ namespace H3Engine.Mapping
                         tile.RoadDir = roadDir;
                         tile.ExtTileFlags = extTileFlags;
 
-                        mapObject.TerrainTiles[a, yy, xx] = tile;
+                        mapObject.TerrainTiles[a, xx, yy] = tile;
                     }
                 }
             }

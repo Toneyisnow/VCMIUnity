@@ -14,6 +14,8 @@ namespace H3Engine.API
         private ResourceHandler resourceHandler = null;
 
         private Dictionary<ETerrainType, BundleImageDefinition> terrainImageDefinitions = new Dictionary<ETerrainType, BundleImageDefinition>();
+        private Dictionary<ERoadType, BundleImageDefinition> roadImageDefinitions = new Dictionary<ERoadType, BundleImageDefinition>();
+        private Dictionary<ERiverType, BundleImageDefinition> riverImageDefinitions = new Dictionary<ERiverType, BundleImageDefinition>();
 
         public ResourceUsage(ResourceHandler handler)
         {
@@ -78,6 +80,104 @@ namespace H3Engine.API
             }
 
             return definition.GetImageData(0, terrainIndex);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roadType"></param>
+        /// <param name="roadIndex"></param>
+        /// <returns></returns>
+        public ImageData RetrieveRoadImage(ERoadType roadType, int roadIndex)
+        {
+            if (!roadImageDefinitions.ContainsKey(roadType))
+            {
+                string roadDefFileName = string.Empty;
+                switch (roadType)
+                {
+                    case ERoadType.DIRT_ROAD:
+                        roadDefFileName = "dirt";
+                        break;
+                    case ERoadType.GRAVEL_ROAD:
+                        roadDefFileName = "grav";
+                        break;
+                    case ERoadType.COBBLESTONE_ROAD:
+                        roadDefFileName = "cobb";
+                        break;
+                    case ERoadType.NO_ROAD:
+                        return null;
+                    default:
+                        return null;
+                }
+
+                roadDefFileName += "rd.def";
+
+                BundleImageDefinition def = resourceHandler.RetrieveBundleImage(roadDefFileName);
+                if (def != null)
+                {
+                    roadImageDefinitions[roadType] = def;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            BundleImageDefinition definition = roadImageDefinitions[roadType];
+            if (definition == null || definition.Groups.Count < 1 || definition.Groups[0].Frames.Count <= roadIndex)
+            {
+                return null;
+            }
+
+            return definition.GetImageData(0, roadIndex);
+
+        }
+
+        public ImageData RetrieveRiverImage(ERiverType riverType, int riverIndex)
+        {
+            if (!riverImageDefinitions.ContainsKey(riverType))
+            {
+                string riverDefFileName = string.Empty;
+                switch (riverType)
+                {
+                    case ERiverType.CLEAR_RIVER:
+                        riverDefFileName = "clr";
+                        break;
+                    case ERiverType.ICY_RIVER:
+                        riverDefFileName = "icy";
+                        break;
+                    case ERiverType.LAVA_RIVER:
+                        riverDefFileName = "lav";
+                        break;
+                    case ERiverType.MUDDY_RIVER:
+                        riverDefFileName = "mud";
+                        break;
+                    case ERiverType.NO_RIVER:
+                        return null;
+                    default:
+                        return null;
+                }
+
+                riverDefFileName += "rvr.def";
+
+                BundleImageDefinition def = resourceHandler.RetrieveBundleImage(riverDefFileName);
+                if (def != null)
+                {
+                    riverImageDefinitions[riverType] = def;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            BundleImageDefinition definition = riverImageDefinitions[riverType];
+            if (definition == null || definition.Groups.Count < 1 || definition.Groups[0].Frames.Count <= riverIndex)
+            {
+                return null;
+            }
+
+            return definition.GetImageData(0, riverIndex);
         }
     }
 }
