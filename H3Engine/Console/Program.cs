@@ -66,14 +66,14 @@ namespace H3Console
             Engine engine = Engine.GetInstance();
             engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3sprite.lod");
 
-            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("dirtrd.def");
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("clrrvr.def");
             for (int g = 0; g < bundleImage.Groups.Count; g++)
             {
                 for (int i = 0; i < bundleImage.Groups[g].Frames.Count; i++)
                 {
                     ImageData image = bundleImage.GetImageData(g, i);
                     byte[] imageBytes = image.GetPNGData();
-                    StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\dirtrd-{0}-{1}.png", g, i), imageBytes);
+                    StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\clrrvr-{0}-{1}.png", g, i), imageBytes);
                 }
             }
         }
