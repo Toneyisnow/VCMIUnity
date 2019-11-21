@@ -88,39 +88,15 @@ public class SampleTest : MonoBehaviour
         engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
         engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
-        H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
+        H3Campaign campaign = engine.RetrieveCampaign("good1.h3c");
 
         H3Map map = campaign.Scenarios[0].MapData;
-        //TerrainTile tile = map1.TerrainTiles[0, 3, 4];
-        //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
         for (int xx = 0; xx < map.Header.Width; xx++)
         {
             for (int yy = 0; yy < map.Header.Height; yy++)
             {
                 LoadTileAsGameObject(map, xx, yy);
-
-                //StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\tiles\tile-{0}-{1}.png", xx, yy), tileImage.GetPNGData());
-
-                /*
-                if ((H3Engine.Common.ERoadType)tile.RoadType != H3Engine.Common.ERoadType.NO_ROAD)
-                {
-                    ImageData roadImage = engine.RetrieveRoadImage((H3Engine.Common.ERoadType)tile.RoadType, tile.RoadDir);
-                    if (roadImage != null)
-                    {
-                        StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\roads\road-{0}-{1}.png", xx, yy), roadImage.GetPNGData());
-                    }
-                }
-
-                if ((H3Engine.Common.ERiverType)tile.RiverType != H3Engine.Common.ERiverType.NO_RIVER)
-                {
-                    ImageData riverImage = engine.RetrieveRiverImage((H3Engine.Common.ERiverType)tile.RiverType, tile.RiverDir);
-                    if (riverImage != null)
-                    {
-                        StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\rivers\river-{0}-{1}.png", xx, yy), riverImage.GetPNGData());
-                    }
-                }
-                */
             }
         }
     }
@@ -150,20 +126,23 @@ public class SampleTest : MonoBehaviour
 
         TerrainTile tile = map.TerrainTiles[0, x, y];
 
-        ImageData tileImage = engine.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
-
-        Texture2D terrainTexture = TextureStorage.GetInstance().LoadTerrainTexture(tile.TerrainType, tile.TerrainView, tile.TerrainRotation, tileImage.GetPNGData(tile.TerrainRotation));
-
-
+        ImageData terrainImage = engine.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
+        Texture2D terrainTexture = TextureStorage.GetInstance().LoadTerrainTexture(tile.TerrainType, tile.TerrainView, tile.TerrainRotation, terrainImage.GetPNGData(tile.TerrainRotation));
         LoadImageSprite(terrainTexture, "Terrain", x, y, 0);
 
-        /*
-        ImageData riverImage = engine.RetrieveRiverImage((H3Engine.Common.ERiverType)tile.RiverType, tile.RiverDir);
+        ImageData roadImage = engine.RetrieveRoadImage(tile.RoadType, tile.RoadDir);
+        if (roadImage != null)
+        {
+            Texture2D roadTexture = TextureStorage.GetInstance().LoadRoadTexture(tile.RoadType, tile.RoadDir, tile.RoadRotation, roadImage.GetPNGData(tile.RoadRotation));
+            LoadImageSprite(roadTexture, "Road", x, y, -1);
+        }
+
+        ImageData riverImage = engine.RetrieveRiverImage(tile.RiverType, tile.RiverDir);
         if (riverImage != null)
         {
-            LoadImageSprite(riverImage.GetPNGData(tile.RiverRotation), "River", x, y, -1);
+            Texture2D riverTexture = TextureStorage.GetInstance().LoadRiverTexture(tile.RiverType, tile.RiverDir, tile.RiverRotation, riverImage.GetPNGData(tile.RiverRotation));
+            LoadImageSprite(riverTexture, "River", x, y, -1);
         }
-        */
     }
 
     private void LoadImageSprite(Texture2D texture, string spriteId, int x, int y, int z)

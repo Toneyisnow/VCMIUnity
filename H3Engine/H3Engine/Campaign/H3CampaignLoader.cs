@@ -20,8 +20,7 @@ namespace H3Engine.Campaign
 
         private byte[] campaignHeaderBytes = null;
 
-        private List<byte[]> campaignMapBytes = null;
-
+        
 
         public H3CampaignLoader(string campaignFileName, byte[] rawBytesData)
         {
@@ -45,8 +44,8 @@ namespace H3Engine.Campaign
 
                     int scenarioCount = 8;      // Read from CampText.txt, currently hard coded for AB.h3c
 
-                    for (int g = 0; g < 1; g++)
-                    //// for (int g = 0; g < campaignMapBytes.Count; g++)
+                    //// for (int g = 0; g < 1; g++)
+                    for (int g = 0; g < CampaignMapBytes.Count; g++)
                     {
                         // Load the Scenario Configs
                         CampaignScenario scenario = ReadScenario(reader, campaignObject.Header.Version, campaignObject.Header.MapVersion);
@@ -54,7 +53,7 @@ namespace H3Engine.Campaign
                         try
                         {
                             // Load the H3M Map Data
-                            H3MapLoader mapLoader = new H3MapLoader(campaignMapBytes[g]);
+                            H3MapLoader mapLoader = new H3MapLoader(CampaignMapBytes[g]);
                             scenario.MapData = mapLoader.LoadMap();
                         }
                         catch(Exception ex)
@@ -68,6 +67,26 @@ namespace H3Engine.Campaign
             }
 
             return campaignObject;
+        }
+
+        public H3Map LoadScenarioMap(H3Campaign campaign, int scenarioIndex)
+        {
+            if (campaign == null)
+            {
+                throw new ArgumentNullException("campaign is null."));
+            }
+
+            if (scenarioIndex < 0 || scenarioIndex >= campaign.Scenarios.Count())
+            {
+                throw new ArgumentOutOfRangeException("scenarioIndex");
+            }
+
+            if (campaign.Scenarios[scenarioIndex].MapData == null)
+            {
+                
+            }
+
+            return campaign.Scenarios[scenarioIndex].MapData;
         }
 
         private void ExtractRawBytesData()

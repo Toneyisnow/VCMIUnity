@@ -15,6 +15,12 @@ namespace H3Engine.Campaign
             get; set;
         }
 
+        public List<byte[]> CampaignMapBytes
+        {
+            get; private set;
+        }
+
+
         public List<CampaignScenario> Scenarios = null;
 
         public H3Campaign()

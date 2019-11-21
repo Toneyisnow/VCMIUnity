@@ -62,18 +62,19 @@ namespace Assets.Scripts
         public Texture2D LoadTerrainTexture(ETerrainType terrainType, byte terrainIndex, byte rotation, byte[] pngData)
         {
             string key = string.Format(@"TL-{0}-{1}-{2}", terrainType.GetHashCode(), terrainIndex, rotation);
-
-            Texture2D texture = GetTexture(key);
-            if (texture == null)
-            {
-                texture = new Texture2D(1, 1, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
-                texture.LoadImage(pngData);
-
-                textureDict[key] = texture;
-            }
-
-            return texture;
+            return LoadTextureFromPNGData(key, pngData);
         }
 
+        public Texture2D LoadRoadTexture(ERoadType roadType, byte roadIndex, byte rotation, byte[] pngData)
+        {
+            string key = string.Format(@"RD-{0}-{1}-{2}", roadType.GetHashCode(), roadIndex, rotation);
+            return LoadTextureFromPNGData(key, pngData);
+        }
+
+        public Texture2D LoadRiverTexture(ERiverType riverType, byte riverIndex, byte rotation, byte[] pngData)
+        {
+            string key = string.Format(@"RVR-{0}-{1}-{2}", riverType.GetHashCode(), riverIndex, rotation);
+            return LoadTextureFromPNGData(key, pngData);
+        }
     }
 }
