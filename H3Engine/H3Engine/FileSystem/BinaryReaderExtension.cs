@@ -74,13 +74,14 @@ namespace H3Engine.FileSystem
             UInt32 length = reader.ReadUInt32();
             byte[] result = new byte[length];
 
+            if (length > 2048)
+            {
+                throw new ArgumentOutOfRangeException("ReadStringWithLength: length is out of range: " + length);
+            }
+
             for (var i = 0; i < length; i++)
             {
                 result[i] = reader.ReadByte();
-                //if (result[i] == '\0')
-                {
-                //    break;
-                }
 
                 if (reader.BaseStream.Position >= reader.BaseStream.Length)
                 {
@@ -95,8 +96,8 @@ namespace H3Engine.FileSystem
 
         public static string ReadStringToEnd(this BinaryReader reader)
         {
-            byte[] result = new byte[1024];
-            for (var i = 0; i < 1024; i++)
+            byte[] result = new byte[2048];
+            for (var i = 0; i < 2048; i++)
             {
                 result[i] = reader.ReadByte();
                 if (result[i] == '\0')
