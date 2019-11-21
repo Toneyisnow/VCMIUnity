@@ -14,7 +14,7 @@ namespace H3Engine.FileSystem
     {
         private byte[] rawData;
 
-        private byte[] pngData = null;
+        private Dictionary<byte, byte[]> pngData = null;
 
         private MemoryStream pngStream = null;
 
@@ -36,6 +36,8 @@ namespace H3Engine.FileSystem
             this.Height = height;
 
             this.rawData = new byte[width * height * 4];
+            this.pngData = new Dictionary<byte, byte[]>();
+
             this.dataIndex = 0;
         }
 
@@ -55,8 +57,126 @@ namespace H3Engine.FileSystem
             this.rawData[this.dataIndex++] = color.A;
         }
 
+        public void ExportDataToPNG(bool needRotate = false)
+        {
+            if (rawData == null)
+            {
+                return;
+            }
+
+            this.pngData = new Dictionary<byte, byte[]>();
+            pngData[0] = GeneratePNGData(rawData);
+
+            if (needRotate)
+            {
+                pngData[1] = GeneratePNGData(FlipLeftAndRight(rawData));
+                pngData[2] = GeneratePNGData(FlipUpAndDown(rawData));
+                pngData[3] = GeneratePNGData(Rotate180(rawData));
+            }
+
+            // Clean up the rawData to free memory
+            rawData = null;
+        }
+
+        public byte[] GetPNGData(byte rotation = 0)
+        {
+            if (pngData == null)
+            {
+                return null;
+            }
+
+            if(rotation >= pngData.Count)
+            {
+                throw new ArgumentOutOfRangeException("Rotation index is out of range of PNG Data.");
+            }
+
+            return pngData[rotation];
+        }
+
+        private byte[] Rotate180(byte[] raw)
+        {
+            byte[] resultData = new byte[Width * Height * 4];
+
+            for (int j = 0; j < this.Height; j++)
+            {
+                for (int i = 0; i < this.Width; i++)
+                {
+                    int originIndex = i + Width * j;
+                    int newIndex = Width - 1 - i + Width * (Height - j - 1);
+
+                    for (int w = 0; w < 4; w++)
+                    {
+                        resultData[newIndex * 4 + w] = raw[originIndex * 4 + w];
+                    }
+                }
+            }
+
+            return resultData;
+        }
+
+        private byte[] FlipUpAndDown(byte[] raw)
+        {
+            byte[] resultData = new byte[Width * Height * 4];
+
+            for (int j = 0; j < this.Height; j++)
+            {
+                for (int i = 0; i < this.Width; i++)
+                {
+                    int originIndex = i + Width * j;
+                    int newIndex = i + Width * (Height - j - 1);
+
+                    for (int w = 0; w < 4; w++)
+                    {
+                        resultData[newIndex * 4 + w] = raw[originIndex * 4 + w];
+                    }
+                }
+            }
+
+            return resultData;
+        }
+
+        private byte[] FlipLeftAndRight(byte[] raw)
+        {
+            byte[] resultData = new byte[Width * Height * 4];
+
+            for (int j = 0; j < this.Height; j++)
+            {
+                for (int i = 0; i < this.Width; i++)
+                {
+                    int originIndex = i + Width * j;
+                    int newIndex = Width - 1 - i + Width * j;
+
+                    for (int w = 0; w < 4; w++)
+                    {
+                        resultData[newIndex * 4 + w] = raw[originIndex * 4 + w];
+                    }
+                }
+            }
+
+            return resultData;
+        }
+
+        private byte[] GeneratePNGData(byte[] raw)
+        {
+            using (MemoryStream output = new MemoryStream())
+            {
+                unsafe
+                {
+                    fixed (byte* ptr = raw)
+                    {
+                        using (Bitmap image = new Bitmap(this.Width, this.Height, this.Width * 4, PixelFormat.Format32bppRgb, new IntPtr(ptr)))
+                        {
+                            image.Save(output, ImageFormat.Png);
+                        }
+                    }
+                }
+
+                return StreamHelper.ReadToEnd(output);
+            }
+        }
+
         /// <summary>
-        /// This should not be used any more, it's replaced by GetPNGData()
+        /// This should not be used any more, it's replaced by ExportDataToPNG()
         /// </summary>
         /// <param name="outputStream"></param>
         public void SaveAsPNGStream(Stream outputStream)
@@ -76,20 +196,6 @@ namespace H3Engine.FileSystem
                     }
                 }
             }
-        }
-        
-        public byte[] GetPNGData()
-        {
-            if (pngData == null)
-            {
-                using (Stream outputStream = new MemoryStream())
-                {
-                    this.SaveAsPNGStream(outputStream);
-                    pngData = StreamHelper.ReadToEnd(outputStream);
-                }
-            }
-
-            return pngData;
         }
     }
 }

@@ -7,6 +7,7 @@ using H3Engine.GUI;
 using H3Engine.Utils;
 using H3Engine.Mapping;
 using H3Engine.Campaign;
+using Assets.Scripts;
 
 public class SampleTest : MonoBehaviour
 {
@@ -40,7 +41,7 @@ public class SampleTest : MonoBehaviour
         h3Engine.LoadArchiveFile(@"D:\Toney\Personal\Git\toneyisnow\HeroesIII\External\HeroesIII_Data\H3ab_bmp.lod");
         ImageData image = h3Engine.RetrieveImage("Bo53Muck.pcx");
         
-        Sprite sprite = CreateSpriteFromBytes(image.GetPNGData());
+        Sprite sprite = CreateSpriteFromBytes("Bo53Muck", image.GetPNGData());
 
         GameObject go = new GameObject("SampleSprite");
         /// go.transform.position = new Vector3(10, 20, 0);
@@ -61,7 +62,7 @@ public class SampleTest : MonoBehaviour
             for (int i = 0; i < animation.Groups[g].Frames.Count; i++)
             {
                 ImageData image = animation.GetImageData(g, i);
-                Sprite sprite = CreateSpriteFromBytes(image.GetPNGData());
+                Sprite sprite = CreateSpriteFromBytes("AVG2ele", image.GetPNGData());
                 mainSprites.Add(sprite);
             }
         }
@@ -86,7 +87,6 @@ public class SampleTest : MonoBehaviour
         //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
         
-        
         for (int xx = 0; xx < map1.Header.Width; xx++)
         {
             for (int yy = 0; yy < map1.Header.Height; yy++)
@@ -94,11 +94,13 @@ public class SampleTest : MonoBehaviour
                 TerrainTile tile = map1.TerrainTiles[0, xx, yy];
                 //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
-                ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
-                Sprite sprite = CreateSpriteFromBytes(tileImage.GetPNGData());
+                ImageData tileImage = engine.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
 
-                GameObject g = new GameObject(string.Format(@"TerrainObject-{0}-{1}", xx, yy));
-                g.transform.position = new Vector3(xx * 32, yy * 32, 0);
+                string textureName = string.Format(@"TerrainObject-{0}-{1}", xx, yy);
+                Sprite sprite = CreateSpriteFromBytes(textureName, tileImage.GetPNGData(tile.TerrainRotation));
+
+                GameObject g = new GameObject(textureName);
+                g.transform.position = new Vector3((float)(xx * 0.32 - 5), (float)(yy * 0.32 - 5), 0);
 
                 SpriteRenderer renderer = g.AddComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -130,13 +132,15 @@ public class SampleTest : MonoBehaviour
 
 
 
-    private Sprite CreateSpriteFromBytes(byte[] imageBytes)
+    private Sprite CreateSpriteFromBytes(string name, byte[] imageBytes)
     {
-        Texture2D texture = new Texture2D(1, 1, UnityEngine.Experimental.Rendering.DefaultFormat.HDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
-        texture.LoadImage(imageBytes);
+        Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData(name, imageBytes);
+        if (texture == null)
+        {
+            return null;
+        }
 
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-        
         return sprite;
     }
 

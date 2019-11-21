@@ -17,7 +17,7 @@ namespace H3Console
     {
         static void Main(string[] args)
         {
-            TestRetrieveCampaign();
+            TestRetrieveMap();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -74,6 +74,23 @@ namespace H3Console
                     ImageData image = bundleImage.GetImageData(g, i);
                     byte[] imageBytes = image.GetPNGData();
                     StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\clrrvr-{0}-{1}.png", g, i), imageBytes);
+                }
+            }
+        }
+
+        static void TestRetrieveMap()
+        {
+            Engine engine = Engine.GetInstance();
+            H3Map map = engine.LoadH3MapFile(@"D:\PlayGround\suiyi\suiyi");
+
+            for (int xx = 0; xx < map.Header.Width; xx++)
+            {
+                for (int yy = 0; yy < map.Header.Height; yy++)
+                {
+                    TerrainTile tile = map.TerrainTiles[0, xx, yy];
+                    Console.WriteLine(string.Format(@"Tile [{0},{1}]: Terrain={2},{3} Road={4},{5}, River={6},{7} TerrainRotate={8}", 
+                            xx, yy, tile.TerrainType, tile.TerrainView, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir,
+                            tile.TerrainRotation));
                 }
             }
         }
@@ -146,10 +163,13 @@ namespace H3Console
             engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3sprite.lod");
 
             ImageData tileImage = engine.RetrieveTerrainImage(H3Engine.Common.ETerrainType.SAND, 2);
-            StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile.png", tileImage.GetPNGData());
+            StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile-0.png", tileImage.GetPNGData(2));
 
-            ImageData tileImage2 = engine.RetrieveTerrainImage(H3Engine.Common.ETerrainType.SAND, 13);
-            StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile2.png", tileImage2.GetPNGData());
+            ImageData tileImage2 = engine.RetrieveTerrainImage(H3Engine.Common.ETerrainType.WATER, 3);
+            StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile2-0.png", tileImage2.GetPNGData(0));
+            StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile2-1.png", tileImage2.GetPNGData(1));
+            StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile2-2.png", tileImage2.GetPNGData(2));
+            StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile2-3.png", tileImage2.GetPNGData(3));
 
         }
     }

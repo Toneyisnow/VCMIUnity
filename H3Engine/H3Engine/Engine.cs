@@ -144,13 +144,13 @@ namespace H3Engine
         ///////// API from Handler Layer //////////
 
         /// <summary>
-        /// 
+        /// Retrive the H3Map data from file
         /// </summary>
         /// <param name="mapFileFullPath"></param>
         /// <returns></returns>
-        public H3Map LoadH3MapFile(string mapFileFullPath)
+        public H3Map LoadH3MapFile(string h3mFileFullPath)
         {
-            return null;
+            return resourceHandler.RetrieveMap(h3mFileFullPath);
         }
         
         /// <summary>
@@ -158,9 +158,9 @@ namespace H3Engine
         /// </summary>
         /// <param name="mapName"></param>
         /// <returns></returns>
-        public H3Map ReteiveMap(string mapName)
+        public H3Map ReteiveMap(string h3mFileFullPath)
         {
-            return null;
+            return resourceHandler.RetrieveMap(h3mFileFullPath);
         }
 
         /// <summary>

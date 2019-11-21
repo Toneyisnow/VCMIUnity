@@ -79,7 +79,10 @@ namespace H3Engine.API
                 return null;
             }
 
-            return definition.GetImageData(0, terrainIndex);
+            ImageData image = definition.GetImageData(0, terrainIndex);
+            image.ExportDataToPNG(true);
+
+            return image;
         }
 
         /// <summary>
@@ -129,8 +132,10 @@ namespace H3Engine.API
                 return null;
             }
 
-            return definition.GetImageData(0, roadIndex);
+            ImageData image = definition.GetImageData(0, roadIndex);
+            image.ExportDataToPNG(true);
 
+            return image;
         }
 
         public ImageData RetrieveRiverImage(ERiverType riverType, int riverIndex)
@@ -177,7 +182,10 @@ namespace H3Engine.API
                 return null;
             }
 
-            return definition.GetImageData(0, riverIndex);
+            ImageData image = definition.GetImageData(0, riverIndex);
+            image.ExportDataToPNG(true);
+
+            return image;
         }
     }
 }

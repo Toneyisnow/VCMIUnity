@@ -1,6 +1,7 @@
 ﻿using H3Engine.Campaign;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
+using H3Engine.Mapping;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,6 +39,17 @@ namespace H3Engine.API
             campaignsCache[fileName] = campaign;
 
             return campaign;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="h3mFileFullPath"></param>
+        /// <returns></returns>
+        public H3Map RetrieveMap(string h3mFileFullPath)
+        {
+            H3MapLoader mapLoader = new H3MapLoader(h3mFileFullPath);   // TODO: Should we save the map object  into cache?
+            return mapLoader.LoadMap();
         }
 
         public BundleImageDefinition RetrieveBundleImage(string defFileName)

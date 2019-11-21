@@ -611,22 +611,25 @@ namespace H3Engine.Mapping
                 {
                     for (int xx = 0; xx < mapWidth; xx++)
                     {
-                        int terrianType = reader.ReadByte();
-                        int terrianView = reader.ReadByte();
-                        int riverType = reader.ReadByte();
-                        int riverDir = reader.ReadByte();
-                        int roadType = reader.ReadByte();
-                        int roadDir = reader.ReadByte();
-                        int extTileFlags = reader.ReadByte();
+                        byte terrianType = reader.ReadByte();
+                        byte terrianView = reader.ReadByte();
+                        byte riverType = reader.ReadByte();
+                        byte riverDir = reader.ReadByte();
+                        byte roadType = reader.ReadByte();
+                        byte roadDir = reader.ReadByte();
+                        byte extTileFlags = reader.ReadByte();
 
                         TerrainTile tile = new TerrainTile();
-                        tile.TerrainType = terrianType;
+                        tile.TerrainType = (ETerrainType)terrianType;
                         tile.TerrainView = terrianView;
-                        tile.RiverType = riverType;
+                        tile.RiverType = (ERiverType)riverType;
                         tile.RiverDir = riverDir;
-                        tile.RoadType = roadType;
+                        tile.RoadType = (ERoadType)roadType;
                         tile.RoadDir = roadDir;
-                        tile.ExtTileFlags = extTileFlags;
+                        tile.SetExtTileFlags(extTileFlags);
+
+                        tile.IsBlocked = (tile.TerrainType == ETerrainType.ROCK || tile.TerrainType == ETerrainType.BORDER); //underground tiles are always blocked
+                        tile.IsVisitable = false;
 
                         mapObject.TerrainTiles[a, xx, yy] = tile;
                     }
