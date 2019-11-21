@@ -8,6 +8,8 @@ using H3Engine.Utils;
 using H3Engine.Mapping;
 using H3Engine.Campaign;
 using Assets.Scripts;
+using H3Engine.MapObjects;
+using H3Engine.Core;
 
 public class SampleTest : MonoBehaviour
 {
@@ -88,15 +90,40 @@ public class SampleTest : MonoBehaviour
         engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
         engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
-        H3Campaign campaign = engine.RetrieveCampaign("good1.h3c");
+        H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
 
-        H3Map map = campaign.Scenarios[0].MapData;
+        H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
 
-        for (int xx = 0; xx < map.Header.Width; xx++)
+        int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
+        for (int a = 0; a < 1; a++)
         {
-            for (int yy = 0; yy < map.Header.Height; yy++)
+            for (int xx = 0; xx < map.Header.Width; xx++)
             {
-                LoadTileAsGameObject(map, xx, yy);
+                for (int yy = 0; yy < map.Header.Height; yy++)
+                {
+                    LoadTileAsGameObject(map, xx, yy, a);
+                }
+            }
+
+            int objectIndex = 0;
+            foreach (CGObject obj in map.Objects)
+            {
+                ObjectTemplate template = obj.Template;
+                if (template == null)
+                {
+                    continue;
+                }
+
+                MapPosition position = obj.Position;
+
+                BundleImageDefinition bundleImage = engine.RetrieveBundleImage(template.AnimationFile);
+                ImageData image = bundleImage.GetImageData(0, 0);
+                image.ExportDataToPNG();
+
+                Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
+                LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, -2);
+
+                objectIndex++;
             }
         }
     }
@@ -109,22 +136,46 @@ public class SampleTest : MonoBehaviour
         engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
         engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
-        H3Map map = engine.LoadH3MapFile(@"D:\Temp\h3\suiyi.h3m");
+        H3Map map = engine.LoadH3MapFile(@"D:\PlayGround\Heroes3\suiyi.h3m");
 
-        for (int xx = 0; xx < map.Header.Width; xx++)
+        for (int a = 0; a < (map.Header.IsTwoLevel ? 1 : 1); a++)
         {
-            for (int yy = 0; yy < map.Header.Height; yy++)
+            for (int xx = 0; xx < map.Header.Width; xx++)
             {
-                LoadTileAsGameObject(map, xx, yy);
+                for (int yy = 0; yy < map.Header.Height; yy++)
+                {
+                    LoadTileAsGameObject(map, xx, yy, a);
+                }
+            }
+
+            int objectIndex = 0;
+            foreach (CGObject obj in map.Objects)
+            {
+                ObjectTemplate template = obj.Template;
+                if (template == null)
+                {
+                    continue;
+                }
+
+                MapPosition position = obj.Position;
+
+                BundleImageDefinition bundleImage = engine.RetrieveBundleImage(template.AnimationFile);
+                ImageData image = bundleImage.GetImageData(0, 0);
+                image.ExportDataToPNG();
+
+                Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
+                LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, -2);
+                
+                objectIndex++;
             }
         }
     }
 
-    private void LoadTileAsGameObject(H3Map map, int x, int y)
+    private void LoadTileAsGameObject(H3Map map, int x, int y, int level)
     {
         Engine engine = Engine.GetInstance();
 
-        TerrainTile tile = map.TerrainTiles[0, x, y];
+        TerrainTile tile = map.TerrainTiles[level, x, y];
 
         ImageData terrainImage = engine.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
         Texture2D terrainTexture = TextureStorage.GetInstance().LoadTerrainTexture(tile.TerrainType, tile.TerrainView, tile.TerrainRotation, terrainImage.GetPNGData(tile.TerrainRotation));
@@ -150,11 +201,12 @@ public class SampleTest : MonoBehaviour
         Sprite sprite = CreateSpriteFromTexture(texture);
 
         GameObject g1 = new GameObject(string.Format(@"{0}-{1}-{2}", spriteId, x, y));
-        g1.transform.position = new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z);
+        g1.transform.position = GetMapPositionInPixel(x, y, z);
         g1.transform.parent = transform;
         
         SpriteRenderer renderer = g1.AddComponent<SpriteRenderer>();
         renderer.sprite = sprite;
+        
     }
 
     private Sprite CreateSpriteFromTexture(Texture2D texture)
@@ -166,6 +218,11 @@ public class SampleTest : MonoBehaviour
 
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
         return sprite;
+    }
+
+    private Vector3 GetMapPositionInPixel(int x, int y, int z)
+    {
+        return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z);
     }
 
     // Update is called once per frame

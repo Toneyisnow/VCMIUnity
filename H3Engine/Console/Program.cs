@@ -6,8 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using H3Engine;
 using H3Engine.Campaign;
+using H3Engine.Core;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
+using H3Engine.MapObjects;
 using H3Engine.Mapping;
 using H3Engine.Utils;
 
@@ -19,7 +21,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestRetrieveRiverBundleImage();
+            TestRetrieveMap();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -88,18 +90,47 @@ namespace H3Console
         static void TestRetrieveMap()
         {
             Engine engine = Engine.GetInstance();
-            H3Map map = engine.LoadH3MapFile(@"D:\Temp\h3\suiyi.h3m");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
+            H3Map map = engine.LoadH3MapFile(@"D:\PlayGround\Heroes3\suiyi.h3m");
+            foreach(CGObject obj in map.Objects)
+            {
+                ObjectTemplate template = obj.Template;
+                if (template == null)
+                {
+                    continue;
+                }
+
+                MapPosition position = obj.Position;
+
+                BundleImageDefinition bundleImage = engine.RetrieveBundleImage(template.AnimationFile);
+                ImageData image = bundleImage.GetImageData(0, 0);
+                image.ExportDataToPNG();
+
+                StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\suiyi_map\obj-{0}-{1}.png", position.PosX, position.PosY), image.GetPNGData());
+            }
+
+            /*
             for (int yy = 0; yy < map.Header.Height; yy++)
             {
                 for (int xx = 0; xx < map.Header.Width; xx++)
                 {
-                   TerrainTile tile = map.TerrainTiles[0, xx, yy];
+                    TerrainTile tile = map.TerrainTiles[0, xx, yy];
                     Console.WriteLine(string.Format(@"Tile [{0},{1}]: Terrain={2},{3},{8} Road={4},{5} River={6},{7}", 
                             xx, yy, tile.TerrainType, tile.TerrainView, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir,
                             tile.TerrainRotation));
+
+                    ImageData tileImage = engine.RetrieveRoadImage((H3Engine.Common.ERoadType)tile.RoadType, tile.RoadDir);
+                    if (tileImage != null)
+                    {
+                        StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\suiyi_map\road-{0}-{1}.png", yy, xx), tileImage.GetPNGData(tile.RoadRotation));
+                    }
                 }
-            }
+            }*/
+
         }
 
         static void TestRetrieveCampaign()
@@ -111,8 +142,7 @@ namespace H3Console
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-
-            H3Map map1 = campaign.Scenarios[0].MapData;
+            H3Map map1 = H3CampaignLoader.LoadScenarioMap(campaign, 5);
 
             for (int xx = 0; xx < map1.Header.Width; xx++)
             {
@@ -121,28 +151,17 @@ namespace H3Console
                     TerrainTile tile = map1.TerrainTiles[0, xx, yy];
                     //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
-                    ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
-                    StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\tile-{0}-{1}.png", yy, xx), tileImage.GetPNGData(tile.TerrainRotation));
+                    // ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
+                    // StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\tile-{0}-{1}.png", yy, xx), tileImage.GetPNGData(tile.TerrainRotation));
 
-                    /*
-                    if ((H3Engine.Common.ERoadType)tile.RoadType != H3Engine.Common.ERoadType.NO_ROAD)
+                    if (tile.RoadType != H3Engine.Common.ERoadType.NO_ROAD)
                     {
                         ImageData roadImage = engine.RetrieveRoadImage((H3Engine.Common.ERoadType)tile.RoadType, tile.RoadDir);
                         if (roadImage != null)
                         {
-                            StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\roads\road-{0}-{1}.png", xx, yy), roadImage.GetPNGData());
+                            StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\road-{0}-{1}.png", yy, xx), roadImage.GetPNGData(tile.RoadRotation));
                         }
                     }
-
-                    if ((H3Engine.Common.ERiverType)tile.RiverType != H3Engine.Common.ERiverType.NO_RIVER)
-                    {
-                        ImageData riverImage = engine.RetrieveRiverImage((H3Engine.Common.ERiverType)tile.RiverType, tile.RiverDir);
-                        if (riverImage != null)
-                        {
-                            StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\rivers\river-{0}-{1}.png", xx, yy), riverImage.GetPNGData());
-                        }
-                    }
-                    */
                 }
             }
 

@@ -54,6 +54,8 @@ namespace H3Engine.API
 
         public BundleImageDefinition RetrieveBundleImage(string defFileName)
         {
+            defFileName = defFileName.ToLower();
+
             if (bundleImageCache.ContainsKey(defFileName))
             {
                 return bundleImageCache[defFileName];

@@ -641,7 +641,7 @@ namespace H3Engine.Mapping
         private void ReadObjectTemplates(BinaryReader reader)
         {
             uint templateCount = reader.ReadUInt32();
-            Console.WriteLine("ReadObjectTemplates totally:" + templateCount);
+            Console.WriteLine("ReadObjectTemplates totally:" + (int)templateCount);
 
             this.mapObject.ObjectTemplates = new List<ObjectTemplate>((int)templateCount);
 
