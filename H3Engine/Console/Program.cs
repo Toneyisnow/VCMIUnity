@@ -15,9 +15,11 @@ namespace H3Console
 {
     class Program
     {
+        static readonly string HEROES3_DATA_FOLDER = @"D:\PlayGround\Heroes3\SOD_DATA\";
+
         static void Main(string[] args)
         {
-            TestRetrieveMap();
+            TestRetrieveCampaign();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -27,7 +29,7 @@ namespace H3Console
         {
             Engine engine = Engine.GetInstance();
 
-            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3ab_bmp.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             byte[] h3cFile = engine.RetrieveFileData("ab.h3c");
             StreamHelper.WriteBytesToFile(@"D:\Temp\ab.h3c", h3cFile);
 
@@ -37,7 +39,7 @@ namespace H3Console
         {
             Engine engine = Engine.GetInstance();
 
-            engine.LoadArchiveFile(@"D:\Toney\Personal\Git\toneyisnow\HeroesIII\External\HeroesIII_Data\H3ab_bmp.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             ImageData image = engine.RetrieveImage("Bo53Muck.pcx");
 
             byte[] imageBytes = image.GetPNGData();
@@ -47,7 +49,7 @@ namespace H3Console
         static void TestRetrieveBundleImage()
         {
             Engine engine = Engine.GetInstance();
-            engine.LoadArchiveFile(@"D:\Toney\Personal\Git\toneyisnow\HeroesIII\External\HeroesIII_Data\H3ab_spr.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
 
             BundleImageDefinition bundleImage = engine.RetrieveBundleImage("AVG2ele.def");
             for (int g = 0; g < bundleImage.Groups.Count; g++)
@@ -64,16 +66,21 @@ namespace H3Console
         static void TestRetrieveRiverBundleImage()
         {
             Engine engine = Engine.GetInstance();
-            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3sprite.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
-            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("clrrvr.def");
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("watrtl.def");
             for (int g = 0; g < bundleImage.Groups.Count; g++)
             {
                 for (int i = 0; i < bundleImage.Groups[g].Frames.Count; i++)
                 {
                     ImageData image = bundleImage.GetImageData(g, i);
-                    byte[] imageBytes = image.GetPNGData();
-                    StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\clrrvr-{0}-{1}.png", g, i), imageBytes);
+                    image.ExportDataToPNG(true);
+
+                    for(byte r = 0; r < 4; r++)
+                    {
+                        byte[] imageBytes = image.GetPNGData(r);
+                        StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\h3\watrtl-{0}-{1}-{2}.png", g, i, r), imageBytes);
+                    }
                 }
             }
         }
@@ -81,14 +88,14 @@ namespace H3Console
         static void TestRetrieveMap()
         {
             Engine engine = Engine.GetInstance();
-            H3Map map = engine.LoadH3MapFile(@"D:\PlayGround\suiyi\suiyi");
+            H3Map map = engine.LoadH3MapFile(@"D:\Temp\h3\suiyi.h3m");
 
-            for (int xx = 0; xx < map.Header.Width; xx++)
+            for (int yy = 0; yy < map.Header.Height; yy++)
             {
-                for (int yy = 0; yy < map.Header.Height; yy++)
+                for (int xx = 0; xx < map.Header.Width; xx++)
                 {
-                    TerrainTile tile = map.TerrainTiles[0, xx, yy];
-                    Console.WriteLine(string.Format(@"Tile [{0},{1}]: Terrain={2},{3} Road={4},{5}, River={6},{7} TerrainRotate={8}", 
+                   TerrainTile tile = map.TerrainTiles[0, xx, yy];
+                    Console.WriteLine(string.Format(@"Tile [{0},{1}]: Terrain={2},{3},{8} Road={4},{5} River={6},{7}", 
                             xx, yy, tile.TerrainType, tile.TerrainView, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir,
                             tile.TerrainRotation));
                 }
@@ -98,10 +105,10 @@ namespace H3Console
         static void TestRetrieveCampaign()
         {
             Engine engine = Engine.GetInstance();
-            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3ab_bmp.lod");
-            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3ab_spr.lod");
-            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3bitmap.lod");
-            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3sprite.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
 
@@ -114,9 +121,10 @@ namespace H3Console
                     TerrainTile tile = map1.TerrainTiles[0, xx, yy];
                     //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
-                    //ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
-                    //StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\tiles\tile-{0}-{1}.png", xx, yy), tileImage.GetPNGData());
+                    ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
+                    StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\tile-{0}-{1}.png", yy, xx), tileImage.GetPNGData(tile.TerrainRotation));
 
+                    /*
                     if ((H3Engine.Common.ERoadType)tile.RoadType != H3Engine.Common.ERoadType.NO_ROAD)
                     {
                         ImageData roadImage = engine.RetrieveRoadImage((H3Engine.Common.ERoadType)tile.RoadType, tile.RoadDir);
@@ -134,6 +142,7 @@ namespace H3Console
                             StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\rivers\river-{0}-{1}.png", xx, yy), riverImage.GetPNGData());
                         }
                     }
+                    */
                 }
             }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using H3Engine.Common;
 
 namespace Assets.Scripts
 {
@@ -53,6 +54,22 @@ namespace Assets.Scripts
                 texture.LoadImage(pngData);
 
                 textureDict[textureKey] = texture;
+            }
+
+            return texture;
+        }
+
+        public Texture2D LoadTerrainTexture(ETerrainType terrainType, byte terrainIndex, byte rotation, byte[] pngData)
+        {
+            string key = string.Format(@"TL-{0}-{1}-{2}", terrainType.GetHashCode(), terrainIndex, rotation);
+
+            Texture2D texture = GetTexture(key);
+            if (texture == null)
+            {
+                texture = new Texture2D(1, 1, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
+                texture.LoadImage(pngData);
+
+                textureDict[key] = texture;
             }
 
             return texture;

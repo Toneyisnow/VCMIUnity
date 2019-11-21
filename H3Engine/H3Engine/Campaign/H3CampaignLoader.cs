@@ -94,10 +94,10 @@ namespace H3Engine.Campaign
                             {
                                 if (fileBytes.Count > 0)
                                 {
-                                    byte[] data = GZipStreamHelper.DecompressBytes(fileBytes.ToArray());
+                                    byte[] data = fileBytes.ToArray();
                                     if (isFirstSection)
                                     {
-                                        campaignHeaderBytes = data;
+                                        campaignHeaderBytes = GZipStreamHelper.DecompressBytes(data);
                                         isFirstSection = false;
                                     }
                                     else
@@ -141,8 +141,7 @@ namespace H3Engine.Campaign
             if (fileBytes.Count > 0)
             {
                 // Save the current bytes into file
-                byte[] data = GZipStreamHelper.DecompressBytes(fileBytes.ToArray());
-                campaignMapBytes.Add(data);
+                campaignMapBytes.Add(fileBytes.ToArray());
             }
         }
 

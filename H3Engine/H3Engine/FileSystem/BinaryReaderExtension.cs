@@ -72,13 +72,12 @@ namespace H3Engine.FileSystem
         public static string ReadStringWithLength(this BinaryReader reader)
         {
             UInt32 length = reader.ReadUInt32();
-            byte[] result = new byte[length];
-
             if (length > 2048)
             {
                 throw new ArgumentOutOfRangeException("ReadStringWithLength: length is out of range: " + length);
             }
 
+            byte[] result = new byte[length];
             for (var i = 0; i < length; i++)
             {
                 result[i] = reader.ReadByte();

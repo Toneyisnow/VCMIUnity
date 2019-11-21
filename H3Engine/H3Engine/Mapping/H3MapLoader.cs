@@ -24,13 +24,14 @@ namespace H3Engine.Mapping
         {
             using (FileStream file = new FileStream(h3mFileFullPath, FileMode.Open, FileAccess.Read))
             {
-                mapData = StreamHelper.ReadToEnd(file);
+                byte[] rawData = StreamHelper.ReadToEnd(file);
+                mapData = GZipStreamHelper.DecompressBytes(rawData);
             }
         }
 
         public H3MapLoader(byte[] rawData)
         {
-            mapData = rawData;
+            mapData = GZipStreamHelper.DecompressBytes(rawData);
         }
 
         public H3Map LoadMap()
