@@ -332,6 +332,7 @@ UnityClient/Library/metadata/
 UnityClient/Library/PackageCache/
 UnityClient/Library/ShaderCache/
 UnityClient/Library/StateCache/
+UnityClient/Library/ScriptAssemblies/*.dll
 UnityClient/Temp/
 
 UnityClient/Assets/Plugins/

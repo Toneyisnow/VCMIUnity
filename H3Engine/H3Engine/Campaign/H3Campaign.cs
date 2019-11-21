@@ -17,7 +17,7 @@ namespace H3Engine.Campaign
 
         public List<byte[]> CampaignMapBytes
         {
-            get; private set;
+            get; set;
         }
 
 

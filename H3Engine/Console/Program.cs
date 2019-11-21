@@ -19,7 +19,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestRetrieveCampaign();
+            TestRetrieveRiverBundleImage();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -68,7 +68,7 @@ namespace H3Console
             Engine engine = Engine.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
-            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("watrtl.def");
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("clrrvr.def");
             for (int g = 0; g < bundleImage.Groups.Count; g++)
             {
                 for (int i = 0; i < bundleImage.Groups[g].Frames.Count; i++)
@@ -79,7 +79,7 @@ namespace H3Console
                     for(byte r = 0; r < 4; r++)
                     {
                         byte[] imageBytes = image.GetPNGData(r);
-                        StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\h3\watrtl-{0}-{1}-{2}.png", g, i, r), imageBytes);
+                        StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\h3\clrrvr-{0}-{1}.png", i, r), imageBytes);
                     }
                 }
             }

@@ -79,12 +79,14 @@ namespace H3Engine.FileSystem
         {
             h3Palette = new Color[8]
             {
-                Color.FromArgb(0, 255, 255, 0), //// Color.FromArgb(0, 0, 0, 0),
+                //// Color.FromArgb(0, 255, 255, 0), //// Color.FromArgb(0, 0, 0, 0),
+                Color.FromArgb(0, 0, 0, 0), //// Color.FromArgb(0, 0, 0, 0),
                 Color.FromArgb(32, 0, 0, 0),
                 Color.FromArgb(64, 0, 0, 0),
                 Color.FromArgb(128, 0, 0, 0),
                 Color.FromArgb(128, 0, 0, 0),
-                Color.FromArgb(0, 0, 255, 255), //// Color.FromArgb(0, 0, 0, 0),
+                //// Color.FromArgb(0, 0, 255, 255), //// Color.FromArgb(0, 0, 0, 0),
+                Color.FromArgb(0, 0, 0, 0), //// Color.FromArgb(0, 0, 0, 0),
                 Color.FromArgb(128, 0, 0, 0),
                 Color.FromArgb(64, 0, 0, 0)
             };

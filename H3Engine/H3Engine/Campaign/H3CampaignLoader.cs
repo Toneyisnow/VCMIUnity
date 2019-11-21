@@ -45,7 +45,7 @@ namespace H3Engine.Campaign
                     int scenarioCount = 8;      // Read from CampText.txt, currently hard coded for AB.h3c
 
                     //// for (int g = 0; g < 1; g++)
-                    for (int g = 0; g < CampaignMapBytes.Count; g++)
+                    for (int g = 0; g < campaignObject.CampaignMapBytes.Count; g++)
                     {
                         // Load the Scenario Configs
                         CampaignScenario scenario = ReadScenario(reader, campaignObject.Header.Version, campaignObject.Header.MapVersion);
@@ -53,7 +53,7 @@ namespace H3Engine.Campaign
                         try
                         {
                             // Load the H3M Map Data
-                            H3MapLoader mapLoader = new H3MapLoader(CampaignMapBytes[g]);
+                            H3MapLoader mapLoader = new H3MapLoader(campaignObject.CampaignMapBytes[g]);
                             scenario.MapData = mapLoader.LoadMap();
                         }
                         catch(Exception ex)
@@ -73,7 +73,7 @@ namespace H3Engine.Campaign
         {
             if (campaign == null)
             {
-                throw new ArgumentNullException("campaign is null."));
+                throw new ArgumentNullException("campaign is null.");
             }
 
             if (scenarioIndex < 0 || scenarioIndex >= campaign.Scenarios.Count())
@@ -96,7 +96,7 @@ namespace H3Engine.Campaign
                 return;
             }
 
-            campaignMapBytes = new List<byte[]>();
+            campaignObject.CampaignMapBytes = new List<byte[]>();
             List<byte> fileBytes = new List<byte>();
             bool isFirstSection = true;
 
@@ -122,7 +122,7 @@ namespace H3Engine.Campaign
                                     else
                                     {
                                         // Save the current bytes into file
-                                        campaignMapBytes.Add(data);
+                                        campaignObject.CampaignMapBytes.Add(data);
                                     }
                                 }
 
@@ -160,7 +160,7 @@ namespace H3Engine.Campaign
             if (fileBytes.Count > 0)
             {
                 // Save the current bytes into file
-                campaignMapBytes.Add(fileBytes.ToArray());
+                campaignObject.CampaignMapBytes.Add(fileBytes.ToArray());
             }
         }
 

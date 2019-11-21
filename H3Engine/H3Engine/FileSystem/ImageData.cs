@@ -51,6 +51,7 @@ namespace H3Engine.FileSystem
 
         public void WriteColor(Color color)
         {
+
             this.rawData[this.dataIndex++] = color.R;
             this.rawData[this.dataIndex++] = color.G;
             this.rawData[this.dataIndex++] = color.B;
@@ -164,7 +165,7 @@ namespace H3Engine.FileSystem
                 {
                     fixed (byte* ptr = raw)
                     {
-                        using (Bitmap image = new Bitmap(this.Width, this.Height, this.Width * 4, PixelFormat.Format32bppRgb, new IntPtr(ptr)))
+                        using (Bitmap image = new Bitmap(this.Width, this.Height, this.Width * 4, PixelFormat.Format32bppPArgb, new IntPtr(ptr)))
                         {
                             image.Save(output, ImageFormat.Png);
                         }
@@ -174,7 +175,7 @@ namespace H3Engine.FileSystem
                 return StreamHelper.ReadToEnd(output);
             }
         }
-
+        
         /// <summary>
         /// This should not be used any more, it's replaced by ExportDataToPNG()
         /// </summary>
