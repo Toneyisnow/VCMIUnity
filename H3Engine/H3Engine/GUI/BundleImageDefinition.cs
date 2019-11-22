@@ -38,6 +38,13 @@ namespace H3Engine.GUI
             get; set;
         }
 
+        /// <summary>
+        /// This is the file name without the ext ".def", in order to identify this resource and cache
+        /// </summary>
+        public string Identity
+        {
+            get; set;
+        }
 
         /// <summary>
         /// The type of the bundleImage

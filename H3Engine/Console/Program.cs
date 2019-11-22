@@ -21,7 +21,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestRetrieveMap();
+            TestRetrieveCampaign();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -142,7 +142,7 @@ namespace H3Console
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-            H3Map map1 = H3CampaignLoader.LoadScenarioMap(campaign, 5);
+            H3Map map1 = H3CampaignLoader.LoadScenarioMap(campaign, 0);
 
             for (int xx = 0; xx < map1.Header.Width; xx++)
             {

@@ -7,12 +7,15 @@ using H3Engine.GUI;
 using H3Engine.Utils;
 using H3Engine.Mapping;
 using H3Engine.Campaign;
-using Assets.Scripts;
+using Assets.Scripts.Components;
 using H3Engine.MapObjects;
 using H3Engine.Core;
 
 public class SampleTest : MonoBehaviour
 {
+    public GameObject mapObjectPrefab = null;
+
+
     private List<Sprite> mainSprites;
 
     private int spriteIndex = 0;
@@ -82,6 +85,24 @@ public class SampleTest : MonoBehaviour
         renderer.sprite = mainSprites[0];
     }
 
+    void LoadAnimationToGameObject()
+    {
+        Engine engine = Engine.GetInstance();
+        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+
+
+        BundleImageDefinition animation = engine.RetrieveBundleImage("AVG2ele.def");
+
+        GameObject obj = Instantiate(mapObjectPrefab, transform);
+        obj.transform.position = new Vector3(0, 0, 0);
+
+        AdventureMapCoordinate mapCoordinate = obj.GetComponent<AdventureMapCoordinate>();
+        mapCoordinate.Initialize(animation.Width, animation.Height);
+
+        AnimatedObject animated = obj.GetComponent<AnimatedObject>();
+        animated.Initialize(animation);
+    }
+
     void LoadTerrain()
     {
         Engine engine = Engine.GetInstance();
@@ -117,11 +138,28 @@ public class SampleTest : MonoBehaviour
                 MapPosition position = obj.Position;
 
                 BundleImageDefinition bundleImage = engine.RetrieveBundleImage(template.AnimationFile);
-                ImageData image = bundleImage.GetImageData(0, 0);
-                image.ExportDataToPNG();
 
-                Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
-                LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, -2);
+                if (template.Type == H3Engine.Common.EObjectType.MONSTER
+                    || template.Type == H3Engine.Common.EObjectType.CAMPFIRE
+                    || template.Type == H3Engine.Common.EObjectType.LEARNING_STONE
+                    || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR1
+                    || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR2
+                    || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR3
+                    || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR4
+                    )
+                {
+                    // Load Animation
+                    LoadAnimatedMapObject(position.PosX, position.PosY, bundleImage);
+                }
+                else
+                {
+                    // Load Single Image
+                    ImageData image = bundleImage.GetImageData(0, 0);
+                    image.ExportDataToPNG();
+
+                    Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
+                    LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, -2);
+                }
 
                 objectIndex++;
             }
@@ -209,6 +247,18 @@ public class SampleTest : MonoBehaviour
         
     }
 
+    private void LoadAnimatedMapObject(int x, int y, BundleImageDefinition bundleImage)
+    {
+        GameObject newObject = Instantiate(mapObjectPrefab, transform);
+        newObject.transform.position = GetMapPositionInPixel(x, y, -2);
+        
+        //AdventureMapCoordinate mapCoordinate = newObject.GetComponent<AdventureMapCoordinate>();
+        //mapCoordinate.Initialize(bundleImage.Width, bundleImage.Height);
+
+        AnimatedObject animated = newObject.GetComponent<AnimatedObject>();
+        animated.Initialize(bundleImage);
+    }
+
     private Sprite CreateSpriteFromTexture(Texture2D texture)
     {
         if (texture == null)
@@ -228,18 +278,9 @@ public class SampleTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!sceneLoaded || mainSprites.Count == 0)
+        if (!sceneLoaded)
         {
             return;
-        }
-
-        if (frameCount ++ > 6)
-        {
-            frameCount = 0;
-
-            SpriteRenderer renderer = gObject.GetComponent<SpriteRenderer>();
-            spriteIndex = (spriteIndex + 1) % mainSprites.Count;
-            renderer.sprite = mainSprites[spriteIndex];
         }
     }
 }

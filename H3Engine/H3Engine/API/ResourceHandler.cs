@@ -70,9 +70,11 @@ namespace H3Engine.API
             using (MemoryStream animationStream = new MemoryStream(animationRawData))
             {
                 H3DefFileHandler defHandler = new H3DefFileHandler(animationStream);
+               
                 defHandler.LoadAllFrames();
 
                 bundleImageCache[defFileName] = defHandler.GetBundleImage();
+                bundleImageCache[defFileName].Identity = defFileName.Replace(".def", "");
 
                 return bundleImageCache[defFileName];
             }

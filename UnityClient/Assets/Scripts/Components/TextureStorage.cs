@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using H3Engine.Common;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Components
 {
     public class TextureStorage
     {
