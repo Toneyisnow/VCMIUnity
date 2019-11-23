@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using H3Engine;
@@ -25,11 +26,19 @@ public class SampleTest : MonoBehaviour
 
     private GameObject gObject = null;
 
-    private static readonly string HEROES3_DATA_FOLDER = @"D:\PlayGround\Heroes3\SOD_DATA\";
+    private static string HEROES3_DATA_FOLDER = string.Empty;
 
     // Start is called before the first frame update
+
+    private static string GetGameDataFilePath(string filename)
+    {
+        return Path.Combine(HEROES3_DATA_FOLDER, filename);
+    }
+
     void Start()
     {
+        HEROES3_DATA_FOLDER = Path.Combine(Application.dataPath, @"Resources\GameData");
+
         mainSprites = new List<Sprite>();
 
         // LoadImage();
@@ -42,10 +51,17 @@ public class SampleTest : MonoBehaviour
         frameCount = 0;
     }
 
+    void LoadResource()
+    {
+        Engine h3Engine = Engine.GetInstance();
+        
+        h3Engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
+    }
+
     void LoadImage()
     {
         Engine h3Engine = Engine.GetInstance();
-        h3Engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
+        h3Engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
         ImageData image = h3Engine.RetrieveImage("Bo53Muck.pcx");
 
         Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData("Bo53Muck", image.GetPNGData());
@@ -62,9 +78,9 @@ public class SampleTest : MonoBehaviour
     void LoadAnimation()
     {
         Engine engine = Engine.GetInstance();
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_sprlod"));
 
-        
+
         BundleImageDefinition animation = engine.RetrieveBundleImage("AVG2ele.def");
         for (int g = 0; g < animation.Groups.Count; g++)
         {
@@ -88,7 +104,7 @@ public class SampleTest : MonoBehaviour
     void LoadAnimationToGameObject()
     {
         Engine engine = Engine.GetInstance();
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
 
 
         BundleImageDefinition animation = engine.RetrieveBundleImage("AVG2ele.def");
@@ -106,10 +122,11 @@ public class SampleTest : MonoBehaviour
     void LoadTerrain()
     {
         Engine engine = Engine.GetInstance();
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+        
+        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("H3bitmap.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("H3sprite.lod"));
 
         H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
 
@@ -169,10 +186,10 @@ public class SampleTest : MonoBehaviour
     void LoadTerrain2()
     {
         Engine engine = Engine.GetInstance();
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
-        engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("H3bitmap.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("H3sprite.lod"));
 
         H3Map map = engine.LoadH3MapFile(@"D:\PlayGround\Heroes3\suiyi.h3m");
 
@@ -272,7 +289,7 @@ public class SampleTest : MonoBehaviour
 
     private Vector3 GetMapPositionInPixel(int x, int y, int z)
     {
-        return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z);
+        return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z - (float)(y * 0.01));
     }
 
     // Update is called once per frame
