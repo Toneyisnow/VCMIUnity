@@ -653,23 +653,23 @@ namespace H3Engine.Mapping
                 objectTemplate.AnimationFile = reader.ReadStringWithLength();
                 Console.WriteLine("Object Animation File:" + objectTemplate.AnimationFile);
 
-                int[] blockMask = new int[6];
-                int[] visitMask = new int[6];
+                byte[] blockMask = new byte[6];
+                byte[] visitMask = new byte[6];
 
-                foreach (int val in blockMask)
+                foreach (byte val in blockMask)
                 {
-                    int r = reader.ReadByte();
+                    byte r = reader.ReadByte();
                     //Console.WriteLine("BlockMask: " + r);
                 }
 
-                foreach (int val in visitMask)
+                foreach (byte val in visitMask)
                 {
-                    int r = reader.ReadByte();
+                    byte r = reader.ReadByte();
                     //Console.WriteLine("VisitMask: " + r);
                 }
 
                 reader.ReadUInt16();
-                int terrMask = reader.ReadUInt16();
+                int terrainMask = reader.ReadUInt16();
 
                 objectTemplate.Type = (EObjectType)reader.ReadUInt32();
                 objectTemplate.SubId = (int)reader.ReadUInt32();
