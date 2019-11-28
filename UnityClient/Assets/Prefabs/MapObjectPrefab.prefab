@@ -10,8 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 386947536324583675}
   - component: {fileID: 386947536324583674}
-  - component: {fileID: 380407730}
-  - component: {fileID: 380407731}
+  - component: {fileID: 383810899741462836}
   m_Layer: 0
   m_Name: MapObjectPrefab
   m_TagString: Untagged
@@ -83,7 +82,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &380407730
+--- !u!114 &383810899741462836
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,19 +91,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 386947536324583673}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3adb0b151950086429cd2ab84b70a258, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &380407731
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386947536324583673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d79fa9e2b7d7e594fbb1c337e2730aa0, type: 3}
+  m_Script: {fileID: 11500000, guid: b3e642d2fd6413640a39a9815689c761, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7456411092371047429

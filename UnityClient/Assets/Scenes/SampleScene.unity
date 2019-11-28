@@ -251,10 +251,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1761168788}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 826db604f874d824493bf5bc40d21f1d, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b996b5f5e9fc8e408b81d403d00a276, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapObjectPrefab: {fileID: 386947536324583673, guid: 000791cb2bb481f47b78db6285439911,
+  mapObjectPrefab: {fileID: 386947536324583673, guid: d0e2ee530bdb4c842badcaa7ea5b2896,
     type: 3}
 --- !u!212 &1761168790
 SpriteRenderer:
