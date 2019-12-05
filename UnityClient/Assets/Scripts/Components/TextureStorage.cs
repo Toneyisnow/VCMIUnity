@@ -14,6 +14,8 @@ namespace Assets.Scripts.Components
 
         private Dictionary<string, Texture2D> textureDict = new Dictionary<string, Texture2D>();
 
+        private Dictionary<string, TextureAtlas> textureAtlases = new Dictionary<string, TextureAtlas>();
+
 
         public static TextureStorage GetInstance()
         {
@@ -63,6 +65,25 @@ namespace Assets.Scripts.Components
         {
             string key = string.Format(@"TL-{0}-{1}-{2}", terrainType.GetHashCode(), terrainIndex, rotation);
             return LoadTextureFromPNGData(key, pngData);
+        }
+
+        public Sprite LoadTerrainSprite(ETerrainType terrainType, byte terrainIndex, byte rotation)
+        {
+            TextureAtlas textureAtlas = null;
+            string atlasKey = terrainType.ToString();
+            if (textureAtlases.ContainsKey(atlasKey))
+            {
+                textureAtlas = textureAtlases[atlasKey];
+            }
+            else
+            {
+                textureAtlas = new TilemapTextureAtlas(terrainType);
+                textureAtlas.LoadTextures();
+
+                textureAtlases[atlasKey] = textureAtlas;
+            }
+
+            return textureAtlas.RetrieveSpriteAt(TilemapTextureAtlas.GetTextureIndex(terrainIndex, rotation));
         }
 
         public Texture2D LoadRoadTexture(ERoadType roadType, byte roadIndex, byte rotation, byte[] pngData)

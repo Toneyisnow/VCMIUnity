@@ -197,6 +197,16 @@ namespace H3Engine
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="terrainType"></param>
+        /// <returns></returns>
+        public ImageData[] RetrieveAllTerrainImages(ETerrainType terrainType)
+        {
+            return resourceUsage.RetrieveAllTerrainImages(terrainType);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="roadType"></param>
         /// <param name="roadDir"></param>
         /// <returns></returns>

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 386947536324583675}
   - component: {fileID: 386947536324583674}
   - component: {fileID: 383810899741462836}
+  - component: {fileID: 7143644611998172470}
   m_Layer: 0
   m_Name: MapObjectPrefab
   m_TagString: Untagged
@@ -92,6 +93,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3e642d2fd6413640a39a9815689c761, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7143644611998172470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386947536324583673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25b70c15c0013a14f8db9a3a23908690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7456411092371047429

@@ -22,6 +22,12 @@ namespace H3Engine.API
             this.resourceHandler = handler;
         }
 
+        /// <summary>
+        /// This is legacy
+        /// </summary>
+        /// <param name="terrainType"></param>
+        /// <param name="terrainIndex"></param>
+        /// <returns></returns>
         public ImageData RetrieveTerrainImage(ETerrainType terrainType, int terrainIndex)
         {
             if (!terrainImageDefinitions.ContainsKey(terrainType))
@@ -84,6 +90,82 @@ namespace H3Engine.API
 
             return image;
         }
+
+        /// <summary>
+        /// This should be used by the higher lever
+        /// </summary>
+        /// <param name="terrainType"></param>
+        /// <returns></returns>
+        public ImageData[] RetrieveAllTerrainImages(ETerrainType terrainType)
+        {
+            if (!terrainImageDefinitions.ContainsKey(terrainType))
+            {
+                string terrainDefFileName = string.Empty;
+                switch (terrainType)
+                {
+                    case ETerrainType.DIRT:
+                        terrainDefFileName = "dirt";
+                        break;
+                    case ETerrainType.GRASS:
+                        terrainDefFileName = "gras";
+                        break;
+                    case ETerrainType.LAVA:
+                        terrainDefFileName = "lava";
+                        break;
+                    case ETerrainType.ROCK:
+                        terrainDefFileName = "rock";
+                        break;
+                    case ETerrainType.SAND:
+                        terrainDefFileName = "sand";
+                        break;
+                    case ETerrainType.SNOW:
+                        terrainDefFileName = "snow";
+                        break;
+                    case ETerrainType.SUBTERRANEAN:
+                        terrainDefFileName = "subb";
+                        break;
+                    case ETerrainType.SWAMP:
+                        terrainDefFileName = "swmp";
+                        break;
+                    case ETerrainType.WATER:
+                        terrainDefFileName = "watr";
+                        break;
+                    default:
+                        break;
+                }
+
+                terrainDefFileName += "tl.def";
+
+                BundleImageDefinition def = resourceHandler.RetrieveBundleImage(terrainDefFileName);
+                if (def != null)
+                {
+                    terrainImageDefinitions[terrainType] = def;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            BundleImageDefinition definition = terrainImageDefinitions[terrainType];
+            if (definition == null || definition.Groups.Count < 1)
+            {
+                return null;
+            }
+
+            int frameCount = definition.Groups[0].Frames.Count;
+
+            ImageData[] result = new ImageData[frameCount];
+            for(int i = 0; i < frameCount; i ++)
+            {
+                ImageData image = definition.GetImageData(0, i);
+                image.ExportDataToPNG(true);
+                result[i] = image;
+            }
+            
+            return result;
+        }
+
 
         /// <summary>
         /// 
