@@ -43,7 +43,7 @@ public class SampleTest : MonoBehaviour
 
         mainSprites = new List<Sprite>();
 
-        TestTextureRenderer2();
+        TestTileMap();
 
         // LoadSimpleImage();
         // LoadH3Image();
@@ -236,117 +236,7 @@ public class SampleTest : MonoBehaviour
         animated.Initialize(animation);
     }
 
-    void TestTextureRenderer()
-    {
-        Engine engine = Engine.GetInstance();
-
-        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("H3bitmap.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("H3sprite.lod"));
-
-        H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-
-        H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
-
-        Dictionary<Texture2D, List<Vector2>> textureDict = new Dictionary<Texture2D, List<Vector2>>();
-        Dictionary<string, Sprite> spriteDictionary = new Dictionary<string, Sprite>();
-        int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
-        for (int level = 0; level < 1; level++)
-        {
-            for (int xx = 0; xx < map.Header.Width; xx++)
-            {
-                for (int yy = 0; yy < map.Header.Height; yy++)
-                {
-                    TerrainTile tile = map.TerrainTiles[level, xx, yy];
-
-                    ImageData terrainImage = engine.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
-                    Texture2D terrainTexture = TextureStorage.GetInstance().LoadTerrainTexture(tile.TerrainType, tile.TerrainView, tile.TerrainRotation, terrainImage.GetPNGData(tile.TerrainRotation));
-
-                    List<Vector2> positions = null;
-                    if (textureDict.ContainsKey(terrainTexture))
-                    {
-                        positions = textureDict[terrainTexture];
-                    }
-                    else
-                    {
-                        positions = new List<Vector2>();
-                        textureDict[terrainTexture] = positions;
-                    }
-
-                    positions.Add(new Vector2(xx, yy));
-                }
-            }
-
-            Texture2D[] textures = new Texture2D[textureDict.Keys.Count];
-            int i = 0;
-            foreach (Texture2D texture in textureDict.Keys)
-            {
-                textures[i++] = texture;
-            }
-
-            Texture2D atlas = new Texture2D(4098, 4096);
-            ////Rect[] rect2 = atlas.PackTextures(textures, 0, 4096, false);
-
-            //// SpriteAtlas atlas = new SpriteAtlas();
-            //atlas.
-
-            Shader shader = Shader.Find("Sprites/Default");
-            int index = 0;
-            ////foreach (Rect rectTexture in rect2)
-            foreach (Texture2D texture in textureDict.Keys)
-            {
-                // Texture2D texture = textures[index++];
-                // Sprite sprite = Sprite.Create(atlas, new Rect(rectTexture.xMin, rectTexture.yMin, rectTexture.width * 500, rectTexture.height * 500), Vector2.zero);
-                Sprite sprite = Sprite.Create(atlas, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-
-                MaterialPropertyBlock block = new MaterialPropertyBlock();
-                block.SetTexture("tl", texture);
-                Material material = new Material(shader);
-                //// material.enableInstancing = true;
-                material.mainTexture = texture;
-                
-                List<Vector2> positions = textureDict[texture];
-                foreach (Vector2 pos in positions)
-                {
-                    string spriteKey = string.Format(@"{0}-{1}-{2}", "tl", pos.x, pos.y);
-                    //// Sprite sprite = null;
-
-                    /*
-                    if (spriteDictionary.ContainsKey(spriteKey))
-                    {
-                        sprite = spriteDictionary[spriteKey];
-                    }
-                    else
-                    {
-                        sprite = CreateSpriteFromTexture(texture);
-                        spriteDictionary[spriteKey] = sprite;
-                    }
-                    */
-
-                    
-                    /// sprite.packingMode = SpritePackingMode.Rectangle;
-                    
-
-                    GameObject g1 = new GameObject();
-                    g1.transform.position = GetMapPositionInPixel((int)pos.x, (int)pos.y, -1);
-                    g1.transform.parent = transform;
-                    
-                    SpriteRenderer renderer = g1.AddComponent<SpriteRenderer>();
-                    renderer.drawMode = SpriteDrawMode.Simple;
-                    renderer.sharedMaterial = material;
-                    renderer.sprite = sprite;
-                    //// renderer.tag = "Sprite";
-
-                    //// renderer.sprite = sprite;
-
-                    //// renderer.sharedMaterial.SetTexture(spriteKey, terrainTexture);
-                }
-            }
-        }
-    }
-
-    void TestTextureRenderer2()
+    void TestTileMap()
     {
         Engine engine = Engine.GetInstance();
 
@@ -371,6 +261,46 @@ public class SampleTest : MonoBehaviour
         RenderTileMapByRiverType(map, ERiverType.CLEAR_RIVER);
         RenderTileMapByRiverType(map, ERiverType.LAVA_RIVER);
 
+        int objectIndex = 0;
+        foreach (CGObject obj in map.Objects)
+        {
+            ObjectTemplate template = obj.Template;
+            if (template == null)
+            {
+                continue;
+            }
+
+            MapPosition position = obj.Position;
+
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage(template.AnimationFile);
+
+            if (template.Type == H3Engine.Common.EObjectType.MONSTER
+                || template.Type == H3Engine.Common.EObjectType.CAMPFIRE
+                || template.Type == H3Engine.Common.EObjectType.LEARNING_STONE
+                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR1
+                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR2
+                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR3
+                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR4
+                )
+            {
+                // Load Animation
+                LoadAnimatedMapObject(position.PosX, position.PosY, bundleImage);
+            }
+            else
+            {
+                // Load Single Image
+                ImageData image = bundleImage.GetImageData(0, 0);
+                image.ExportDataToPNG();
+
+                Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
+                LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, 0);
+            }
+
+            objectIndex++;
+        }
+
+
+
     }
 
     private void RenderTileMapByTerrainType(H3Map map, ETerrainType terrainType)
@@ -391,7 +321,8 @@ public class SampleTest : MonoBehaviour
                     }
 
                     Sprite sprite = textureStorage.LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
-                    var position = GetMapPositionInPixel(xx, yy, -1);
+                    var position = GetMapPositionInPixel(xx, yy, 1);
+                    position.z += (float)terrainType.GetHashCode() / 10;
 
                     Transform child = transform.Find("TL-" + terrainType.ToString());
                     if (child == null)
@@ -400,7 +331,7 @@ public class SampleTest : MonoBehaviour
                         terrain.name = "TL-" + terrainType.ToString();
                         terrain.transform.parent = transform;
 
-                        terrain.transform.localPosition = new Vector3(0, 0, terrainType.GetHashCode());
+                        //// terrain.transform.localPosition = new Vector3(0, 0, terrainType.GetHashCode());
                     }
 
                     GameObject g1 = new GameObject();
@@ -438,7 +369,7 @@ public class SampleTest : MonoBehaviour
                     }
 
                     Sprite sprite = textureStorage.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
-                    var position = GetMapPositionInPixel(xx, yy, -1);
+                    var position = GetMapPositionInPixel(xx, yy, 1);
 
                     GameObject g1 = new GameObject();
                     g1.transform.position = position;
@@ -470,7 +401,7 @@ public class SampleTest : MonoBehaviour
                     }
 
                     Sprite sprite = textureStorage.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
-                    var position = GetMapPositionInPixel(xx, yy, -1);
+                    var position = GetMapPositionInPixel(xx, yy, 1);
 
                     GameObject g1 = new GameObject();
                     g1.transform.position = position;
