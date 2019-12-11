@@ -64,10 +64,11 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\AdventureMapCoordinate.cs" />
     <Compile Include="Assets\Scripts\AnimatedObject.cs" />
+    <Compile Include="Assets\Scripts\Components\TextureAtlas.cs" />
+    <Compile Include="Assets\Scripts\Components\TextureSet.cs" />
+    <Compile Include="Assets\Scripts\Components\TextureSheet.cs" />
     <Compile Include="Assets\Scripts\Components\TextureStorage.cs" />
     <Compile Include="Assets\Scripts\SampleTest.cs" />
-    <None Include="Assets\Scripts\Plugins\Newtonsoft.Json.xml" />
-    <None Include="Assets\Scripts\Plugins\ZipForge.xml" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
@@ -278,14 +279,14 @@
     <Reference Include="UnityEngine.XRModule">
       <HintPath>D:/Software/UnityEngine/2019.2.12f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
     </Reference>
-    <Reference Include="ZipForge">
-      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Scripts/Plugins/ZipForge.dll</HintPath>
-    </Reference>
     <Reference Include="H3Engine">
-      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Scripts/Plugins/H3Engine.dll</HintPath>
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/H3Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="ZipForge">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/ZipForge.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Scripts/Plugins/Newtonsoft.Json.dll</HintPath>
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Software/UnityEngine/2019.2.12f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -640,6 +641,9 @@
     </Reference>
     <Reference Include="Boo.Lang">
       <HintPath>D:/Software/UnityEngine/2019.2.12f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
+    </Reference>
+    <Reference Include="H3Engine">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/H3Engine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -107,7 +107,7 @@ namespace H3Engine
                 }
             }
         }
-        
+
         private void UnZipFile(string fileFullPath, string targetDirectoryPath)
         {
             UnZipFile_GZip(fileFullPath, targetDirectoryPath);
@@ -134,7 +134,7 @@ namespace H3Engine
         {
             return resourceStorage.ExtractFileData(fileName);
         }
-        
+
         public ImageData RetrieveImage(string imageName)
         {
             return resourceStorage.ExtractImage(imageName);
@@ -152,7 +152,7 @@ namespace H3Engine
         {
             return resourceHandler.RetrieveMap(h3mFileFullPath);
         }
-        
+
         /// <summary>
         /// Retrive the H3Map data from data
         /// </summary>
@@ -185,13 +185,43 @@ namespace H3Engine
 
 
         ////// Resource Usage Layer ///////
-        
+
         /// <summary>
         /// 
         /// </summary>
         public ImageData RetrieveTerrainImage(ETerrainType terrainType, int terrainIndex)
         {
             return resourceUsage.RetrieveTerrainImage(terrainType, terrainIndex);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="terrainType"></param>
+        /// <returns></returns>
+        public ImageData[] RetrieveAllTerrainImages(ETerrainType terrainType)
+        {
+            return resourceUsage.RetrieveAllTerrainImages(terrainType);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roadType"></param>
+        /// <returns></returns>
+        public ImageData[] RetrieveAllRoadImages(ERoadType roadType)
+        {
+            return resourceUsage.RetrieveAllRoadImages(roadType);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="riverType"></param>
+        /// <returns></returns>
+        public ImageData[] RetrieveAllRiverImages(ERiverType riverType)
+        {
+            return resourceUsage.RetrieveAllRiverImages(riverType);
         }
 
         /// <summary>

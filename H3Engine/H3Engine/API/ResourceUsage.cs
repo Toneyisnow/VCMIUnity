@@ -22,6 +22,12 @@ namespace H3Engine.API
             this.resourceHandler = handler;
         }
 
+        /// <summary>
+        /// This is legacy
+        /// </summary>
+        /// <param name="terrainType"></param>
+        /// <param name="terrainIndex"></param>
+        /// <returns></returns>
         public ImageData RetrieveTerrainImage(ETerrainType terrainType, int terrainIndex)
         {
             if (!terrainImageDefinitions.ContainsKey(terrainType))
@@ -86,6 +92,82 @@ namespace H3Engine.API
         }
 
         /// <summary>
+        /// This should be used by the higher level
+        /// </summary>
+        /// <param name="terrainType"></param>
+        /// <returns></returns>
+        public ImageData[] RetrieveAllTerrainImages(ETerrainType terrainType)
+        {
+            if (!terrainImageDefinitions.ContainsKey(terrainType))
+            {
+                string terrainDefFileName = string.Empty;
+                switch (terrainType)
+                {
+                    case ETerrainType.DIRT:
+                        terrainDefFileName = "dirt";
+                        break;
+                    case ETerrainType.GRASS:
+                        terrainDefFileName = "gras";
+                        break;
+                    case ETerrainType.LAVA:
+                        terrainDefFileName = "lava";
+                        break;
+                    case ETerrainType.ROCK:
+                        terrainDefFileName = "rock";
+                        break;
+                    case ETerrainType.SAND:
+                        terrainDefFileName = "sand";
+                        break;
+                    case ETerrainType.SNOW:
+                        terrainDefFileName = "snow";
+                        break;
+                    case ETerrainType.SUBTERRANEAN:
+                        terrainDefFileName = "subb";
+                        break;
+                    case ETerrainType.SWAMP:
+                        terrainDefFileName = "swmp";
+                        break;
+                    case ETerrainType.WATER:
+                        terrainDefFileName = "watr";
+                        break;
+                    default:
+                        break;
+                }
+
+                terrainDefFileName += "tl.def";
+
+                BundleImageDefinition def = resourceHandler.RetrieveBundleImage(terrainDefFileName);
+                if (def != null)
+                {
+                    terrainImageDefinitions[terrainType] = def;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            BundleImageDefinition definition = terrainImageDefinitions[terrainType];
+            if (definition == null || definition.Groups.Count < 1)
+            {
+                return null;
+            }
+
+            int frameCount = definition.Groups[0].Frames.Count;
+
+            ImageData[] result = new ImageData[frameCount];
+            for(int i = 0; i < frameCount; i ++)
+            {
+                ImageData image = definition.GetImageData(0, i);
+                image.ExportDataToPNG(true);
+                result[i] = image;
+            }
+            
+            return result;
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="roadType"></param>
@@ -138,6 +220,60 @@ namespace H3Engine.API
             return image;
         }
 
+        public ImageData[] RetrieveAllRoadImages(ERoadType roadType)
+        {
+            if (!roadImageDefinitions.ContainsKey(roadType))
+            {
+                string roadDefFileName = string.Empty;
+                switch (roadType)
+                {
+                    case ERoadType.DIRT_ROAD:
+                        roadDefFileName = "dirt";
+                        break;
+                    case ERoadType.GRAVEL_ROAD:
+                        roadDefFileName = "grav";
+                        break;
+                    case ERoadType.COBBLESTONE_ROAD:
+                        roadDefFileName = "cobb";
+                        break;
+                    case ERoadType.NO_ROAD:
+                        return null;
+                    default:
+                        return null;
+                }
+
+                roadDefFileName += "rd.def";
+
+                BundleImageDefinition def = resourceHandler.RetrieveBundleImage(roadDefFileName);
+                if (def != null)
+                {
+                    roadImageDefinitions[roadType] = def;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            BundleImageDefinition definition = roadImageDefinitions[roadType];
+            if (definition == null || definition.Groups.Count < 1)
+            {
+                return null;
+            }
+
+            int frameCount = definition.Groups[0].Frames.Count;
+
+            ImageData[] result = new ImageData[frameCount];
+            for (int i = 0; i < frameCount; i++)
+            {
+                ImageData image = definition.GetImageData(0, i);
+                image.ExportDataToPNG(true);
+                result[i] = image;
+            }
+
+            return result;
+        }
+
         public ImageData RetrieveRiverImage(ERiverType riverType, int riverIndex)
         {
             if (!riverImageDefinitions.ContainsKey(riverType))
@@ -186,6 +322,62 @@ namespace H3Engine.API
             image.ExportDataToPNG(true);
 
             return image;
+        }
+
+        public ImageData[] RetrieveAllRiverImages(ERiverType riverType)
+        {
+            if (!riverImageDefinitions.ContainsKey(riverType))
+            {
+                string riverDefFileName = string.Empty;
+                switch (riverType)
+                {
+                    case ERiverType.CLEAR_RIVER:
+                        riverDefFileName = "clr";
+                        break;
+                    case ERiverType.ICY_RIVER:
+                        riverDefFileName = "icy";
+                        break;
+                    case ERiverType.LAVA_RIVER:
+                        riverDefFileName = "lav";
+                        break;
+                    case ERiverType.MUDDY_RIVER:
+                        riverDefFileName = "mud";
+                        break;
+                    case ERiverType.NO_RIVER:
+                        return null;
+                    default:
+                        return null;
+                }
+
+                riverDefFileName += "rvr.def";
+
+                BundleImageDefinition def = resourceHandler.RetrieveBundleImage(riverDefFileName);
+                if (def != null)
+                {
+                    riverImageDefinitions[riverType] = def;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            BundleImageDefinition definition = riverImageDefinitions[riverType];
+            if (definition == null || definition.Groups.Count < 1)
+            {
+                return null;
+            }
+
+            int frameCount = definition.Groups[0].Frames.Count;
+            ImageData[] result = new ImageData[frameCount];
+            for (int i = 0; i < frameCount; i++)
+            {
+                ImageData image = definition.GetImageData(0, i);
+                image.ExportDataToPNG(true);
+                result[i] = image;
+            }
+
+            return result;
         }
     }
 }

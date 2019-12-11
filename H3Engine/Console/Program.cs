@@ -43,7 +43,7 @@ namespace H3Console
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             ImageData image = engine.RetrieveImage("Bo53Muck.pcx");
-
+            
             byte[] imageBytes = image.GetPNGData();
             StreamHelper.WriteBytesToFile(@"D:\Temp\Bo53Muck.png", imageBytes);
         }
@@ -51,16 +51,18 @@ namespace H3Console
         static void TestRetrieveBundleImage()
         {
             Engine engine = Engine.GetInstance();
-            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
-            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("AVG2ele.def");
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("lavatl.def");
             for (int g = 0; g < bundleImage.Groups.Count; g++)
             {
                 for (int i = 0; i < bundleImage.Groups[g].Frames.Count; i++)
                 {
                     ImageData image = bundleImage.GetImageData(g, i);
+                    image.ExportDataToPNG();
+
                     byte[] imageBytes = image.GetPNGData();
-                    StreamHelper.WriteBytesToFile(string.Format(@"D:\Temp\AVG2ele-{0}-{1}.png", g, i), imageBytes);
+                    StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\H3sprite\lavatl-{0}-{1}.png", g, i), imageBytes);
                 }
             }
         }
@@ -149,7 +151,7 @@ namespace H3Console
                 for (int yy = 0; yy < map1.Header.Height; yy++)
                 {
                     TerrainTile tile = map1.TerrainTiles[0, xx, yy];
-                    //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
+                    Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
                     // ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
                     // StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\tile-{0}-{1}.png", yy, xx), tileImage.GetPNGData(tile.TerrainRotation));

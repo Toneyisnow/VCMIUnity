@@ -11,6 +11,8 @@ using H3Engine.Campaign;
 using Assets.Scripts.Components;
 using H3Engine.MapObjects;
 using H3Engine.Core;
+using UnityEngine.U2D;
+using H3Engine.Common;
 
 public class SampleTest : MonoBehaviour
 {
@@ -41,11 +43,16 @@ public class SampleTest : MonoBehaviour
 
         mainSprites = new List<Sprite>();
 
+        TestTileMap();
+
+        // LoadSimpleImage();
+        // LoadH3Image();
+
         // LoadImage();
 
         // LoadAnimation();
 
-        TestTextureRenderer();
+        // TestTextureRenderer();
 
         sceneLoaded = true;
         frameCount = 0;
@@ -75,10 +82,120 @@ public class SampleTest : MonoBehaviour
         renderer.sprite = sprite;
     }
 
+    void LoadImage2()
+    {
+        Engine h3Engine = Engine.GetInstance();
+        h3Engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
+        ImageData image = h3Engine.RetrieveImage("BoArt021.pcx");
+        image.ExportDataToPNG();
+
+        Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData("BoArt021", image.GetPNGData());
+        //// Sprite sprite = CreateSpriteFromTexture(texture);
+
+        GameObject go = new GameObject("SampleSprite");
+        go.transform.parent = transform;
+        // go.transform.position = new Vector3(10, 20, 0);
+
+        SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
+        ////renderer.sharedMaterial.mainTexture = texture;
+
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+        renderer.sprite = sprite;
+    }
+
+    void LoadSimpleImage()
+    {
+        string imagePath1 = Path.Combine(Application.dataPath, @"Images\HPL016Rn.png");
+        string imagePath2 = Path.Combine(Application.dataPath, @"Images\HPL017Rn.png");
+        string imagePath3 = Path.Combine(Application.dataPath, @"Images\HPL018Rn.png");
+        string imagePath4 = Path.Combine(Application.dataPath, @"Images\HPL019Rn.png");
+
+        int width = 58;
+        int height = 64;
+        Texture2D texture1 = new Texture2D(width, height);
+        texture1.LoadImage(File.ReadAllBytes(imagePath1));
+
+        Texture2D texture2 = new Texture2D(width, height);
+        texture2.LoadImage(File.ReadAllBytes(imagePath2));
+
+        Texture2D texture3 = new Texture2D(width, height);
+        texture3.LoadImage(File.ReadAllBytes(imagePath3));
+
+        Texture2D texture4 = new Texture2D(width, height);
+        texture4.LoadImage(File.ReadAllBytes(imagePath4));
+
+        Texture2D[] textures = new Texture2D[4] { texture1 , texture2 , texture3 , texture4 };
+
+        Texture2D atlas = new Texture2D(512, 512);
+        Rect[] rects = atlas.PackTextures(textures, 2);
+        
+
+        for(int i = 0; i < 4; i++)
+        {
+            Sprite sprite = Sprite.Create(atlas, new Rect(rects[i].xMin * atlas.width, rects[i].yMin * atlas.height, rects[i].width * atlas.width, rects[i].height * atlas.height), Vector2.zero);
+
+            GameObject go = new GameObject("SampleSprite");
+            go.transform.parent = transform;
+            go.transform.position = new Vector3((float)0.8 * i - 1, 0, 0);
+
+            SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+        }
+    }
+
+    void LoadH3Image()
+    {
+        Engine engine = Engine.GetInstance();
+        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
+
+        string imagePath1 = Path.Combine(Application.dataPath, @"Images\HPL016Rn.png");
+        string imagePath2 = Path.Combine(Application.dataPath, @"Images\HPL017Rn.png");
+        string imagePath3 = Path.Combine(Application.dataPath, @"Images\HPL018Rn.png");
+        string imagePath4 = Path.Combine(Application.dataPath, @"Images\HPL019Rn.png");
+
+        int width = 58;
+        int height = 64;
+
+        ImageData image1 = engine.RetrieveImage("HPL016Rn.pcx");
+        image1.ExportDataToPNG();
+        Texture2D texture1 = TextureStorage.GetInstance().LoadTextureFromPNGData("HPL016Rn", image1.GetPNGData());
+
+        ImageData image2 = engine.RetrieveImage("HPL017Rn.pcx");
+        image2.ExportDataToPNG();
+        Texture2D texture2 = TextureStorage.GetInstance().LoadTextureFromPNGData("HPL017Rn", image2.GetPNGData());
+
+        ImageData image3 = engine.RetrieveImage("HPL018Rn.pcx");
+        image3.ExportDataToPNG();
+        Texture2D texture3 = TextureStorage.GetInstance().LoadTextureFromPNGData("HPL018Rn", image3.GetPNGData());
+
+        ImageData image4 = engine.RetrieveImage("HPL019Rn.pcx");
+        image4.ExportDataToPNG();
+        Texture2D texture4 = TextureStorage.GetInstance().LoadTextureFromPNGData("HPL019Rn", image4.GetPNGData());
+        
+
+        Texture2D[] textures = new Texture2D[4] { texture1, texture2, texture3, texture4 };
+
+        Texture2D atlas = new Texture2D(512, 512);
+        Rect[] rects = atlas.PackTextures(textures, 2);
+
+
+        for (int i = 0; i < 4; i++)
+        {
+            Sprite sprite = Sprite.Create(atlas, new Rect(rects[i].xMin * atlas.width, rects[i].yMin * atlas.height, rects[i].width * atlas.width, rects[i].height * atlas.height), Vector2.zero);
+
+            GameObject go = new GameObject("SampleSprite");
+            go.transform.parent = transform;
+            go.transform.position = new Vector3((float)0.8 * i - 1, 0, 0);
+
+            SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+        }
+    }
+
     void LoadAnimation()
     {
         Engine engine = Engine.GetInstance();
-        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_sprlod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
 
 
         BundleImageDefinition animation = engine.RetrieveBundleImage("AVG2ele.def");
@@ -119,7 +236,7 @@ public class SampleTest : MonoBehaviour
         animated.Initialize(animation);
     }
 
-    void TestTextureRenderer()
+    void TestTileMap()
     {
         Engine engine = Engine.GetInstance();
 
@@ -129,11 +246,67 @@ public class SampleTest : MonoBehaviour
         engine.LoadArchiveFile(GetGameDataFilePath("H3sprite.lod"));
 
         H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-
         H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
 
-        Dictionary<Texture2D, List<Vector2>> textureDict = new Dictionary<Texture2D, List<Vector2>>();
-        Dictionary<string, Sprite> spriteDictionary = new Dictionary<string, Sprite>();
+        for (int i = 0; i <= 9; i++)
+        {
+            RenderTileMapByTerrainType(map, (ETerrainType)i);
+        }
+
+        RenderTileMapByRoadType(map, ERoadType.DIRT_ROAD);
+        RenderTileMapByRoadType(map, ERoadType.GRAVEL_ROAD);
+        RenderTileMapByRoadType(map, ERoadType.COBBLESTONE_ROAD);
+
+
+        RenderTileMapByRiverType(map, ERiverType.CLEAR_RIVER);
+        RenderTileMapByRiverType(map, ERiverType.LAVA_RIVER);
+
+        int objectIndex = 0;
+        foreach (CGObject obj in map.Objects)
+        {
+            ObjectTemplate template = obj.Template;
+            if (template == null)
+            {
+                continue;
+            }
+
+            MapPosition position = obj.Position;
+
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage(template.AnimationFile);
+
+            if (template.Type == H3Engine.Common.EObjectType.MONSTER
+                || template.Type == H3Engine.Common.EObjectType.CAMPFIRE
+                || template.Type == H3Engine.Common.EObjectType.LEARNING_STONE
+                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR1
+                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR2
+                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR3
+                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR4
+                )
+            {
+                // Load Animation
+                LoadAnimatedMapObject(position.PosX, position.PosY, bundleImage);
+            }
+            else
+            {
+                // Load Single Image
+                ImageData image = bundleImage.GetImageData(0, 0);
+                image.ExportDataToPNG();
+
+                Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
+                LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, 0);
+            }
+
+            objectIndex++;
+        }
+
+
+
+    }
+
+    private void RenderTileMapByTerrainType(H3Map map, ETerrainType terrainType)
+    {
+        TextureStorage textureStorage = TextureStorage.GetInstance();
+
         int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
         for (int level = 0; level < 1; level++)
         {
@@ -142,67 +315,101 @@ public class SampleTest : MonoBehaviour
                 for (int yy = 0; yy < map.Header.Height; yy++)
                 {
                     TerrainTile tile = map.TerrainTiles[level, xx, yy];
-
-                    ImageData terrainImage = engine.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
-                    Texture2D terrainTexture = TextureStorage.GetInstance().LoadTerrainTexture(tile.TerrainType, tile.TerrainView, tile.TerrainRotation, terrainImage.GetPNGData(tile.TerrainRotation));
-
-                    List<Vector2> positions = null;
-                    if (textureDict.ContainsKey(terrainTexture))
+                    if (tile.TerrainType != terrainType)
                     {
-                        positions = textureDict[terrainTexture];
-                    }
-                    else
-                    {
-                        positions = new List<Vector2>();
-                        textureDict[terrainTexture] = positions;
+                        continue;
                     }
 
-                    positions.Add(new Vector2(xx, yy));
+                    Sprite sprite = textureStorage.LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
+                    var position = GetMapPositionInPixel(xx, yy, 1);
+                    position.z += (float)terrainType.GetHashCode() / 10;
+
+                    Transform child = transform.Find("TL-" + terrainType.ToString());
+                    if (child == null)
+                    {
+                        GameObject terrain = new GameObject();
+                        terrain.name = "TL-" + terrainType.ToString();
+                        terrain.transform.parent = transform;
+
+                        //// terrain.transform.localPosition = new Vector3(0, 0, terrainType.GetHashCode());
+                    }
+
+                    GameObject g1 = new GameObject();
+                    g1.transform.localPosition = position;
+                    g1.transform.parent = child;
+
+                    SpriteRenderer renderer = g1.AddComponent<SpriteRenderer>();
+                    renderer.drawMode = SpriteDrawMode.Tiled;
+                    renderer.sprite = sprite;
                 }
             }
+        }
+    }
 
-            Shader shader = Shader.Find("Sprites/Default");
-            foreach (Texture2D texture in textureDict.Keys)
+    private void RenderTileMapByRoadType(H3Map map, H3Engine.Common.ERoadType roadType)
+    {
+        TextureStorage textureStorage = TextureStorage.GetInstance();
+
+        int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
+        for (int level = 0; level < 1; level++)
+        {
+            for (int xx = 0; xx < map.Header.Width; xx++)
             {
-                MaterialPropertyBlock block = new MaterialPropertyBlock();
-                block.SetTexture("tl", texture);
-
-                Material material = new Material(shader);
-                //// material.enableInstancing = true;
-                material.mainTexture = texture;
-                
-                List<Vector2> positions = textureDict[texture];
-                foreach (Vector2 pos in positions)
+                for (int yy = 0; yy < map.Header.Height; yy++)
                 {
-                    string spriteKey = string.Format(@"{0}-{1}-{2}", "tl", pos.x, pos.y);
-                    //// Sprite sprite = null;
-
-                    /*
-                    if (spriteDictionary.ContainsKey(spriteKey))
+                    TerrainTile tile = map.TerrainTiles[level, xx, yy];
+                    if (tile.RoadType != ERoadType.NO_ROAD)
                     {
-                        sprite = spriteDictionary[spriteKey];
+                        int here = 1;
                     }
-                    else
-                    {
-                        sprite = CreateSpriteFromTexture(texture);
-                        spriteDictionary[spriteKey] = sprite;
-                    }
-                    */
 
-                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+                    if (tile.RoadType != roadType)
+                    {
+                        continue;
+                    }
+
+                    Sprite sprite = textureStorage.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
+                    var position = GetMapPositionInPixel(xx, yy, 1);
+
                     GameObject g1 = new GameObject();
-                    g1.transform.position = GetMapPositionInPixel((int)pos.x, (int)pos.y, -1);
+                    g1.transform.position = position;
                     g1.transform.parent = transform;
-                    
+
                     SpriteRenderer renderer = g1.AddComponent<SpriteRenderer>();
-                    renderer.drawMode = SpriteDrawMode.Simple;
-                    
-                    renderer.sharedMaterial = material;
+                    renderer.drawMode = SpriteDrawMode.Tiled;
                     renderer.sprite = sprite;
+                }
+            }
+        }
+    }
 
-                    //// renderer.sprite = sprite;
+    private void RenderTileMapByRiverType(H3Map map, H3Engine.Common.ERiverType riverType)
+    {
+        TextureStorage textureStorage = TextureStorage.GetInstance();
 
-                    //// renderer.sharedMaterial.SetTexture(spriteKey, terrainTexture);
+        int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
+        for (int level = 0; level < 1; level++)
+        {
+            for (int xx = 0; xx < map.Header.Width; xx++)
+            {
+                for (int yy = 0; yy < map.Header.Height; yy++)
+                {
+                    TerrainTile tile = map.TerrainTiles[level, xx, yy];
+                    if (tile.RiverType != riverType)
+                    {
+                        continue;
+                    }
+
+                    Sprite sprite = textureStorage.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
+                    var position = GetMapPositionInPixel(xx, yy, 1);
+
+                    GameObject g1 = new GameObject();
+                    g1.transform.position = position;
+                    g1.transform.parent = transform;
+
+                    SpriteRenderer renderer = g1.AddComponent<SpriteRenderer>();
+                    renderer.drawMode = SpriteDrawMode.Tiled;
+                    renderer.sprite = sprite;
                 }
             }
         }
