@@ -10,6 +10,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.Components
 {
+    /// <summary>
+    /// This is legacy, using TextureSet instead
+    /// </summary>
     public abstract class TextureAtlas
     {
         protected Texture2D textureAtlas = null;
@@ -48,7 +51,7 @@ namespace Assets.Scripts.Components
             Rect rect = rects[textureIndex];
 
             Sprite sprite = Sprite.Create(textureAtlas, new Rect(rect.xMin * totalWidth, rect.yMin * totalHeight, rect.width * totalWidth, rect.height * totalHeight), Vector2.zero);
-
+            
             spriteCache[textureIndex] = sprite;
             return sprite;
         }

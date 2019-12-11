@@ -12,6 +12,7 @@ using Assets.Scripts.Components;
 using H3Engine.MapObjects;
 using H3Engine.Core;
 using UnityEngine.U2D;
+using H3Engine.Common;
 
 public class SampleTest : MonoBehaviour
 {
@@ -356,7 +357,26 @@ public class SampleTest : MonoBehaviour
 
         H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
         H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
-        
+
+        for (int i = 0; i <= 9; i++)
+        {
+            RenderTileMapByTerrainType(map, (ETerrainType)i);
+        }
+
+        RenderTileMapByRoadType(map, ERoadType.DIRT_ROAD);
+        RenderTileMapByRoadType(map, ERoadType.GRAVEL_ROAD);
+        RenderTileMapByRoadType(map, ERoadType.COBBLESTONE_ROAD);
+
+
+        RenderTileMapByRiverType(map, ERiverType.CLEAR_RIVER);
+        RenderTileMapByRiverType(map, ERiverType.LAVA_RIVER);
+
+    }
+
+    private void RenderTileMapByTerrainType(H3Map map, ETerrainType terrainType)
+    {
+        TextureStorage textureStorage = TextureStorage.GetInstance();
+
         int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
         for (int level = 0; level < 1; level++)
         {
@@ -365,14 +385,99 @@ public class SampleTest : MonoBehaviour
                 for (int yy = 0; yy < map.Header.Height; yy++)
                 {
                     TerrainTile tile = map.TerrainTiles[level, xx, yy];
+                    if (tile.TerrainType != terrainType)
+                    {
+                        continue;
+                    }
 
-                    Sprite sprite = TextureStorage.GetInstance().LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
+                    Sprite sprite = textureStorage.LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
+                    var position = GetMapPositionInPixel(xx, yy, -1);
+
+                    Transform child = transform.Find("TL-" + terrainType.ToString());
+                    if (child == null)
+                    {
+                        GameObject terrain = new GameObject();
+                        terrain.name = "TL-" + terrainType.ToString();
+                        terrain.transform.parent = transform;
+
+                        terrain.transform.localPosition = new Vector3(0, 0, terrainType.GetHashCode());
+                    }
 
                     GameObject g1 = new GameObject();
-                    g1.transform.position = GetMapPositionInPixel(xx, yy, -1);
-                    g1.transform.parent = transform;
-                    
+                    g1.transform.localPosition = position;
+                    g1.transform.parent = child;
+
                     SpriteRenderer renderer = g1.AddComponent<SpriteRenderer>();
+                    renderer.drawMode = SpriteDrawMode.Tiled;
+                    renderer.sprite = sprite;
+                }
+            }
+        }
+    }
+
+    private void RenderTileMapByRoadType(H3Map map, H3Engine.Common.ERoadType roadType)
+    {
+        TextureStorage textureStorage = TextureStorage.GetInstance();
+
+        int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
+        for (int level = 0; level < 1; level++)
+        {
+            for (int xx = 0; xx < map.Header.Width; xx++)
+            {
+                for (int yy = 0; yy < map.Header.Height; yy++)
+                {
+                    TerrainTile tile = map.TerrainTiles[level, xx, yy];
+                    if (tile.RoadType != ERoadType.NO_ROAD)
+                    {
+                        int here = 1;
+                    }
+
+                    if (tile.RoadType != roadType)
+                    {
+                        continue;
+                    }
+
+                    Sprite sprite = textureStorage.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
+                    var position = GetMapPositionInPixel(xx, yy, -1);
+
+                    GameObject g1 = new GameObject();
+                    g1.transform.position = position;
+                    g1.transform.parent = transform;
+
+                    SpriteRenderer renderer = g1.AddComponent<SpriteRenderer>();
+                    renderer.drawMode = SpriteDrawMode.Tiled;
+                    renderer.sprite = sprite;
+                }
+            }
+        }
+    }
+
+    private void RenderTileMapByRiverType(H3Map map, H3Engine.Common.ERiverType riverType)
+    {
+        TextureStorage textureStorage = TextureStorage.GetInstance();
+
+        int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
+        for (int level = 0; level < 1; level++)
+        {
+            for (int xx = 0; xx < map.Header.Width; xx++)
+            {
+                for (int yy = 0; yy < map.Header.Height; yy++)
+                {
+                    TerrainTile tile = map.TerrainTiles[level, xx, yy];
+                    if (tile.RiverType != riverType)
+                    {
+                        continue;
+                    }
+
+                    Sprite sprite = textureStorage.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
+                    var position = GetMapPositionInPixel(xx, yy, -1);
+
+                    GameObject g1 = new GameObject();
+                    g1.transform.position = position;
+                    g1.transform.parent = transform;
+
+                    SpriteRenderer renderer = g1.AddComponent<SpriteRenderer>();
+                    renderer.drawMode = SpriteDrawMode.Tiled;
                     renderer.sprite = sprite;
                 }
             }

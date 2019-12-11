@@ -65,8 +65,43 @@
     <Compile Include="Assets\Scripts\AdventureMapCoordinate.cs" />
     <Compile Include="Assets\Scripts\AnimatedObject.cs" />
     <Compile Include="Assets\Scripts\Components\TextureAtlas.cs" />
+    <Compile Include="Assets\Scripts\Components\TextureSet.cs" />
+    <Compile Include="Assets\Scripts\Components\TextureSheet.cs" />
     <Compile Include="Assets\Scripts\Components\TextureStorage.cs" />
     <Compile Include="Assets\Scripts\SampleTest.cs" />
+    <Reference Include="Unity.Timeline.Editor">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.PixelPerfect.Editor">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.2D.PixelPerfect.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VSCode.Editor">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro.Editor">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Timeline">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.CollabProxy.Editor">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Rider.Editor">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.PixelPerfect">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.2D.PixelPerfect.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UI">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>D:/Software/UnityEngine/2019.2.12f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
     </Reference>
