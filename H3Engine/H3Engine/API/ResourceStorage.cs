@@ -22,7 +22,8 @@ namespace H3Engine.API
 
         public void LoadArchive(string fileFullName)
         {
-            fileFullName = fileFullName.ToLower().Trim();
+            // Bug: Since on the iOS, the file path is case sensitive, we should not do the ToLower() here.
+            ////fileFullName = fileFullName.ToLower().Trim();
             if (loadedArchiveDataDict.ContainsKey(fileFullName))
             {
                 return;
