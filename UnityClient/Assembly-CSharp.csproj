@@ -282,11 +282,14 @@
     <Reference Include="H3Engine">
       <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/H3Engine.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="ZipForge">
       <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/ZipForge.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
+    <Reference Include="CoreCompat.System.Drawing">
+      <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Plugins/CoreCompat.System.Drawing.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Software/UnityEngine/2019.2.12f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
