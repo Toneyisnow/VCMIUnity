@@ -21,7 +21,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestRetrieveCampaign();
+            TestRetrieveImage();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -43,9 +43,10 @@ namespace H3Console
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             ImageData image = engine.RetrieveImage("Bo53Muck.pcx");
-            
+            image.ExportDataToPNG();
+
             byte[] imageBytes = image.GetPNGData();
-            StreamHelper.WriteBytesToFile(@"D:\Temp\Bo53Muck.png", imageBytes);
+            StreamHelper.WriteBytesToFile(@"D:\Temp\h3\Bo53Muck.png", imageBytes);
         }
 
         static void TestRetrieveBundleImage()

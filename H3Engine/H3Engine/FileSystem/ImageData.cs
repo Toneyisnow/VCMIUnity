@@ -79,6 +79,31 @@ namespace H3Engine.FileSystem
             rawData = null;
         }
 
+        public Color GetPixelColor(int x, int y)
+        {
+            if (x < 0 || x >= this.Width || y < 0 || y >= this.Height)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            int index = (y * this.Width + x) << 2;
+
+            byte r = this.rawData[index];
+            byte g = this.rawData[index + 1];
+            byte b = this.rawData[index + 2];
+            byte a = this.rawData[index + 3];
+
+            return Color.FromArgb(a, r, g, b);
+        }
+
+        public byte[] RawData
+        {
+            get
+            {
+                return rawData;
+            }
+        }
+
         public byte[] GetPNGData(byte rotation = 0)
         {
             if (pngData == null)
@@ -157,7 +182,27 @@ namespace H3Engine.FileSystem
             return resultData;
         }
 
-        private byte[] GeneratePNGData(byte[] raw)
+        private byte[] GeneratePNGData(byte[] rawBytes)
+        {
+            using (MemoryStream output = new MemoryStream())
+            {
+                Bitmap bmp = new Bitmap(this.Width, this.Height, PixelFormat.Format32bppArgb);
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, bmp.PixelFormat);
+
+                System.Runtime.InteropServices.Marshal.Copy(rawBytes, 0, bmpData.Scan0, rawBytes.Length);
+                bmp.UnlockBits(bmpData);
+                bmp.Save(output, ImageFormat.Png);
+                
+                return StreamHelper.ReadToEnd(output);
+            }
+        }
+
+        /// <summary>
+        /// This version should be used on Windows
+        /// </summary>
+        /// <param name="raw"></param>
+        /// <returns></returns>
+        private byte[] GeneratePNGData2(byte[] raw)
         {
             using (MemoryStream output = new MemoryStream())
             {
@@ -175,7 +220,7 @@ namespace H3Engine.FileSystem
                 return StreamHelper.ReadToEnd(output);
             }
         }
-        
+
         /// <summary>
         /// This should not be used any more, it's replaced by ExportDataToPNG()
         /// </summary>
