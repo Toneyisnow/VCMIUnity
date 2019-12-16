@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using H3Engine.Common;
+using H3Engine.FileSystem;
 
 namespace Assets.Scripts.Components
 {
@@ -56,6 +57,18 @@ namespace Assets.Scripts.Components
                 texture = new Texture2D(1, 1, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
                 texture.LoadImage(pngData);
 
+                textureDict[textureKey] = texture;
+            }
+
+            return texture;
+        }
+
+        public Texture2D LoadTextureFromImage(string textureKey, ImageData imageData)
+        {
+            Texture2D texture = GetTexture(textureKey);
+            if (texture == null)
+            {
+                texture = Texture2DExtension.LoadFromData(imageData);
                 textureDict[textureKey] = texture;
             }
 

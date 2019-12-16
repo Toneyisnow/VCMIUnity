@@ -1,7 +1,11 @@
 ﻿using H3Engine.GUI;
+using H3Engine.Common;
+
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+
+//// using System.Drawing;
+///
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -79,8 +83,8 @@ namespace H3Engine.FileSystem
         {
             h3Palette = new Color[8]
             {
-                //// Color.FromArgb(0, 255, 255, 0), //// Color.FromArgb(0, 0, 0, 0),
-                Color.FromArgb(0, 0, 0, 0), //// Color.FromArgb(0, 0, 0, 0),
+                Color.FromArgb(0, 0, 255, 255), //// Color.FromArgb(0, 0, 0, 0),
+                //// Color.FromArgb(0, 0, 0, 0), //// Color.FromArgb(0, 0, 0, 0),
                 Color.FromArgb(32, 0, 0, 0),
                 Color.FromArgb(64, 0, 0, 0),
                 Color.FromArgb(128, 0, 0, 0),
@@ -109,7 +113,7 @@ namespace H3Engine.FileSystem
                 byte green = reader.ReadByte();
                 byte red = reader.ReadByte();
 
-                palette[i] = Color.FromArgb(red, green, blue);
+                palette[i] = Color.FromArgb(0, red, green, blue);
             }
 
             switch(bundleImage.Type)

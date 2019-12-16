@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+using HCommon = H3Engine.Common;
+
 namespace Assets.Scripts.Components
 {
     /// <summary>
@@ -16,15 +18,13 @@ namespace Assets.Scripts.Components
     public abstract class TextureSet
     {
         protected Engine h3Engine = null;
-
-
-
+        
         public TextureSet()
         {
             h3Engine = Engine.GetInstance();
         }
 
-        protected Texture2D GenerateTexture(ImageData imageData, byte rotateIndex = 0)
+        protected Texture2D GenerateTexturePNG(ImageData imageData, byte rotateIndex = 0)
         {
             byte[] pngData = imageData.GetPNGData(rotateIndex);
             Texture2D texture = new Texture2D(1, 1, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
@@ -89,7 +89,7 @@ namespace Assets.Scripts.Components
             {
                 for (byte rotate = 0; rotate < 4; rotate++)
                 {
-                    Texture2D texture =  GenerateTexture(images[i], rotate);
+                    Texture2D texture = Texture2DExtension.LoadFromData(images[i], rotate);
                     textureSheet.AddImageData(TextureKey(i, rotate), texture);
                 }
             }

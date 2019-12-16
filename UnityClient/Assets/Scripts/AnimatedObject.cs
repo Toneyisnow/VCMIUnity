@@ -5,6 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using HCommon = H3Engine.Common;
+
+
 public class AnimatedObject : MonoBehaviour
 {
     private List<Sprite> mainSprites;
@@ -34,8 +37,8 @@ public class AnimatedObject : MonoBehaviour
             for (int i = 0; i < animation.Groups[g].Frames.Count; i++)
             {
                 ImageData image = animation.GetImageData(g, i);
-                image.ExportDataToPNG();
-                Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData(animation.Identity + g + i, image.GetPNGData());
+
+                Texture2D texture = Texture2DExtension.LoadFromData(image);
                 Sprite sprite = CreateSpriteFromTexture(texture);
                 mainSprites.Add(sprite);
             }
@@ -44,6 +47,14 @@ public class AnimatedObject : MonoBehaviour
         isInitialized = true;
         frameTick = 0;
         frameIndex = 0;
+    }
+    
+    private Texture2D GenerateTexture2(ImageData imageData, string textureId)
+    {
+        imageData.ExportDataToPNG();
+        Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData(textureId, imageData.GetPNGData());
+
+        return texture;
     }
 
     // Update is called once per frame

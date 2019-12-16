@@ -14,7 +14,7 @@ public class AdventureMapCoordinate : MonoBehaviour
     {
         GameObject imageSprite = gameObject.transform.GetChild(0).gameObject;
 
-        imageSprite.transform.position = new Vector3(0, 0, 0);
+        imageSprite.transform.position = new Vector3(0, 0, -1);
     }
 
 
