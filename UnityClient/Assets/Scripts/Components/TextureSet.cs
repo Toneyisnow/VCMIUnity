@@ -33,7 +33,7 @@ namespace Assets.Scripts.Components
             return texture;
         }
 
-        public abstract Sprite RetrieveSprite(int key);
+        public abstract Sprite RetrieveSprite(string key);
 
     }
 
@@ -44,7 +44,7 @@ namespace Assets.Scripts.Components
         River
     }
 
-    public class TileMapTextureSet : TextureSet
+    public class MapTileTextureSet : TextureSet
     {
         private ETileType tileType;
 
@@ -52,12 +52,12 @@ namespace Assets.Scripts.Components
 
         private TextureSheet textureSheet = null;
 
-        public static int TextureKey(int index, byte rotate)
+        public static string TextureKey(int index, byte rotate)
         {
-            return index * 4 + rotate;
+            return string.Format(@"{0}", index * 4 + rotate);
         }
 
-        public TileMapTextureSet(ETileType tileType, int subType)
+        public MapTileTextureSet(ETileType tileType, int subType)
         {
             this.tileType = tileType;
             this.subType = subType;
@@ -97,7 +97,25 @@ namespace Assets.Scripts.Components
             textureSheet.PackTextures();
         }
 
-        public override Sprite RetrieveSprite(int key)
+        public override Sprite RetrieveSprite(string key)
+        {
+            return textureSheet.RetrieveSprite(key);
+        }
+    }
+
+    /// <summary>
+    /// All of the MapObject that def file name starting with "AVA*"
+    /// </summary>
+    public class MapArtifactTextureSet : TextureSet
+    {
+        private TextureSheet textureSheet = null;
+
+        public static string TextureKey(string defFileName)
+        {
+            return defFileName.ToLower().Replace(@".def", string.Empty);
+        }
+
+        public override Sprite RetrieveSprite(string key)
         {
             return textureSheet.RetrieveSprite(key);
         }

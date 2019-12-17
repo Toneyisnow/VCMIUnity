@@ -9,13 +9,13 @@ namespace Assets.Scripts.Components
 {
     public class TextureSheet
     {
-        private List<int> textureKeys = null;
+        private List<string> textureKeys = null;
 
         private List<Texture2D> textures = null;
         
-        private Dictionary<int, Rect> keysToRects = null;
+        private Dictionary<string, Rect> keysToRects = null;
 
-        private Dictionary<int, Sprite> spriteCache = null;
+        private Dictionary<string, Sprite> spriteCache = null;
 
         private int sheetWidth = 0;
 
@@ -26,13 +26,13 @@ namespace Assets.Scripts.Components
 
         public TextureSheet()
         {
-            textureKeys = new List<int>();
+            textureKeys = new List<string>();
             textures = new List<Texture2D>();
 
-            spriteCache = new Dictionary<int, Sprite>();
+            spriteCache = new Dictionary<string, Sprite>();
         }
 
-        public void AddImageData(int key, Texture2D texture)
+        public void AddImageData(string key, Texture2D texture)
         {
             textureKeys.Add(key);
             textures.Add(texture);
@@ -49,8 +49,8 @@ namespace Assets.Scripts.Components
                 return;
             }
 
-            int unitHeight = textures[0].height;
-            int unitWidth = textures[0].width;
+            int unitHeight = textures[0].height + 2;
+            int unitWidth = textures[0].width + 2;
 
             int multiFactor = (int)Math.Sqrt(totalCount) + 1;
 
@@ -60,9 +60,9 @@ namespace Assets.Scripts.Components
 
             mainTextureSheet = new Texture2D(this.sheetWidth, this.sheetHeight);
 
-            Rect[] rects = mainTextureSheet.PackTextures(textures.ToArray(), 0);
+            Rect[] rects = mainTextureSheet.PackTextures(textures.ToArray(), 2);
 
-            keysToRects = new Dictionary<int, Rect>();
+            keysToRects = new Dictionary<string, Rect>();
             for(int i = 0; i < rects.Length; i ++)
             {
                 keysToRects[textureKeys[i]] = rects[i];
@@ -73,7 +73,7 @@ namespace Assets.Scripts.Components
             textureKeys.Clear();
         }
 
-        public Sprite RetrieveSprite(int key)
+        public Sprite RetrieveSprite(string key)
         {
             if (spriteCache.ContainsKey(key))
             {

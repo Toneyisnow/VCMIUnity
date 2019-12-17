@@ -62,6 +62,7 @@
     <Compile Include="Campaign\H3CampaignLoader.cs" />
     <Compile Include="Common\GameConstants.cs" />
     <Compile Include="Common\Color.cs" />
+    <Compile Include="Common\ILogger.cs" />
     <Compile Include="Components\ArtifactSet.cs" />
     <Compile Include="Components\CreatureSet.cs" />
     <Compile Include="Components\ResourceSet.cs" />

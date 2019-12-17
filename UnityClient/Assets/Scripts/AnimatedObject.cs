@@ -14,7 +14,7 @@ public class AnimatedObject : MonoBehaviour
 
     private bool isInitialized = false;
 
-    private int frameTickCount = 6;
+    private int frameTickCount = 4;
 
     private int frameTick = 0;
 
