@@ -165,7 +165,7 @@ namespace H3Engine.FileSystem
             }
 
             bundleImage.Palette = palette;
-            Console.WriteLine(string.Format("Type: {0} Width: {1} Height: {2} GroupCount: {3}", bundleImage.Type, bundleImage.Width, bundleImage.Height, groupCount));
+            //// Console.WriteLine(string.Format("Type: {0} Width: {1} Height: {2} GroupCount: {3}", bundleImage.Type, bundleImage.Width, bundleImage.Height, groupCount));
 
             for(int i = 0; i < groupCount; i++)
             {
@@ -177,8 +177,8 @@ namespace H3Engine.FileSystem
                 reader.ReadUInt32();
                 
                 byte[] name = reader.ReadBytes(13 * frameCount);
-                
-                Console.WriteLine(string.Format(@"Group: {0} Id={1} name={2} frameCount={3}", i, groupId, Encoding.ASCII.GetString(name, 0, name.Length), frameCount));
+
+                //// Console.WriteLine(string.Format(@"Group: {0} Id={1} name={2} frameCount={3}", i, groupId, Encoding.ASCII.GetString(name, 0, name.Length), frameCount));
 
                 List<UInt32> offset = new List<UInt32>();
                 for (int j = 0; j < frameCount; j++)
@@ -255,8 +255,8 @@ namespace H3Engine.FileSystem
                 baseOffset = 16;
             }
 
-            Console.WriteLine(string.Format(@"Frame [{0}][{1}]: format={2} FullWidth={3} FullHeight={4} Width={5} Height={6} Left={7} Top={8} Size={9}", 
-                                        groupIndex, frameIndex, format, frame.FullWidth, frame.FullHeight, frame.Width, frame.Height, frame.LeftMargin, frame.TopMargin, size));
+            //// Console.WriteLine(string.Format(@"Frame [{0}][{1}]: format={2} FullWidth={3} FullHeight={4} Width={5} Height={6} Left={7} Top={8} Size={9}", 
+            //// groupIndex, frameIndex, format, frame.FullWidth, frame.FullHeight, frame.Width, frame.Height, frame.LeftMargin, frame.TopMargin, size));
 
             UInt32 currentOffset = baseOffset;
             long basePosition = inputStream.Position;
