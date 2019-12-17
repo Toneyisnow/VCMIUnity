@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using H3Engine.Common;
+using H3Engine.FileSystem;
 
 namespace Assets.Scripts.Components
 {
@@ -62,6 +63,18 @@ namespace Assets.Scripts.Components
             return texture;
         }
 
+        public Texture2D LoadTextureFromImage(string textureKey, ImageData imageData)
+        {
+            Texture2D texture = GetTexture(textureKey);
+            if (texture == null)
+            {
+                texture = Texture2DExtension.LoadFromData(imageData);
+                textureDict[textureKey] = texture;
+            }
+
+            return texture;
+        }
+
         public Texture2D LoadTerrainTexture(ETerrainType terrainType, byte terrainIndex, byte rotation, byte[] pngData)
         {
             string key = string.Format(@"TL-{0}-{1}-{2}", terrainType.GetHashCode(), terrainIndex, rotation);
@@ -74,11 +87,11 @@ namespace Assets.Scripts.Components
             
             if (!textureSets.ContainsKey(textureSetKey))
             {
-                textureSets[textureSetKey] = new TileMapTextureSet(ETileType.Terrain, terrainType.GetHashCode());
+                textureSets[textureSetKey] = new MapTileTextureSet(ETileType.Terrain, terrainType.GetHashCode());
             }
 
             TextureSet textureSet = textureSets[textureSetKey];
-            return textureSet.RetrieveSprite(TileMapTextureSet.TextureKey(terrainIndex, rotation));
+            return textureSet.RetrieveSprite(MapTileTextureSet.TextureKey(terrainIndex, rotation));
         }
         
         public Texture2D LoadRoadTexture(ERoadType roadType, byte roadIndex, byte rotation, byte[] pngData)
@@ -99,11 +112,11 @@ namespace Assets.Scripts.Components
 
             if (!textureSets.ContainsKey(textureSetKey))
             {
-                textureSets[textureSetKey] = new TileMapTextureSet(ETileType.Road, roadType.GetHashCode());
+                textureSets[textureSetKey] = new MapTileTextureSet(ETileType.Road, roadType.GetHashCode());
             }
 
             TextureSet textureSet = textureSets[textureSetKey];
-            return textureSet.RetrieveSprite(TileMapTextureSet.TextureKey(roadIndex, rotation));
+            return textureSet.RetrieveSprite(MapTileTextureSet.TextureKey(roadIndex, rotation));
         }
 
         public Sprite LoadRiverSprite(ERiverType riverType, byte riverIndex, byte rotation)
@@ -112,11 +125,11 @@ namespace Assets.Scripts.Components
 
             if (!textureSets.ContainsKey(textureSetKey))
             {
-                textureSets[textureSetKey] = new TileMapTextureSet(ETileType.River, riverType.GetHashCode());
+                textureSets[textureSetKey] = new MapTileTextureSet(ETileType.River, riverType.GetHashCode());
             }
 
             TextureSet textureSet = textureSets[textureSetKey];
-            return textureSet.RetrieveSprite(TileMapTextureSet.TextureKey(riverIndex, rotation));
+            return textureSet.RetrieveSprite(MapTileTextureSet.TextureKey(riverIndex, rotation));
         }
 
     }

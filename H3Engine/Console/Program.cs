@@ -43,9 +43,10 @@ namespace H3Console
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             ImageData image = engine.RetrieveImage("Bo53Muck.pcx");
-            
+            image.ExportDataToPNG();
+
             byte[] imageBytes = image.GetPNGData();
-            StreamHelper.WriteBytesToFile(@"D:\Temp\Bo53Muck.png", imageBytes);
+            StreamHelper.WriteBytesToFile(@"D:\Temp\h3\Bo53Muck.png", imageBytes);
         }
 
         static void TestRetrieveBundleImage()
@@ -144,14 +145,14 @@ namespace H3Console
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-            H3Map map1 = H3CampaignLoader.LoadScenarioMap(campaign, 0);
+            H3Map map1 = H3CampaignLoader.LoadScenarioMap(campaign, 0, new ConsoleLogger());
 
             for (int xx = 0; xx < map1.Header.Width; xx++)
             {
                 for (int yy = 0; yy < map1.Header.Height; yy++)
                 {
                     TerrainTile tile = map1.TerrainTiles[0, xx, yy];
-                    Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
+                    //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
                     // ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
                     // StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\tile-{0}-{1}.png", yy, xx), tileImage.GetPNGData(tile.TerrainRotation));
@@ -161,7 +162,7 @@ namespace H3Console
                         ImageData roadImage = engine.RetrieveRoadImage((H3Engine.Common.ERoadType)tile.RoadType, tile.RoadDir);
                         if (roadImage != null)
                         {
-                            StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\road-{0}-{1}.png", yy, xx), roadImage.GetPNGData(tile.RoadRotation));
+                            //// StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\road-{0}-{1}.png", yy, xx), roadImage.GetPNGData(tile.RoadRotation));
                         }
                     }
                 }

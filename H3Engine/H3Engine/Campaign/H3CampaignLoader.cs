@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using H3Engine.Common;
 using H3Engine.FileSystem;
 using H3Engine.Mapping;
 using H3Engine.Utils;
@@ -58,7 +59,7 @@ namespace H3Engine.Campaign
             return campaignObject;
         }
 
-        public static H3Map LoadScenarioMap(H3Campaign campaign, int scenarioIndex)
+        public static H3Map LoadScenarioMap(H3Campaign campaign, int scenarioIndex, ILogger logger = null)
         {
             if (campaign == null)
             {
@@ -72,7 +73,7 @@ namespace H3Engine.Campaign
 
             if (campaign.Scenarios[scenarioIndex].MapData == null && campaign.CampaignMapBytes[scenarioIndex] != null)
             {
-                H3MapLoader h3MapLoader = new H3MapLoader(campaign.CampaignMapBytes[scenarioIndex]);
+                H3MapLoader h3MapLoader = new H3MapLoader(campaign.CampaignMapBytes[scenarioIndex], logger);
                 campaign.Scenarios[scenarioIndex].MapData = h3MapLoader.LoadMap();
             }
 

@@ -39,7 +39,8 @@ public class SampleTest : MonoBehaviour
 
     void Start()
     {
-        HEROES3_DATA_FOLDER = Path.Combine(Application.dataPath, @"Resources\GameData");
+        //// HEROES3_DATA_FOLDER = Path.Combine(Application.dataPath, @"Resources\GameData");
+        HEROES3_DATA_FOLDER = Application.streamingAssetsPath;
 
         mainSprites = new List<Sprite>();
 
@@ -227,7 +228,7 @@ public class SampleTest : MonoBehaviour
         BundleImageDefinition animation = engine.RetrieveBundleImage("AVG2ele.def");
 
         GameObject obj = Instantiate(mapObjectPrefab, transform);
-        obj.transform.position = new Vector3(0, 0, 0);
+        obj.transform.position = new Vector3(0, 0, -1);
 
         AdventureMapCoordinate mapCoordinate = obj.GetComponent<AdventureMapCoordinate>();
         mapCoordinate.Initialize(animation.Width, animation.Height);
@@ -290,9 +291,10 @@ public class SampleTest : MonoBehaviour
             {
                 // Load Single Image
                 ImageData image = bundleImage.GetImageData(0, 0);
-                image.ExportDataToPNG();
+                //// image.ExportDataToPNG();
 
-                Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
+                //// Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
+                Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromImage(template.AnimationFile, image);
                 LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, 0);
             }
 

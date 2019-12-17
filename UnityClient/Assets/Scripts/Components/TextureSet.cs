@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+using HCommon = H3Engine.Common;
+
 namespace Assets.Scripts.Components
 {
     /// <summary>
@@ -16,15 +18,13 @@ namespace Assets.Scripts.Components
     public abstract class TextureSet
     {
         protected Engine h3Engine = null;
-
-
-
+        
         public TextureSet()
         {
             h3Engine = Engine.GetInstance();
         }
 
-        protected Texture2D GenerateTexture(ImageData imageData, byte rotateIndex = 0)
+        protected Texture2D GenerateTexturePNG(ImageData imageData, byte rotateIndex = 0)
         {
             byte[] pngData = imageData.GetPNGData(rotateIndex);
             Texture2D texture = new Texture2D(1, 1, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
@@ -33,7 +33,7 @@ namespace Assets.Scripts.Components
             return texture;
         }
 
-        public abstract Sprite RetrieveSprite(int key);
+        public abstract Sprite RetrieveSprite(string key);
 
     }
 
@@ -44,7 +44,7 @@ namespace Assets.Scripts.Components
         River
     }
 
-    public class TileMapTextureSet : TextureSet
+    public class MapTileTextureSet : TextureSet
     {
         private ETileType tileType;
 
@@ -52,12 +52,12 @@ namespace Assets.Scripts.Components
 
         private TextureSheet textureSheet = null;
 
-        public static int TextureKey(int index, byte rotate)
+        public static string TextureKey(int index, byte rotate)
         {
-            return index * 4 + rotate;
+            return string.Format(@"{0}", index * 4 + rotate);
         }
 
-        public TileMapTextureSet(ETileType tileType, int subType)
+        public MapTileTextureSet(ETileType tileType, int subType)
         {
             this.tileType = tileType;
             this.subType = subType;
@@ -89,7 +89,7 @@ namespace Assets.Scripts.Components
             {
                 for (byte rotate = 0; rotate < 4; rotate++)
                 {
-                    Texture2D texture =  GenerateTexture(images[i], rotate);
+                    Texture2D texture = Texture2DExtension.LoadFromData(images[i], rotate);
                     textureSheet.AddImageData(TextureKey(i, rotate), texture);
                 }
             }
@@ -97,7 +97,25 @@ namespace Assets.Scripts.Components
             textureSheet.PackTextures();
         }
 
-        public override Sprite RetrieveSprite(int key)
+        public override Sprite RetrieveSprite(string key)
+        {
+            return textureSheet.RetrieveSprite(key);
+        }
+    }
+
+    /// <summary>
+    /// All of the MapObject that def file name starting with "AVA*"
+    /// </summary>
+    public class MapArtifactTextureSet : TextureSet
+    {
+        private TextureSheet textureSheet = null;
+
+        public static string TextureKey(string defFileName)
+        {
+            return defFileName.ToLower().Replace(@".def", string.Empty);
+        }
+
+        public override Sprite RetrieveSprite(string key)
         {
             return textureSheet.RetrieveSprite(key);
         }
