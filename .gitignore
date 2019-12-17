@@ -344,3 +344,4 @@ UnityClient/Assets/Resources/GameData/H3bitmap.lod
 
 UnityClient/Library/
 UnityClient/Assets/StreamingAssets
+Unity*.csproj
