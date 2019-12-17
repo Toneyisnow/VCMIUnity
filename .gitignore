@@ -337,10 +337,6 @@ UnityClient/Temp/
 
 UnityClient/Assembly-CSharp.csproj
 
-# These files are either built from H3Engine, either too large to upload
-UnityClient/Assets/Plugins/H3Engine.dll
-UnityClient/Assets/Resources/GameData/H3sprite.lod
-UnityClient/Assets/Resources/GameData/H3bitmap.lod
-
+# These files are too large to upload
 UnityClient/Library/
 UnityClient/Assets/StreamingAssets/
