@@ -222,7 +222,7 @@ public class SampleTest : MonoBehaviour
     void LoadAnimationToGameObject()
     {
         Engine engine = Engine.GetInstance();
-        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("h3ab_spr.lod"));
 
 
         BundleImageDefinition animation = engine.RetrieveBundleImage("AVG2ele.def");
@@ -241,10 +241,10 @@ public class SampleTest : MonoBehaviour
     {
         Engine engine = Engine.GetInstance();
 
-        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("H3bitmap.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("H3sprite.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("h3ab_bmp.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("h3ab_spr.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("h3bitmap.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("h3sprite.lod"));
 
         H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
         H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
