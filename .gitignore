@@ -328,6 +328,7 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+UnityClient/Library/
 UnityClient/Library/metadata/
 UnityClient/Library/PackageCache/
 UnityClient/Library/ShaderCache/
@@ -338,5 +339,4 @@ UnityClient/Temp/
 UnityClient/Assembly-CSharp.csproj
 
 # These files are too large to upload
-UnityClient/Library/
 UnityClient/Assets/StreamingAssets/
