@@ -1,4 +1,6 @@
 ﻿using H3Engine.FileSystem;
+using H3Engine.Utils;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,6 +34,28 @@ namespace H3Engine.API
             H3ArchiveData archiveData = new H3ArchiveData(fileFullName);
 
             loadedArchiveDataDict.Add(fileFullName, archiveData);
+        }
+
+        public List<string> SearchResourceFiles(string namePattern)
+        {
+            List<string> result = new List<string>();
+
+            foreach(string key in loadedArchiveDataDict.Keys)
+            {
+                H3ArchiveData archiveData = loadedArchiveDataDict[key];
+
+                foreach(var fileInfo in archiveData.FileInfos)
+                {
+                    if (fileInfo.FileName.WildCardMatching(namePattern))
+                    {
+                        result.Add(fileInfo.FileName);
+                    }
+                }
+            }
+
+            result.Sort();
+
+            return result;
         }
 
         public byte[] ExtractFileData(string fileName)

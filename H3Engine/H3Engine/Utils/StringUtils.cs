@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace H3Engine.Utils
 {
-    public class StringUtils
+    public static class StringUtils
     {
         public static string ByteArrayToString(byte[] ba)
         {
@@ -28,5 +28,36 @@ namespace H3Engine.Utils
             return hex.ToString();
         }
 
+        /// <summary>
+        /// Pattern supports: XXX*, *XX
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="wildcardPattern"></param>
+        /// <returns></returns>
+        public static bool WildCardMatching(this string text, string wildcardPattern)
+        {
+            wildcardPattern = wildcardPattern.ToLower();
+
+            if (wildcardPattern.EndsWith("*"))
+            {
+                return text.StartsWith(wildcardPattern.Substring(0, wildcardPattern.Length - 1));
+            }
+
+            if (wildcardPattern.StartsWith("*"))
+            {
+                return text.EndsWith(wildcardPattern.Substring(1));
+            }
+
+            if (wildcardPattern.Contains("*"))
+            {
+                int starIndex = wildcardPattern.IndexOf("*");
+
+                string startPart = wildcardPattern.Substring(0, starIndex);
+                string endPart = wildcardPattern.Substring(starIndex + 1);
+                return text.StartsWith(startPart) && text.EndsWith(endPart);
+            }
+
+            return text == wildcardPattern;
+        }
     }
 }

@@ -63,12 +63,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\AdventureMapCoordinate.cs" />
+    <Compile Include="Assets\Scripts\AnimatedMapArtifact.cs" />
+    <Compile Include="Assets\Scripts\AnimatedMapObject.cs" />
     <Compile Include="Assets\Scripts\AnimatedObject.cs" />
+    <Compile Include="Assets\Scripts\Components\MapTextureManager.cs" />
     <Compile Include="Assets\Scripts\Components\Texture2DExtension.cs" />
     <Compile Include="Assets\Scripts\Components\TextureAtlas.cs" />
     <Compile Include="Assets\Scripts\Components\TextureSet.cs" />
     <Compile Include="Assets\Scripts\Components\TextureSheet.cs" />
     <Compile Include="Assets\Scripts\Components\TextureStorage.cs" />
+    <Compile Include="Assets\Scripts\MapCamera.cs" />
     <Compile Include="Assets\Scripts\SampleTest.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Toney/Personal/Git/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
