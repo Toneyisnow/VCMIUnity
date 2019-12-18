@@ -45,7 +45,7 @@ public class SampleTest : MonoBehaviour
 
         mainSprites = new List<Sprite>();
 
-        TestTileMap();
+        LoadCampaignMap();
 
         // LoadSimpleImage();
         // LoadH3Image();
@@ -236,6 +236,25 @@ public class SampleTest : MonoBehaviour
 
         AnimatedObject animated = obj.GetComponent<AnimatedObject>();
         animated.Initialize(animation);
+    }
+
+    void LoadCampaignMap()
+    {
+        Engine engine = Engine.GetInstance();
+
+        engine.LoadArchiveFile(GetGameDataFilePath("h3ab_bmp.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("h3ab_spr.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("h3bitmap.lod"));
+        engine.LoadArchiveFile(GetGameDataFilePath("h3sprite.lod"));
+
+        H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
+        H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
+
+        Transform gameMap = transform.Find("GameMap");
+        MapLoader mapLoader = gameMap.gameObject.GetComponent<MapLoader>();
+        mapLoader.Initialize(map);
+        mapLoader.RenderMap();
+
     }
 
     void TestTileMap()

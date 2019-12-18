@@ -30,25 +30,22 @@ SpriteAtlas:
       enableTightPacking: 0
     variantMultiplier: 1
     packables:
-    - {fileID: 2800000, guid: 9ecd51ed0adb51844b783aa4bceddc24, type: 3}
     - {fileID: 2800000, guid: 87f70f6554c6e1e41a5fbaf1c826d379, type: 3}
     - {fileID: 2800000, guid: 18d3f51119448ba4c88506f0b9464364, type: 3}
     - {fileID: 2800000, guid: 3419cadffc710b04fb2b60fba8556209, type: 3}
-    totalSpriteSurfaceArea: 4096
+    totalSpriteSurfaceArea: 3072
     bindAsDefault: 1
     storedHash:
       serializedVersion: 2
-      Hash: e79ab62ed1c0b0d4026c2036e3bd027b
+      Hash: ffd0f296aee5d150cb679e90a773a5f2
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 18d3f51119448ba4c88506f0b9464364, type: 3}
   - {fileID: 21300000, guid: 87f70f6554c6e1e41a5fbaf1c826d379, type: 3}
-  - {fileID: 21300000, guid: 9ecd51ed0adb51844b783aa4bceddc24, type: 3}
   - {fileID: 21300000, guid: 3419cadffc710b04fb2b60fba8556209, type: 3}
   m_PackedSpriteNamesToIndex:
   - watrtl-0-2-3
   - watrtl-0-2-2
-  - watrtl-0-0-1
   - watrtl-0-4-2
   m_Tag: MyAtlas
   m_IsVariant: 0

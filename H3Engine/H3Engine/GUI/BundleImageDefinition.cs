@@ -30,7 +30,6 @@ namespace H3Engine.GUI
     /// </summary>
     public class BundleImageDefinition
     {
-
         public BundleImageDefinition()
         {
             this.Groups = new List<BundleImageGroup>();
@@ -75,6 +74,21 @@ namespace H3Engine.GUI
         public List<BundleImageGroup> Groups
         {
             get; set;
+        }
+
+        public ImageData[] GetAllImageData()
+        {
+            List<ImageData> result = new List<ImageData>();
+            for (int group = 0; group < this.Groups.Count; group++)
+            {
+                var groupObj = this.Groups[group];
+                for(int frame = 0; frame < groupObj.Frames.Count; frame++)
+                {
+                    result.Add(GetImageData(group, frame));
+                }
+            }
+
+            return result.ToArray();
         }
 
         public ImageData GetImageData(int groupIndex, int frameIndex)

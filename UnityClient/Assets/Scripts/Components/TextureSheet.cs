@@ -63,9 +63,9 @@ namespace Assets.Scripts.Components
             this.sheetHeight = unitHeight + multiFactor;
 
 
-            mainTextureSheet = new Texture2D(this.sheetWidth, this.sheetHeight);
+            mainTextureSheet = new Texture2D(1, 1);
 
-            Rect[] rects = mainTextureSheet.PackTextures(textures.ToArray(), 2);
+            Rect[] rects = mainTextureSheet.PackTextures(textures.ToArray(), 1);
 
             keysToRects = new Dictionary<string, Rect>();
             for(int i = 0; i < rects.Length; i ++)
@@ -85,7 +85,7 @@ namespace Assets.Scripts.Components
                 return spriteCache[key];
             }
 
-            if (!keysToRects.ContainsKey(key))
+            if (keysToRects == null || !keysToRects.ContainsKey(key))
             {
                 return null;
             }
