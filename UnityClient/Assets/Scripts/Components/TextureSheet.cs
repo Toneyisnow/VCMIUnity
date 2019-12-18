@@ -34,6 +34,11 @@ namespace Assets.Scripts.Components
 
         public void AddImageData(string key, Texture2D texture)
         {
+            if (textureKeys.Contains(key))
+            {
+                return;
+            }
+
             textureKeys.Add(key);
             textures.Add(texture);
         }
@@ -80,11 +85,16 @@ namespace Assets.Scripts.Components
                 return spriteCache[key];
             }
 
+            if (!keysToRects.ContainsKey(key))
+            {
+                return null;
+            }
+
             float totalWidth = mainTextureSheet.width;
             float totalHeight = mainTextureSheet.height;
             Rect rect = keysToRects[key];
 
-            Sprite sprite = Sprite.Create(mainTextureSheet, new Rect(rect.xMin * totalWidth, rect.yMin * totalHeight, rect.width * totalWidth, rect.height * totalHeight), Vector2.zero);
+            Sprite sprite = Sprite.Create(mainTextureSheet, new Rect(rect.xMin * totalWidth, rect.yMin * totalHeight, rect.width * totalWidth, rect.height * totalHeight), new Vector2(0.5f, -0.5f));
             spriteCache[key] = sprite;
 
             return sprite;

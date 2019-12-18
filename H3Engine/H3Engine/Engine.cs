@@ -140,6 +140,10 @@ namespace H3Engine
             return resourceStorage.ExtractImage(imageName);
         }
 
+        public List<string> SearchResourceFiles(string namePattern)
+        {
+            return resourceStorage.SearchResourceFiles(namePattern);
+        }
 
         ///////// API from Handler Layer //////////
 

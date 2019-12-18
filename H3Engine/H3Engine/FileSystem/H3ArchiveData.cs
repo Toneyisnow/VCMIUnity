@@ -85,6 +85,13 @@ namespace H3Engine.FileSystem
             }
         }
 
+        public List<ArchivedFileInfo> FileInfos
+        {
+            get
+            {
+                return this.fileInfos;
+            }
+        }
 
         /// <summary>
         /// Test methods, will remove soon

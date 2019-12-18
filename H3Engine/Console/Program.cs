@@ -21,7 +21,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestRetrieveCampaign();
+            TestSearchResourceFiles();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -191,7 +191,7 @@ namespace H3Console
         static void TestRetrieveTerrainImage()
         {
             Engine engine = Engine.GetInstance();
-            engine.LoadArchiveFile(@"D:\PlayGround\SOD_Data\H3sprite.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             ImageData tileImage = engine.RetrieveTerrainImage(H3Engine.Common.ETerrainType.SAND, 2);
             StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile-0.png", tileImage.GetPNGData(2));
@@ -201,6 +201,15 @@ namespace H3Console
             StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile2-1.png", tileImage2.GetPNGData(1));
             StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile2-2.png", tileImage2.GetPNGData(2));
             StreamHelper.WriteBytesToFile(@"D:\PlayGround\tile2-3.png", tileImage2.GetPNGData(3));
+
+        }
+
+        static void TestSearchResourceFiles()
+        {
+            Engine engine = Engine.GetInstance();
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+
+            List<string> files = engine.SearchResourceFiles(@"AVA*.def");
 
         }
     }

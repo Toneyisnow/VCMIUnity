@@ -75,11 +75,15 @@ namespace Assets.Scripts.Components
             return texture;
         }
 
-        public Texture2D LoadTerrainTexture(ETerrainType terrainType, byte terrainIndex, byte rotation, byte[] pngData)
-        {
-            string key = string.Format(@"TL-{0}-{1}-{2}", terrainType.GetHashCode(), terrainIndex, rotation);
-            return LoadTextureFromPNGData(key, pngData);
-        }
+        //////////////// Public Methods for Usage ////////////////////////
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="terrainType"></param>
+        /// <param name="terrainIndex"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
 
         public Sprite LoadTerrainSprite(ETerrainType terrainType, byte terrainIndex, byte rotation)
         {
@@ -92,18 +96,6 @@ namespace Assets.Scripts.Components
 
             TextureSet textureSet = textureSets[textureSetKey];
             return textureSet.RetrieveSprite(MapTileTextureSet.TextureKey(terrainIndex, rotation));
-        }
-        
-        public Texture2D LoadRoadTexture(ERoadType roadType, byte roadIndex, byte rotation, byte[] pngData)
-        {
-            string key = string.Format(@"RD-{0}-{1}-{2}", roadType.GetHashCode(), roadIndex, rotation);
-            return LoadTextureFromPNGData(key, pngData);
-        }
-
-        public Texture2D LoadRiverTexture(ERiverType riverType, byte riverIndex, byte rotation, byte[] pngData)
-        {
-            string key = string.Format(@"RVR-{0}-{1}-{2}", riverType.GetHashCode(), riverIndex, rotation);
-            return LoadTextureFromPNGData(key, pngData);
         }
 
         public Sprite LoadRoadSprite(ERoadType roadType, byte roadIndex, byte rotation)
@@ -132,5 +124,37 @@ namespace Assets.Scripts.Components
             return textureSet.RetrieveSprite(MapTileTextureSet.TextureKey(riverIndex, rotation));
         }
 
+        /// <summary>
+        /// Each Artifact might have an animation sprites
+        /// </summary>
+        /// <param name="defFileName"></param>
+        /// <returns></returns>
+        public Sprite[] LoadMapArtifactSprites(string defFileName)
+        {
+            string textureSetKey = @"AVA";
+            if (!textureSets.ContainsKey(textureSetKey))
+            {
+                textureSets[textureSetKey] = new MapArtifactTextureSet();
+            }
+
+            TextureSet textureSet = textureSets[textureSetKey];
+            List<Sprite> sprites = new List<Sprite>();
+
+            int animationIndex = 0;
+
+            Sprite sprite = null;
+            while ((sprite = textureSet.RetrieveSprite(MapArtifactTextureSet.TextureKey(defFileName, animationIndex))) != null)
+            {
+                sprites.Add(sprite);
+                animationIndex++;
+            }
+
+            return sprites.ToArray();
+        }
+
+        public Sprite LoadMapDecorationSprite(string defFileName, int typeId)
+        {
+            return null;
+        }
     }
 }
