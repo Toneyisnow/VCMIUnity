@@ -12,15 +12,19 @@ public class MapLoader : MonoBehaviour
 {
     private H3Map h3Map = null;
 
+    private int mapLevel = 0;
+
     private Engine h3Engine = null;
 
     private MapTextureManager mapTextureManager = null;
 
-    public void Initialize(H3Map h3Map)
+    public void Initialize(H3Map h3Map, int mapLevel)
     {
         this.h3Engine = Engine.GetInstance();
-
+        
         this.h3Map = h3Map;
+        this.mapLevel = mapLevel;
+
         this.mapTextureManager = new MapTextureManager(h3Map);
     }
 
@@ -53,7 +57,7 @@ public class MapLoader : MonoBehaviour
         {
             for (int yy = 0; yy < h3Map.Header.Height; yy++)
             {
-                TerrainTile tile = h3Map.TerrainTiles[0, xx, yy];
+                TerrainTile tile = h3Map.TerrainTiles[mapLevel, xx, yy];
 
                 Sprite sprite = mapTextureManager.LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
                 var position = GetMapPositionInPixel(xx, yy, 10);
@@ -68,7 +72,7 @@ public class MapLoader : MonoBehaviour
         {
             for (int yy = 0; yy < h3Map.Header.Height; yy++)
             {
-                TerrainTile tile = h3Map.TerrainTiles[0, xx, yy];
+                TerrainTile tile = h3Map.TerrainTiles[mapLevel, xx, yy];
                 Sprite sprite = mapTextureManager.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
                 var position = GetMapPositionInPixel(xx, yy, 9);
                 CreateSubChildObject("Road", GetMapPositionInPixel(xx, yy, 9), sprite);
@@ -82,7 +86,7 @@ public class MapLoader : MonoBehaviour
         {
             for (int yy = 0; yy < h3Map.Header.Height; yy++)
             {
-                TerrainTile tile = h3Map.TerrainTiles[0, xx, yy];
+                TerrainTile tile = h3Map.TerrainTiles[mapLevel, xx, yy];
                 Sprite sprite = mapTextureManager.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
 
                 CreateSubChildObject("River", GetMapPositionInPixel(xx, yy, 8), sprite);
@@ -102,51 +106,43 @@ public class MapLoader : MonoBehaviour
             }
 
             MapPosition position = obj.Position;
+            if (position.Level != mapLevel)
+            {
+                continue;
+            }
 
             BundleImageDefinition bundleImage = h3Engine.RetrieveBundleImage(template.AnimationFile);
 
-            if (template.Type == H3Engine.Common.EObjectType.CAMPFIRE
-                || template.Type == H3Engine.Common.EObjectType.LEARNING_STONE
-                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR1
-                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR2
-                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR3
-                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR4
-                )
-            {
-                // Load Animation
-                //LoadAnimatedMapObject(position.PosX, position.PosY, bundleImage);
-            }
-            else if (template.Type == EObjectType.MONSTER)
-            {
-                Sprite[] sprites = mapTextureManager.LoadMonsterSprites(template.AnimationFile);
-                CreateSubChildAnimatedObject("Monsters", GetMapPositionInPixel(position.PosX, position.PosY, -9), sprites);
-
-            }
-            else if (template.Type == EObjectType.ARTIFACT)
+            if (template.Type == EObjectType.ARTIFACT)
             {
                 Sprite[] sprites = mapTextureManager.LoadArtifactSprites(template.AnimationFile);
-                CreateSubChildAnimatedObject("Artifacts", GetMapPositionInPixel(position.PosX, position.PosY, -9), sprites);
-
+                CreateSubChildAnimatedObject("Artifacts", GetMapPositionInPixel(position.PosX, position.PosY, -6), sprites);
             }
-            else if (MapTextureManager.IsDecoration(template.Type.GetHashCode()))     // Map Decorations
+            else if (MapObjectHelper.IsDecorationObject(template.Type))
             {
                 Sprite sprite = mapTextureManager.LoadDecorationSprite(template.AnimationFile, template.Type.GetHashCode());
                 CreateSubChildObject("Decorations", GetMapPositionInPixel(position.PosX, position.PosY, -1), sprite);
-
-                //GameObject newObject = Instantiate(mapArtifactPrefab, transform);
-                //newObject.transform.position = GetMapPositionInPixel(position.PosX, position.PosY, 2);
-
-                //Sprite sprite = textureStorage.LoadMapDecorationSprite(template.AnimationFile, template.Type.GetHashCode());
-
-                //AdventureMapCoordinate mapCoordinate = newObject.GetComponent<AdventureMapCoordinate>();
-                //mapCoordinate.Initialize(bundleImage.Width, bundleImage.Height);
-
-                //AnimatedMapObject animated = newObject.GetComponent<AnimatedMapObject>();
-                // animated.Initialize(sprite);
-
             }
-            else
+            else if (template.Type == EObjectType.MINE)
             {
+                Sprite[] sprites = mapTextureManager.LoadMineSprites(template.AnimationFile);
+                CreateSubChildAnimatedObject("Mines", GetMapPositionInPixel(position.PosX, position.PosY, -2), sprites);
+            }
+            else if (template.Type == EObjectType.RESOURCE)
+            {
+                Sprite[] sprites = mapTextureManager.LoadResourceSprites(template.AnimationFile);
+                CreateSubChildAnimatedObject("Resources", GetMapPositionInPixel(position.PosX, position.PosY, -4), sprites);
+            }
+            else if (template.Type == EObjectType.TOWN || template.Type == EObjectType.RANDOM_TOWN)
+            {
+                Sprite[] sprites = mapTextureManager.LoadTownSprites(template.AnimationFile);
+                CreateSubChildAnimatedObject("Town", GetMapPositionInPixel(position.PosX, position.PosY, -7), sprites);
+            }
+            else if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER)
+            {
+                Sprite[] sprites = mapTextureManager.LoadHeroSprites(template.AnimationFile);
+                CreateSubChildAnimatedObject("Heroes", GetMapPositionInPixel(position.PosX, position.PosY, -8), sprites);
+
                 // Load Single Image
                 ////ImageData image = bundleImage.GetImageData(0, 0);
                 //// image.ExportDataToPNG();
@@ -155,6 +151,11 @@ public class MapLoader : MonoBehaviour
                 ////Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromImage(template.AnimationFile, image);
                 ////LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, 0);
             }
+            else
+            {
+                Sprite[] sprites = mapTextureManager.LoadSingleBundleImageSprites(template.AnimationFile);
+                CreateSubChildAnimatedObject("AnimatedObjects", GetMapPositionInPixel(position.PosX, position.PosY, -5), sprites);
+            }
 
             objectIndex++;
         }
@@ -162,7 +163,7 @@ public class MapLoader : MonoBehaviour
 
     private Vector3 GetMapPositionInPixel(int x, int y, int z)
     {
-        ////return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z - (float)(y * 0.01));
+        //// return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z - (float)(y * 0.01));
         return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z);
     }
 

@@ -1,6 +1,7 @@
 ﻿using H3Engine.Campaign;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
+using H3Engine.MapObjects;
 using H3Engine.Mapping;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,26 @@ namespace H3Engine.API
         public H3Map RetrieveMap(string h3mFileFullPath)
         {
             H3MapLoader mapLoader = new H3MapLoader(h3mFileFullPath);   // TODO: Should we save the map object  into cache?
-            return mapLoader.LoadMap();
+            H3Map map = mapLoader.LoadMap();
+
+            foreach (ObjectTemplate template in map.ObjectTemplates)
+            {
+                EnhanceObjectTemplateByMask(template);
+            }
+
+            return map;
+        }
+
+        public H3Map RetrieveMap(H3Campaign campaign, int mapIndex)
+        {
+            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
+
+            ////foreach (ObjectTemplate template in map.ObjectTemplates)
+            {
+                ////EnhanceObjectTemplateByMask(template);
+            }
+
+            return map;
         }
 
         public BundleImageDefinition RetrieveBundleImage(string defFileName)
@@ -80,7 +100,24 @@ namespace H3Engine.API
             }
         }
 
+        /// <summary>
+        /// Read the .msk file from resource storage, and fill the Width and Height information
+        /// </summary>
+        /// <param name="objectTemplate"></param>
+        private void EnhanceObjectTemplateByMask(ObjectTemplate objectTemplate)
+        {
+            if(objectTemplate == null)
+            {
+                return;
+            }
 
-
+            string maskFileName = objectTemplate.AnimationFile.Replace(@".def", @".msk");
+            byte[] data = resourceStorage.ExtractFileData(maskFileName);
+            if (data != null && data.Length > 2)
+            {
+                objectTemplate.Width = data[0];
+                objectTemplate.Height = data[1];
+            }
+        }
     }
 }

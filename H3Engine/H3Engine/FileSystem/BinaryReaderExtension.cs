@@ -39,12 +39,12 @@ namespace H3Engine.FileSystem
         /// <param name="byteCount"></param>
         /// <param name="limit"></param>
         /// <param name="negate"></param>
-        public static void ReadBitMask(this BinaryReader reader, HashSet<int> dest, int byteCount, int limit, bool negate = true)
+        public static void ReadBitMask(this BinaryReader reader, HashSet<int> dest, int byteCount, int valueCount, bool negate = true)
         {
-            bool[] boolDest = new bool[limit];
-            reader.ReadBitMask(boolDest, byteCount, limit, negate);
+            bool[] boolDest = new bool[valueCount];
+            reader.ReadBitMask(boolDest, byteCount, valueCount, negate);
 
-            for (int i = 0; i < limit; i++)
+            for (int i = 0; i < valueCount; i++)
             {
                 if (boolDest[i])
                 {
@@ -53,14 +53,14 @@ namespace H3Engine.FileSystem
             }
         }
         
-        public static void ReadBitMask(this BinaryReader reader, bool[] dest, int byteCount, int limit, bool negate)
+        public static void ReadBitMask(this BinaryReader reader, bool[] dest, int byteCount, int valueCount, bool negate)
         {
             for (int nowByte = 0; nowByte < byteCount; nowByte++)
             {
                 int mask = reader.ReadByte();
                 for (int bit = 0; bit < 8; ++bit)
                 {
-                    if (nowByte * 8 + bit < limit)
+                    if (nowByte * 8 + bit < valueCount)
                     {
                         bool flag = (mask & (1 << bit)) > 0;
                         dest[nowByte * 8 + bit] = (flag != negate);        // FIXME: check PR388

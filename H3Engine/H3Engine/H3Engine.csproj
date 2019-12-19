@@ -93,12 +93,14 @@
     <Compile Include="MapObjects\CGPandoraBox.cs" />
     <Compile Include="MapObjects\CQuest.cs" />
     <Compile Include="MapObjects\HeroInstance.cs" />
+    <Compile Include="MapObjects\MapObjectHelper.cs" />
     <Compile Include="MapObjects\MiscObjects.cs" />
     <Compile Include="MapObjects\ObjectTemplate.cs" />
     <Compile Include="MapObjects\TownInstance.cs" />
     <Compile Include="Mapping\CMapEvent.cs" />
     <Compile Include="Mapping\H3Map.cs" />
     <Compile Include="Mapping\H3MapLoader.cs" />
+    <Compile Include="Components\MapProviders\MapBlockManager.cs" />
     <Compile Include="Mapping\MapHeader.cs" />
     <Compile Include="Mapping\MapObjectReader.cs" />
     <Compile Include="Mapping\TerrainTile.cs" />

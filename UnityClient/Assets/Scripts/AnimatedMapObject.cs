@@ -8,7 +8,7 @@ public class AnimatedMapObject : MonoBehaviour
 
     private bool isInitialized = false;
 
-    private int frameTickCount = 4;
+    private int frameTickCount = 2;
 
     private int frameTick = 0;
 

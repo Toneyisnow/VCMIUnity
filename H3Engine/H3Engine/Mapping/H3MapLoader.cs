@@ -660,19 +660,16 @@ namespace H3Engine.Mapping
                 objectTemplate.AnimationFile = reader.ReadStringWithLength();
                 //// logger.LogTrace("Object Animation File:" + objectTemplate.AnimationFile);
 
-                byte[] blockMask = new byte[6];
-                byte[] visitMask = new byte[6];
-
-                foreach (byte val in blockMask)
+                if (objectTemplate.Type == EObjectType.TOWN)
                 {
-                    byte r = reader.ReadByte();
-                    //logger.LogTrace("BlockMask: " + r);
+                    int here = 1;
                 }
 
-                foreach (byte val in visitMask)
+                objectTemplate.BlockMask = ReadTileMask(reader, 6, true);
+                objectTemplate.VisitMask = ReadTileMask(reader, 6, false);
+                if (objectTemplate.VisitMask.Length > 1)
                 {
-                    byte r = reader.ReadByte();
-                    //logger.LogTrace("VisitMask: " + r);
+                    int here = 10;
                 }
 
                 reader.ReadUInt16();
@@ -682,13 +679,7 @@ namespace H3Engine.Mapping
                 objectTemplate.SubId = (int)reader.ReadUInt32();
 
                 //// logger.LogTrace(string.Format("Object Type: {0} SubId: {1}", objectTemplate.Type, objectTemplate.SubId));
-
-                if (objectTemplate.AnimationFile.ToLower().StartsWith(@"avl"))
-                {
-                    values.Add(string.Format(@"{0} | {1}", objectTemplate.Type, objectTemplate.AnimationFile));
-                    //// logger.LogTrace(string.Format(@"Object Type: {0} SubId: {1} File: {2}", objectTemplate.Type, objectTemplate.SubId, objectTemplate.AnimationFile));
-                }
-
+                
                 // This type is not the template type, used in isOnVisitableFromTopList
                 int type = reader.ReadByte();
                 int printPriority = reader.ReadByte() * 100;
@@ -819,6 +810,33 @@ namespace H3Engine.Mapping
 
         }
 
+        /// <summary>
+        /// Load the MASK file for each Object Template
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="byteCount"></param>
+        /// <returns></returns>
+        private bool[] ReadTileMask(BinaryReader reader, int byteCount, bool negate)
+        {
+            int valueCount = byteCount * 8;
 
+            bool[] blockMask = new bool[valueCount];
+            reader.ReadBitMask(blockMask, byteCount, valueCount, negate);
+
+            int firstIndex = 0;
+            while(firstIndex < valueCount && blockMask[firstIndex] == false)
+            {
+                firstIndex++;
+            }
+
+            int count = valueCount - firstIndex;
+            bool[] result = new bool[count];
+            for(int i = 0; i < count; i++)
+            {
+                result[i] = blockMask[valueCount - 1 - i];
+            }
+
+            return result;
+        }
     }
 }

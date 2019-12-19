@@ -167,6 +167,11 @@ namespace H3Engine
             return resourceHandler.RetrieveMap(h3mFileFullPath);
         }
 
+        public H3Map RetrieveMap(H3Campaign campaign, int mapIndex)
+        {
+            return resourceHandler.RetrieveMap(campaign, mapIndex);
+        }
+
         /// <summary>
         /// 
         /// </summary>

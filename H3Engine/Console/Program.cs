@@ -6,12 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using H3Engine;
 using H3Engine.Campaign;
+using H3Engine.Common;
 using H3Engine.Core;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
 using H3Engine.MapObjects;
 using H3Engine.Mapping;
 using H3Engine.Utils;
+using H3Engine.Components.MapProviders;
 
 namespace H3Console
 {
@@ -21,7 +23,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestSearchResourceFiles();
+            TestRetrieveMapBlock();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -145,13 +147,75 @@ namespace H3Console
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-            H3Map map1 = H3CampaignLoader.LoadScenarioMap(campaign, 0, new ConsoleLogger());
+            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0, new ConsoleLogger());
 
-            for (int xx = 0; xx < map1.Header.Width; xx++)
+            Dictionary<EObjectType, HashSet<string>> objectTypeList = new Dictionary<EObjectType, HashSet<string>>();
+            HashSet<int> decorationTemplateIds = new HashSet<int>() {
+                    116, 117, 118, 119, 120, 121, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137,
+                    143, 147, 148, 149, 150, 151, 153, 155, 158, 161, 171, 189, 199, 206, 207, 208, 209, 210
+            };
+
+            foreach (CGObject obj in map.Objects)
             {
-                for (int yy = 0; yy < map1.Header.Height; yy++)
+                ObjectTemplate template = obj.Template;
+                if (template == null)
                 {
-                    TerrainTile tile = map1.TerrainTiles[0, xx, yy];
+                    continue;
+                }
+
+                EObjectType objectType = template.Type;
+                if (
+                    objectType == EObjectType.MONSTER
+                    || objectType == EObjectType.CAMPFIRE
+                    || objectType == EObjectType.LEARNING_STONE
+                    || objectType == EObjectType.CREATURE_GENERATOR1
+                    || objectType == EObjectType.CREATURE_GENERATOR2
+                    || objectType == EObjectType.CREATURE_GENERATOR3
+                    || objectType == EObjectType.CREATURE_GENERATOR4
+                    )
+                {
+                    
+                }
+                else if (template.Type == EObjectType.ARTIFACT)
+                {
+                    
+                }
+                else if (decorationTemplateIds.Contains(template.Type.GetHashCode()))     // Map Decorations
+                {
+                    
+                }
+                else if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER)
+                {
+                }
+                else
+                {
+                    if (objectTypeList.ContainsKey(objectType))
+                    {
+                        objectTypeList[objectType].Add(template.AnimationFile);
+                    }
+                    else
+                    {
+                        objectTypeList[objectType] = new HashSet<string>() { template.AnimationFile };
+                    }
+                }
+            }
+
+            foreach(KeyValuePair<EObjectType, HashSet<string>> values in objectTypeList)
+            {
+                Console.WriteLine("ObjectType: " + values.Key.ToString());
+
+                foreach(string deffilename in values.Value)
+                {
+                    Console.WriteLine("      " + deffilename);
+                }
+            }
+
+
+            for (int xx = 0; xx < map.Header.Width; xx++)
+            {
+                for (int yy = 0; yy < map.Header.Height; yy++)
+                {
+                    TerrainTile tile = map.TerrainTiles[0, xx, yy];
                     //// Console.WriteLine(string.Format(@"Tile [{0},{1}]: Road={2},{3}, River={4},{5}", xx, yy, tile.RoadType,tile.RoadDir, tile.RiverType, tile.RiverDir));
 
                     // ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
@@ -167,6 +231,26 @@ namespace H3Console
                     }
                 }
             }
+
+        }
+
+        static void TestRetrieveMapBlock()
+        {
+            Engine engine = Engine.GetInstance();
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+
+            H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
+            H3Map map = engine.RetrieveMap(campaign, 0);
+            
+
+            MapBlockManager mapBlockManager = new MapBlockManager();
+            mapBlockManager.Initialize(map, 0);
+
+            mapBlockManager.PrintBlocks(new ConsoleLogger());
+            
 
         }
 

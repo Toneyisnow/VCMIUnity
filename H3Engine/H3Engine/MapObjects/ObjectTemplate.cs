@@ -26,6 +26,16 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
+        public byte Width
+        {
+            get; set;
+        }
+
+        public byte Height
+        {
+            get; set;
+        }
+
         public int PrintPriority
         {
             get; set;
@@ -45,6 +55,27 @@ namespace H3Engine.MapObjects
         {
             get; set;
         }
+
+        /// <summary>
+        /// BlockMask Read from .msk file.
+        /// Note: the data is read from 6 Bytes data, with 8 bits per line. Even if the Object width is not 8, it will still read 8 bits per line
+        /// 
+        /// 7 6 5 4 3*2*1*0
+        /// 7 6 5 4*3*2*1*0*
+        /// 7 6 5 4*3*2 1*0*
+        /// 
+        /// 
+        /// </summary>
+        public bool[] BlockMask
+        {
+            get; set;
+        }
+
+        public bool[] VisitMask
+        {
+            get; set;
+        }
+
 
     }
 }
