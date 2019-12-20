@@ -22,9 +22,9 @@ namespace H3Engine.Mapping
 
         private ILogger logger = null;
 
-        public H3MapLoader(string h3mFileFullPath, ILogger logger = null)
+        public H3MapLoader(string h3mFileFullPath)
         {
-            this.logger = (logger != null ? logger : new ILogger());
+            this.logger = LoggerInstance.GetLogger();
             using (FileStream file = new FileStream(h3mFileFullPath, FileMode.Open, FileAccess.Read))
             {
                 byte[] rawData = StreamHelper.ReadToEnd(file);
@@ -32,9 +32,9 @@ namespace H3Engine.Mapping
             }
         }
 
-        public H3MapLoader(byte[] rawData, ILogger logger = null)
+        public H3MapLoader(byte[] rawData)
         {
-            this.logger = (logger != null ? logger : new ILogger());
+            this.logger = LoggerInstance.GetLogger();
             mapData = GZipStreamHelper.DecompressBytes(rawData);
         }
 
@@ -259,6 +259,7 @@ namespace H3Engine.Mapping
             //// mapObject.Header.TrigggeredEvents = new List<TrigggeredEvent>();
 
             var vicCondition = (EVictoryConditionType)reader.ReadByte();
+            logger.LogTrace("Victory Condition:" + vicCondition);
 
             if (vicCondition == EVictoryConditionType.WINSTANDARD)
             {
@@ -285,12 +286,20 @@ namespace H3Engine.Mapping
                     case EVictoryConditionType.ARTIFACT:
                         {
                             int objectType = reader.ReadByte();
+                            if (mapObject.Header.Version != EMapFormat.ROE)
+                            {
+                                reader.ReadByte();
+                            }
                             break;
                         }
                     case EVictoryConditionType.GATHERTROOP:
                         {
                             int objectType = reader.ReadByte();
                             uint value = reader.ReadUInt32();
+                            if (mapObject.Header.Version != EMapFormat.ROE)
+                            {
+                                reader.ReadByte();
+                            }
                             break;
                         }
                     case EVictoryConditionType.GATHERRESOURCE:
@@ -337,18 +346,14 @@ namespace H3Engine.Mapping
                         }
                     case EVictoryConditionType.TRANSPORTITEM:
                         {
-                            uint value = reader.ReadUInt32();
+                            byte value = reader.ReadByte();
                             var pos = reader.ReadPosition();
                             break;
                         }
                     default:
                         break;
                 }
-
-
-
             }
-
 
             ELossConditionType loseCondition = (ELossConditionType)reader.ReadByte();
             logger.LogTrace("Lose Condition:" + loseCondition);
@@ -375,9 +380,7 @@ namespace H3Engine.Mapping
                         break;
                 }
             }
-
         }
-
 
         private void ReadTeamInfo(BinaryReader reader)
         {

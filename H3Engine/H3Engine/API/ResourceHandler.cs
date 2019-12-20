@@ -62,7 +62,7 @@ namespace H3Engine.API
 
         public H3Map RetrieveMap(H3Campaign campaign, int mapIndex)
         {
-            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
+            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, mapIndex);
 
             ////foreach (ObjectTemplate template in map.ObjectTemplates)
             {

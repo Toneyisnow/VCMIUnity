@@ -147,7 +147,7 @@ namespace H3Console
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0, new ConsoleLogger());
+            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
 
             Dictionary<EObjectType, HashSet<string>> objectTypeList = new Dictionary<EObjectType, HashSet<string>>();
             HashSet<int> decorationTemplateIds = new HashSet<int>() {
@@ -236,6 +236,8 @@ namespace H3Console
 
         static void TestRetrieveMapBlock()
         {
+            LoggerInstance.SetConsoleLogger(new ConsoleLogger());
+
             Engine engine = Engine.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
@@ -243,7 +245,7 @@ namespace H3Console
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-            H3Map map = engine.RetrieveMap(campaign, 0);
+            H3Map map = engine.RetrieveMap(campaign, 1);
             
 
             MapBlockManager mapBlockManager = new MapBlockManager();

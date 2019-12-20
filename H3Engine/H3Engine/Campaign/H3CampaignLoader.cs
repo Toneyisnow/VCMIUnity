@@ -59,7 +59,7 @@ namespace H3Engine.Campaign
             return campaignObject;
         }
 
-        public static H3Map LoadScenarioMap(H3Campaign campaign, int scenarioIndex, ILogger logger = null)
+        public static H3Map LoadScenarioMap(H3Campaign campaign, int scenarioIndex)
         {
             if (campaign == null)
             {
@@ -73,7 +73,7 @@ namespace H3Engine.Campaign
 
             if (campaign.Scenarios[scenarioIndex].MapData == null && campaign.CampaignMapBytes[scenarioIndex] != null)
             {
-                H3MapLoader h3MapLoader = new H3MapLoader(campaign.CampaignMapBytes[scenarioIndex], logger);
+                H3MapLoader h3MapLoader = new H3MapLoader(campaign.CampaignMapBytes[scenarioIndex]);
                 campaign.Scenarios[scenarioIndex].MapData = h3MapLoader.LoadMap();
             }
 
