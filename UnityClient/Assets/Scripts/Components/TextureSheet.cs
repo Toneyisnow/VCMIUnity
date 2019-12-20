@@ -94,7 +94,7 @@ namespace Assets.Scripts.Components
             float totalHeight = mainTextureSheet.height;
             Rect rect = keysToRects[key];
 
-            Sprite sprite = Sprite.Create(mainTextureSheet, new Rect(rect.xMin * totalWidth, rect.yMin * totalHeight, rect.width * totalWidth, rect.height * totalHeight), new Vector2(0.5f, -0.5f));
+            Sprite sprite = Sprite.Create(mainTextureSheet, new Rect(rect.xMin * totalWidth, rect.yMin * totalHeight, rect.width * totalWidth, rect.height * totalHeight), new Vector2(1, 0));
             spriteCache[key] = sprite;
 
             return sprite;
