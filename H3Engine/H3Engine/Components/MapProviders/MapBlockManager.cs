@@ -26,10 +26,11 @@ namespace H3Engine.Components.MapProviders
         private int mapLevel = 0;
 
         private BlockAccessibility[,] blockAccessibilities;
-
+        
 
         public MapBlockManager()
         {
+
         }
 
         public void Initialize(H3Map h3Map, int mapLevel)
@@ -103,8 +104,10 @@ namespace H3Engine.Components.MapProviders
             }
         }
 
-        public void PrintBlocks(ILogger logger)
+        public void PrintBlocks()
         {
+            var logger = LoggerInstance.GetLogger();
+
             for (int yy = 0; yy < h3Map.Header.Height; yy++)
             {
                 StringBuilder str = new StringBuilder();

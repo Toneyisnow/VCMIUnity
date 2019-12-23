@@ -35,8 +35,8 @@ namespace H3Console
             Engine engine = Engine.GetInstance();
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
-            byte[] h3cFile = engine.RetrieveFileData("ab.h3c");
-            StreamHelper.WriteBytesToFile(@"D:\Temp\ab.h3c", h3cFile);
+            BinaryData h3cFile = engine.RetrieveFileData("ab.h3c");
+            StreamHelper.WriteBytesToFile(@"D:\Temp\ab.h3c", h3cFile.Bytes);
 
         }
 
@@ -267,27 +267,52 @@ namespace H3Console
 
         static void TestRetrieveMapBlock()
         {
-            LoggerInstance.SetConsoleLogger(new ConsoleLogger());
+            using (FileStream fileStream = new FileStream(@"trace.log", FileMode.Append, FileAccess.Write))
+            {
+                LoggerInstance.SetConsoleLogger(new ConsoleLogger());
 
+                Engine engine = Engine.GetInstance();
+                engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
+                engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+                engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
+                engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+
+                H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
+
+                for (int i = 0; i < campaign.Scenarios.Count; i++)
+                {
+                    H3Map map = engine.RetrieveMap(campaign, i);
+
+                    for(int l = 0; l < (map.Header.IsTwoLevel ? 2 : 1); l++)
+                    {
+                        MapBlockManager mapBlockManager = new MapBlockManager();
+                        mapBlockManager.Initialize(map, 0);
+                        mapBlockManager.PrintBlocks();
+                    }
+                }
+            }
+        }
+
+        static void TestResourceStorage()
+        {
             Engine engine = Engine.GetInstance();
+            engine.SetTemporaryCachePath(@"D:\Temp\h3");
+
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
-            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
+            // engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
+            LoggerInstance.SetConsoleLogger(new ConsoleLogger());
             H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-            H3Map map = engine.RetrieveMap(campaign, 1);
+            H3Map map = engine.RetrieveMap(campaign, 0);
+            
             
 
-            MapBlockManager mapBlockManager = new MapBlockManager();
-            mapBlockManager.Initialize(map, 0);
-
-            mapBlockManager.PrintBlocks(new ConsoleLogger());
-            
 
         }
 
-        static void TestUnZip()
+            static void TestUnZip()
         {
             /*
             Engine engine = Engine.GetInstance();

@@ -45,6 +45,11 @@ namespace H3Engine.FileSystem
 
         private List<ArchivedFileInfo> fileInfos = null;
 
+        public static bool IsPCXImageFile(string fileName)
+        {
+            return fileName.EndsWith(".pcx", StringComparison.InvariantCultureIgnoreCase);
+        }
+
         public H3ArchiveData(string lodFileFullPath)
         {
             file = new FileStream(lodFileFullPath, FileMode.Open, FileAccess.Read);
@@ -194,10 +199,9 @@ namespace H3Engine.FileSystem
             return null;
         }
 
-        public byte[] ExtractFileData(string fileName)
+        public IFileData ExtractFileData(string fileName)
         {
             ArchivedFileInfo fileInfo = GetFileInfo(fileName);
-
             if (fileInfo == null)
             {
                 return null;
@@ -206,18 +210,11 @@ namespace H3Engine.FileSystem
             return ExtractFileData(fileInfo);
         }
 
-        public ImageData ExtractImage(string fileName)
+        public IFileData ExtractFileData(ArchivedFileInfo fileInfo)
         {
-            ArchivedFileInfo fileInfo = GetFileInfo(fileName);
-
-            if (fileInfo == null)
-            {
-                throw new FileNotFoundException();
-            }
-
             reader.Seek((int)fileInfo.Offset);
             byte[] content;
-
+            
             using (MemoryStream outputStream = new MemoryStream())
             {
                 if (fileInfo.CSize > 0)
@@ -241,46 +238,11 @@ namespace H3Engine.FileSystem
                 }
                 else
                 {
-                    return null;
+                    byte[] bytes = StreamHelper.ReadToEnd(outputStream);
+                    return new BinaryData(bytes);
                 }
             }
         }
-
-        private byte[] ExtractFileData(ArchivedFileInfo fileInfo)
-        {
-            reader.Seek((int)fileInfo.Offset);
-            byte[] content;
-            
-            using (MemoryStream outputStream = new MemoryStream())
-            {
-                if (fileInfo.CSize > 0)
-                {
-                    content = reader.ReadBytes((int)fileInfo.CSize);
-                    MemoryStream inputStream = new MemoryStream(content);
-                    DecompressStream(inputStream, outputStream);
-                }
-                else
-                {
-                    content = reader.ReadBytes((int)fileInfo.Size);
-                    outputStream.Write(content, 0, content.Length);
-                }
-
-                outputStream.Seek(0, SeekOrigin.Begin);
-
-                if (H3PcxFileHandler.IsPCX(outputStream))
-                {
-                    ////ImageData image = H3PcxFileHandler.ExtractPCXStream(outputStream);
-                    ////return image.GetPNGData();
-                    return null;
-                }
-                else
-                {
-                    return StreamHelper.ReadToEnd(outputStream);
-                }
-            }
-        }
-
-
 
         public static void DecompressStream(Stream inputStream, Stream ouputStream, bool isGZip = false)
         {

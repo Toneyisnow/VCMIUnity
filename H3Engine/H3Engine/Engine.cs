@@ -125,19 +125,24 @@ namespace H3Engine
             resourceStorage.LoadArchive(fileFullPath);
         }
 
+        public void SetTemporaryCachePath(string tempFolderPath)
+        {
+            resourceStorage.SetTemporaryCachePath(tempFolderPath);
+        }
+
         /// <summary>
         /// This is a most common low level method, that could return the byte array of a given file.
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public byte[] RetrieveFileData(string fileName)
+        public BinaryData RetrieveFileData(string fileName)
         {
-            return resourceStorage.ExtractFileData(fileName);
+            return resourceStorage.ExtractFileData(fileName) as BinaryData;
         }
 
         public ImageData RetrieveImage(string imageName)
         {
-            return resourceStorage.ExtractImage(imageName);
+            return resourceStorage.ExtractFileData(imageName) as ImageData;
         }
 
         public List<string> SearchResourceFiles(string namePattern)

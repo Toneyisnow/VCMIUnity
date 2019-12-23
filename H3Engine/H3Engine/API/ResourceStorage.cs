@@ -15,7 +15,12 @@ namespace H3Engine.API
     /// </summary>
     public class ResourceStorage
     {
+        private string temporaryCacheFolderPath = null;
+
         private Dictionary<string, H3ArchiveData> loadedArchiveDataDict = new Dictionary<string, H3ArchiveData>();
+
+        private Dictionary<string, IFileData> resourceFileCache = new Dictionary<string, IFileData>();
+
 
         public ResourceStorage()
         {
@@ -26,16 +31,49 @@ namespace H3Engine.API
         {
             // Bug: Since on the iOS, the file path is case sensitive, we should not do the ToLower() here.
             ////fileFullName = fileFullName.ToLower().Trim();
-            if (loadedArchiveDataDict.ContainsKey(fileFullName))
+            string archiveKey = GetArchiveKey(fileFullName);
+
+            if (DoesSupportCaching())
             {
+                string archiveCacheFolder = Path.Combine(temporaryCacheFolderPath, archiveKey);
+
+                // If the folder exists, it will be considered loaded for this archive. Updating the archive is not implemented yet.
+                if (Directory.Exists(archiveCacheFolder))
+                {
+                    loadedArchiveDataDict[archiveKey] = null;
+                    return;
+                }
+
+                // Load all files from the Archive into folder
+                Directory.CreateDirectory(archiveCacheFolder);
+
+                H3ArchiveData archiveData = new H3ArchiveData(fileFullName);
+                foreach (ArchivedFileInfo fileInfo in archiveData.FileInfos)
+                {
+                    string fileFullPath = Path.Combine(archiveCacheFolder, fileInfo.FileName);
+                    IFileData data = archiveData.ExtractFileData(fileInfo);
+
+                    StreamHelper.WriteBytesToFile(fileFullPath, data.SerializeToBytes());
+                }
+
+                loadedArchiveDataDict[archiveKey] = null;
+
                 return;
             }
-
-            H3ArchiveData archiveData = new H3ArchiveData(fileFullName);
-
-            loadedArchiveDataDict.Add(fileFullName, archiveData);
+            else
+            {
+                if (!loadedArchiveDataDict.ContainsKey(archiveKey))
+                {
+                    loadedArchiveDataDict[archiveKey] = new H3ArchiveData(fileFullName);
+                }
+            }
         }
-
+        
+        /// <summary>
+        /// From design perspective, this method should not be used any more, since all of the resources should be specifically requested by precise name
+        /// </summary>
+        /// <param name="namePattern"></param>
+        /// <returns></returns>
         public List<string> SearchResourceFiles(string namePattern)
         {
             List<string> result = new List<string>();
@@ -58,32 +96,66 @@ namespace H3Engine.API
             return result;
         }
 
-        public byte[] ExtractFileData(string fileName)
+        public void SetTemporaryCachePath(string tempFolderPath)
         {
-            foreach(H3ArchiveData archiveData in loadedArchiveDataDict.Values)
+            temporaryCacheFolderPath = tempFolderPath;
+        }
+
+        public IFileData ExtractFileData(string fileName)
+        {
+            if (DoesSupportCaching())
             {
-                byte[] data = archiveData.ExtractFileData(fileName);
-                if (data != null)
+                foreach(string archiveKey in loadedArchiveDataDict.Keys)
                 {
-                    return data;
+                    string archiveCacheFolder = Path.Combine(temporaryCacheFolderPath, archiveKey);
+                    if (!Directory.Exists(archiveCacheFolder))
+                    {
+                        continue;
+                    }
+
+                    string fileFullPath = Path.Combine(archiveCacheFolder, fileName);
+                    if (File.Exists(fileFullPath))
+                    {
+                        byte[] data = File.ReadAllBytes(fileFullPath);
+                        if (H3ArchiveData.IsPCXImageFile(fileName))
+                        {
+                            ImageData imageData = new ImageData();
+                            imageData.DeserializeFromBytes(data);
+                            return imageData;
+                        }
+                        else
+                        {
+                            BinaryData binaryData = new BinaryData();
+                            binaryData.DeserializeFromBytes(data);
+                            return binaryData;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (H3ArchiveData archiveData in loadedArchiveDataDict.Values)
+                {
+                    IFileData data = archiveData.ExtractFileData(fileName);
+                    if (data != null)
+                    {
+                        return data;
+                    }
                 }
             }
 
             throw new FileNotFoundException();
         }
 
-        public ImageData ExtractImage(string fileName)
+        private string GetArchiveKey(string archiveFileFullPath)
         {
-            foreach (H3ArchiveData archiveData in loadedArchiveDataDict.Values)
-            {
-               ImageData image = archiveData.ExtractImage(fileName);
-                if (image != null)
-                {
-                    return image;
-                }
-            }
+            string archiveKey = Path.GetFileName(archiveFileFullPath).Replace(".", "");
+            return archiveKey;
+        }
 
-            throw new FileNotFoundException();
+        private bool DoesSupportCaching()
+        {
+            return !string.IsNullOrWhiteSpace(temporaryCacheFolderPath) && Directory.Exists(temporaryCacheFolderPath);
         }
     }
 }

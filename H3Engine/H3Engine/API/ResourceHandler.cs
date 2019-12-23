@@ -32,9 +32,9 @@ namespace H3Engine.API
                 return campaignsCache[fileName];
             }
 
-            byte[] data = resourceStorage.ExtractFileData(fileName);
+            BinaryData data = resourceStorage.ExtractFileData(fileName) as BinaryData;
 
-            H3CampaignLoader loader = new H3CampaignLoader(fileName, data);
+            H3CampaignLoader loader = new H3CampaignLoader(fileName, data.Bytes);
             H3Campaign campaign = loader.LoadCampaign();
 
             campaignsCache[fileName] = campaign;
@@ -81,13 +81,13 @@ namespace H3Engine.API
                 return bundleImageCache[defFileName];
             }
 
-            byte[] animationRawData = resourceStorage.ExtractFileData(defFileName);
+            BinaryData animationRawData = resourceStorage.ExtractFileData(defFileName) as BinaryData;
             if (animationRawData == null)
             {
                 return null;
             }
 
-            using (MemoryStream animationStream = new MemoryStream(animationRawData))
+            using (MemoryStream animationStream = new MemoryStream(animationRawData.Bytes))
             {
                 H3DefFileHandler defHandler = new H3DefFileHandler(animationStream);
                
@@ -112,7 +112,9 @@ namespace H3Engine.API
             }
 
             string maskFileName = objectTemplate.AnimationFile.Replace(@".def", @".msk");
-            byte[] data = resourceStorage.ExtractFileData(maskFileName);
+            BinaryData bData = resourceStorage.ExtractFileData(maskFileName) as BinaryData;
+            byte[] data = bData.Bytes;
+
             if (data != null && data.Length > 2)
             {
                 objectTemplate.Width = data[0];

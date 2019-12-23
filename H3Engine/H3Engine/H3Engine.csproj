@@ -72,6 +72,7 @@
     <Compile Include="Core\H3Spell.cs" />
     <Compile Include="Core\MapPosition.cs" />
     <Compile Include="Core\PlayerInfo.cs" />
+    <Compile Include="FileSystem\BinaryData.cs" />
     <Compile Include="FileSystem\GZipStreamHelper.cs" />
     <Compile Include="API\ResourceStorage.cs" />
     <Compile Include="Engine.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="FileSystem\CompressedStreamReader.cs" />
     <Compile Include="FileSystem\H3ArchiveData.cs" />
     <Compile Include="FileSystem\H3DefFileHandler.cs" />
+    <Compile Include="FileSystem\IFileData.cs" />
     <Compile Include="FileSystem\ImageData.cs" />
     <Compile Include="FileSystem\ImageFileHandler.cs" />
     <Compile Include="GUI\BundleImageDefinition.cs" />
