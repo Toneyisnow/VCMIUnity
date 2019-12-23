@@ -24,7 +24,7 @@ public class MapCamera : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (touchCount == 1)
+            if (touchCount == 1 || touchCount == 0)
             {
                 // Click on screen
                 anchorPosition = Input.mousePosition;
@@ -46,7 +46,7 @@ public class MapCamera : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            if (touchCount == 1)
+            if (touchCount == 1 || touchCount == 0)
             {
                 // Dragging
                 float deltaX = (Input.mousePosition.x - anchorPosition.x) / 100 * cameraCom.orthographicSize;

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace H3Engine.FileSystem
 {
-    public class ImageData
+    public class ImageData : IFileData
     {
         private byte[] rawData;
 
@@ -34,6 +34,14 @@ namespace H3Engine.FileSystem
         public int Height
         {
             get; set;
+        }
+
+        public ImageData()
+        {
+            this.pngData = new Dictionary<byte, byte[]>();
+            this.plainData = new Dictionary<byte, byte[]>();
+
+            this.dataIndex = 0;
         }
 
         public ImageData(int width, int height)
@@ -114,6 +122,26 @@ namespace H3Engine.FileSystem
             {
                 return rawData;
             }
+        }
+
+        public byte[] SerializeToBytes()
+        {
+            byte[] widthBytes = BitConverter.GetBytes(this.Width);
+            byte[] heightBytes = BitConverter.GetBytes(this.Height);
+
+            IEnumerable<byte> rv = widthBytes.Concat(heightBytes).Concat(rawData);
+            return rv.ToArray();
+        }
+
+        public void DeserializeFromBytes(byte[] data)
+        {
+            this.Width = BitConverter.ToInt32(data, 0);
+            this.Height = BitConverter.ToInt32(data, 4);
+
+            this.rawData = new byte[Width * Height * 4];
+            int length = data.Length - 8;
+
+            Array.Copy(data, 8, rawData, 0, length);
         }
 
         /// <summary>
