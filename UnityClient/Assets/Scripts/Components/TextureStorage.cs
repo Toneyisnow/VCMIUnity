@@ -9,6 +9,9 @@ using H3Engine.FileSystem;
 
 namespace Assets.Scripts.Components
 {
+    /// <summary>
+    /// This is legacy, using BundleImageSheet instead
+    /// </summary>
     public class TextureStorage
     {
         private static TextureStorage instance = null;

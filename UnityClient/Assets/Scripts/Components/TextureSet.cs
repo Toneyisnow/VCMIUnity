@@ -15,6 +15,8 @@ namespace Assets.Scripts.Components
 {
     /// <summary>
     /// One TextureSet will be corresponding to the DEF file in the H3Engine, it might contain one or more TextureSheets depending on the Game Object Type
+    /// 
+    /// This is legacy, using BundleImageSheet instead
     /// </summary>
     public abstract class TextureSet
     {
@@ -24,16 +26,7 @@ namespace Assets.Scripts.Components
         {
             h3Engine = Engine.GetInstance();
         }
-
-        protected Texture2D GenerateTexturePNG(ImageData imageData, byte rotateIndex = 0)
-        {
-            byte[] pngData = imageData.GetPNGData(rotateIndex);
-            Texture2D texture = new Texture2D(1, 1, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
-            texture.LoadImage(pngData);
-
-            return texture;
-        }
-
+        
         public abstract Sprite RetrieveSprite(string key);
 
     }

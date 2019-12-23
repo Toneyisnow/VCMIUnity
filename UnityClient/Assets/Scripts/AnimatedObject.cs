@@ -48,14 +48,6 @@ public class AnimatedObject : MonoBehaviour
         frameTick = 0;
         frameIndex = 0;
     }
-    
-    private Texture2D GenerateTexture2(ImageData imageData, string textureId)
-    {
-        imageData.ExportDataToPNG();
-        Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData(textureId, imageData.GetPNGData());
-
-        return texture;
-    }
 
     // Update is called once per frame
     void Update()

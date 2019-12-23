@@ -34,7 +34,6 @@ namespace H3Engine.FileSystem
 
         public ImageData()
         {
-            this.pngData = new Dictionary<byte, byte[]>();
             this.plainData = new Dictionary<byte, byte[]>();
 
             this.dataIndex = 0;
@@ -119,7 +118,7 @@ namespace H3Engine.FileSystem
         /// </summary>
         /// <param name="rotationIndex"></param>
         /// <returns></returns>
-        private byte[] GetPlainData(byte rotation = 0)
+        public byte[] GetPlainData(byte rotation = 0)
         {
             if (this.plainData.ContainsKey(rotation))
             {

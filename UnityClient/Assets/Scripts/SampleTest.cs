@@ -73,7 +73,8 @@ public class SampleTest : MonoBehaviour
         h3Engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
         ImageData image = h3Engine.RetrieveImage("Bo53Muck.pcx");
 
-        Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData("Bo53Muck", image.GetPNGData());
+
+        Texture2D texture = Texture2DExtension.LoadFromData(image);
         Sprite sprite = CreateSpriteFromTexture(texture);
 
         GameObject go = new GameObject("SampleSprite");
@@ -89,10 +90,8 @@ public class SampleTest : MonoBehaviour
         Engine h3Engine = Engine.GetInstance();
         h3Engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
         ImageData image = h3Engine.RetrieveImage("BoArt021.pcx");
-        image.ExportDataToPNG();
 
-        Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData("BoArt021", image.GetPNGData());
-        //// Sprite sprite = CreateSpriteFromTexture(texture);
+        Texture2D texture = Texture2DExtension.LoadFromData(image);
 
         GameObject go = new GameObject("SampleSprite");
         go.transform.parent = transform;
@@ -159,21 +158,16 @@ public class SampleTest : MonoBehaviour
         int height = 64;
 
         ImageData image1 = engine.RetrieveImage("HPL016Rn.pcx");
-        image1.ExportDataToPNG();
-        Texture2D texture1 = TextureStorage.GetInstance().LoadTextureFromPNGData("HPL016Rn", image1.GetPNGData());
+        Texture2D texture1 = Texture2DExtension.LoadFromData(image1);
 
         ImageData image2 = engine.RetrieveImage("HPL017Rn.pcx");
-        image2.ExportDataToPNG();
-        Texture2D texture2 = TextureStorage.GetInstance().LoadTextureFromPNGData("HPL017Rn", image2.GetPNGData());
+        Texture2D texture2 = Texture2DExtension.LoadFromData(image2);
 
         ImageData image3 = engine.RetrieveImage("HPL018Rn.pcx");
-        image3.ExportDataToPNG();
-        Texture2D texture3 = TextureStorage.GetInstance().LoadTextureFromPNGData("HPL018Rn", image3.GetPNGData());
+        Texture2D texture3 = Texture2DExtension.LoadFromData(image3);
 
         ImageData image4 = engine.RetrieveImage("HPL019Rn.pcx");
-        image4.ExportDataToPNG();
-        Texture2D texture4 = TextureStorage.GetInstance().LoadTextureFromPNGData("HPL019Rn", image4.GetPNGData());
-        
+        Texture2D texture4 = Texture2DExtension.LoadFromData(image4);
 
         Texture2D[] textures = new Texture2D[4] { texture1, texture2, texture3, texture4 };
 
@@ -206,7 +200,7 @@ public class SampleTest : MonoBehaviour
             for (int i = 0; i < animation.Groups[g].Frames.Count; i++)
             {
                 ImageData image = animation.GetImageData(g, i);
-                Texture2D texture = TextureStorage.GetInstance().LoadTextureFromPNGData("AVG2ele" + g + i, image.GetPNGData());
+                Texture2D texture = Texture2DExtension.LoadFromData(image);
                 Sprite sprite = CreateSpriteFromTexture(texture);
                 mainSprites.Add(sprite);
             }
@@ -528,9 +522,7 @@ public class SampleTest : MonoBehaviour
                 {
                     // Load Single Image
                     ImageData image = bundleImage.GetImageData(0, 0);
-                    image.ExportDataToPNG();
-
-                    Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
+                    Texture2D objTexture = Texture2DExtension.LoadFromData(image);
                     LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, -2);
                 }
 

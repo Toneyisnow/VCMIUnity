@@ -20,7 +20,7 @@ namespace H3Console.Utils
             this.imageData = imageData;
         }
 
-        public void ExportToPng(string pngFileFullPath)
+        public void ExportToPng(string pngFileFullPath, byte rotate = 0)
         {
             using (FileStream output = new FileStream(pngFileFullPath, FileMode.Create, FileAccess.Write))
             {
@@ -37,7 +37,8 @@ namespace H3Console.Utils
                         updatedData[val + 3] = (byte)((byte)255 - imageData.RawData[val + 3]); // The Alpha value, for PNG format A=255 is solid but in Unity A==255 is transparent
                     }
                     */
-                    byte[] updatedData = imageData.RawData;
+                    
+                    byte[] updatedData = imageData.GetPlainData(rotate);
                     fixed (byte* ptr = updatedData)
                     {
                         using (Bitmap image = new Bitmap(imageData.Width, imageData.Height, imageData.Width * 4, PixelFormat.Format32bppPArgb, new IntPtr(ptr)))

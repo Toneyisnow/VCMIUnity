@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Assets.Scripts.Components
 {
     /// <summary>
-    /// This is legacy, using TextureSet instead
+    /// This is legacy, using BundleImageSheet instead
     /// </summary>
     public abstract class TextureAtlas
     {
@@ -32,11 +32,7 @@ namespace Assets.Scripts.Components
 
         protected Texture2D GenerateTexture(ImageData imageData, byte rotateIndex = 0)
         {
-            byte[] pngData = imageData.GetPNGData(rotateIndex);
-            Texture2D texture = new Texture2D(1, 1, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
-            texture.LoadImage(pngData);
-
-            return texture;
+            return null;
         }
 
         public Sprite RetrieveSpriteAt(int textureIndex)
