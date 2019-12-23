@@ -113,7 +113,8 @@ namespace H3Engine.FileSystem
                 byte green = reader.ReadByte();
                 byte red = reader.ReadByte();
 
-                palette[i] = Color.FromArgb(0, red, green, blue);
+                // For Unity Colors, A=255 means solid and A=0 means transparent
+                palette[i] = Color.FromArgb(255, red, green, blue);
             }
 
             switch(bundleImage.Type)

@@ -86,7 +86,6 @@ namespace H3Engine.API
             }
 
             ImageData image = definition.GetImageData(0, terrainIndex);
-            image.ExportDataToPNG(true);
 
             return image;
         }
@@ -159,7 +158,6 @@ namespace H3Engine.API
             for(int i = 0; i < frameCount; i ++)
             {
                 ImageData image = definition.GetImageData(0, i);
-                image.ExportDataToPNG(true);
                 result[i] = image;
             }
             
@@ -215,7 +213,6 @@ namespace H3Engine.API
             }
 
             ImageData image = definition.GetImageData(0, roadIndex);
-            image.ExportDataToPNG(true);
 
             return image;
         }
@@ -267,7 +264,6 @@ namespace H3Engine.API
             for (int i = 0; i < frameCount; i++)
             {
                 ImageData image = definition.GetImageData(0, i);
-                image.ExportDataToPNG(true);
                 result[i] = image;
             }
 
@@ -319,7 +315,6 @@ namespace H3Engine.API
             }
 
             ImageData image = definition.GetImageData(0, riverIndex);
-            image.ExportDataToPNG(true);
 
             return image;
         }
@@ -373,7 +368,6 @@ namespace H3Engine.API
             for (int i = 0; i < frameCount; i++)
             {
                 ImageData image = definition.GetImageData(0, i);
-                image.ExportDataToPNG(true);
                 result[i] = image;
             }
 

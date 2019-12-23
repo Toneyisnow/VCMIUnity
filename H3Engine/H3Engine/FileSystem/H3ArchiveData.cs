@@ -170,7 +170,7 @@ namespace H3Engine.FileSystem
                     if (H3PcxFileHandler.IsPCX(outputStream))
                     {
                         ImageData image = H3PcxFileHandler.ExtractPCXStream(outputStream);
-                        image.SaveAsPNGStream(outputFile);
+                        //// image.SaveAsPNGStream(outputFile);
                     }
                     else
                     {
@@ -269,8 +269,9 @@ namespace H3Engine.FileSystem
 
                 if (H3PcxFileHandler.IsPCX(outputStream))
                 {
-                    ImageData image = H3PcxFileHandler.ExtractPCXStream(outputStream);
-                    return image.GetPNGData();
+                    ////ImageData image = H3PcxFileHandler.ExtractPCXStream(outputStream);
+                    ////return image.GetPNGData();
+                    return null;
                 }
                 else
                 {

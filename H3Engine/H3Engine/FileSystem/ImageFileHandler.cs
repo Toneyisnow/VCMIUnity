@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -44,7 +42,6 @@ namespace H3Engine.FileSystem
             int height = reader.ReadInt32();
 
             ImageData image = new ImageData(width, height);
-            /// byte[] data = new byte[width * height * 4];
 
             if (size == width * height)
             {
@@ -73,10 +70,11 @@ namespace H3Engine.FileSystem
                 {
                     byte colorIndex = reader.ReadByte();
 
+                    // Note: A=0 means transparent, A=255 means solid
                     if (colorIndex == 0 || transparentColorIndexes.Contains(colorIndex))
                     {
                         // Transparent bit
-                        image.WriteData(0, 0, 0, 255);
+                        image.WriteData(0, 0, 0, 0);
                         //data[o++] = 0;
                         //data[o++] = 0;
                         //data[o++] = 0;
@@ -84,7 +82,7 @@ namespace H3Engine.FileSystem
                     }
                     else
                     {
-                        image.WriteData(red[colorIndex], green[colorIndex], blue[colorIndex], 0);
+                        image.WriteData(red[colorIndex], green[colorIndex], blue[colorIndex], 255);
                         //data[o++] = red[colorIndex];
                         //data[o++] = green[colorIndex];
                         //data[o++] = blue[colorIndex];
@@ -100,7 +98,7 @@ namespace H3Engine.FileSystem
                     var r = reader.ReadByte();
                     var g = reader.ReadByte();
                     var b = reader.ReadByte();
-                    image.WriteData(r, g, b, 0);
+                    image.WriteData(r, g, b, 255);
                     //data[o++] = reader.ReadByte();
                     //data[o++] = reader.ReadByte();
                     //data[o++] = reader.ReadByte();

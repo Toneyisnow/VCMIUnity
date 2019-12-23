@@ -14,6 +14,7 @@ using H3Engine.MapObjects;
 using H3Engine.Mapping;
 using H3Engine.Utils;
 using H3Engine.Components.MapProviders;
+using H3Console.Utils;
 
 namespace H3Console
 {
@@ -23,7 +24,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestRetrieveMapBlock();
+            TestRetrieveAllImages();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -44,11 +45,31 @@ namespace H3Console
             Engine engine = Engine.GetInstance();
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
-            ImageData image = engine.RetrieveImage("Bo53Muck.pcx");
-            image.ExportDataToPNG();
 
-            byte[] imageBytes = image.GetPNGData();
-            StreamHelper.WriteBytesToFile(@"D:\Temp\h3\Bo53Muck.png", imageBytes);
+            ImageData image = engine.RetrieveImage("ArA_CoBr.pcx");
+
+            //image.ExportDataToPNG();
+            //byte[] data = image.GetPNGData();
+            //StreamHelper.WriteBytesToFile(@"D:\Temp\h3\Bo53Muck.png", data);
+
+            ImageDataExporter exporter = new ImageDataExporter(image);
+            exporter.ExportToPng(@"D:\Temp\h3\ArA_CoBr.png");
+        }
+
+        static void TestRetrieveAllImages()
+        {
+            Engine engine = Engine.GetInstance();
+
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
+
+            List<string> pcxFiles = engine.SearchResourceFiles("*.pcx");
+
+            foreach (string pcxFile in pcxFiles)
+            {
+                ImageData image = engine.RetrieveImage(pcxFile);
+                ImageDataExporter exporter = new ImageDataExporter(image);
+                exporter.ExportToPng(@"D:\Temp\h3\" + pcxFile.Replace(".pcx", ".png"));
+            }
         }
 
         static void TestRetrieveBundleImage()
@@ -62,12 +83,22 @@ namespace H3Console
                 for (int i = 0; i < bundleImage.Groups[g].Frames.Count; i++)
                 {
                     ImageData image = bundleImage.GetImageData(g, i);
-                    image.ExportDataToPNG();
-
-                    byte[] imageBytes = image.GetPNGData();
-                    StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\H3sprite\lavatl-{0}-{1}.png", g, i), imageBytes);
+                    ImageDataExporter exporter = new ImageDataExporter(image);
+                    exporter.ExportToPng(string.Format(@"D:\PlayGround\Heroes3\H3sprite\lavatl-{0}-{1}.png", g, i));
                 }
             }
+        }
+
+        static void TestRetrieveBundleImage2()
+        {
+            Engine engine = Engine.GetInstance();
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("AVA0041.def");
+            
+            ImageData image = bundleImage.GetImageData(0, 0);
+            ImageDataExporter exporter = new ImageDataExporter(image);
+            exporter.ExportToPng(@"D:\Temp\h3\AVA0041.png");
         }
 
         static void TestRetrieveRiverBundleImage()

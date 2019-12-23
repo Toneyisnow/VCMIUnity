@@ -94,7 +94,7 @@ namespace Assets.Scripts.Components
 
         public static Color ToColor(HCommon.Color h3Color)
         {
-            return new Color((float)h3Color.B / 255, (float)h3Color.G / 255, (float)h3Color.R / 255, 1 - (float)h3Color.A / 255);
+            return new Color((float)h3Color.B / 255, (float)h3Color.G / 255, (float)h3Color.R / 255, (float)h3Color.A / 255);
         }
 
         public static bool IsTransparentColor(HCommon.Color h3Color)

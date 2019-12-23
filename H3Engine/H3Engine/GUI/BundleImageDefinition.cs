@@ -128,21 +128,5 @@ namespace H3Engine.GUI
 
             return frame.ImageData;
         }
-
-        public ImageData ComposeFrameImage2(int groupIndex, int frameIndex)
-        {
-            ImageData image = new ImageData(Width, Height);
-
-            byte[] data = this.Groups[groupIndex].Frames[frameIndex].RawData;
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                byte value = data[i];
-                Color color = Palette[value];
-                image.WriteColor(color);
-            }
-
-            return image;
-        }
     }
 }

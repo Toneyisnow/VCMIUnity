@@ -18,12 +18,8 @@ namespace H3Engine.FileSystem
     {
         private byte[] rawData;
 
-        private Dictionary<byte, byte[]> pngData = null;
-
         private Dictionary<byte, byte[]> plainData = null;
-
-        private MemoryStream pngStream = null;
-
+        
         private int dataIndex = 0;
 
         public int Width
@@ -42,7 +38,6 @@ namespace H3Engine.FileSystem
             this.Height = height;
 
             this.rawData = new byte[width * height * 4];
-            this.pngData = new Dictionary<byte, byte[]>();
             this.plainData = new Dictionary<byte, byte[]>();
 
             this.dataIndex = 0;
@@ -64,32 +59,7 @@ namespace H3Engine.FileSystem
             this.rawData[this.dataIndex++] = color.B;
             this.rawData[this.dataIndex++] = color.A;
         }
-
-        /// <summary>
-        /// This will be deprecated.
-        /// </summary>
-        /// <param name="needRotate"></param>
-        public void ExportDataToPNG(bool needRotate = false)
-        {
-            if (rawData == null)
-            {
-                return;
-            }
-
-            this.pngData = new Dictionary<byte, byte[]>();
-            pngData[0] = GeneratePNGData(rawData);
-
-            if (needRotate)
-            {
-                pngData[1] = GeneratePNGData(FlipLeftAndRight(rawData));
-                pngData[2] = GeneratePNGData(FlipUpAndDown(rawData));
-                pngData[3] = GeneratePNGData(Rotate180(rawData));
-            }
-
-            // Clean up the rawData to free memory
-            ////  rawData = null;
-        }
-
+        
         public Color GetPixelColor(int x, int y, byte rotation = 0)
         {
             if (x < 0 || x >= this.Width || y < 0 || y >= this.Height)
@@ -150,22 +120,7 @@ namespace H3Engine.FileSystem
             this.plainData[rotation] = data;
             return data;
         }
-
-        public byte[] GetPNGData(byte rotation = 0)
-        {
-            if (pngData == null)
-            {
-                return null;
-            }
-
-            if(rotation >= pngData.Count)
-            {
-                throw new ArgumentOutOfRangeException("Rotation index is out of range of PNG Data.");
-            }
-
-            return pngData[rotation];
-        }
-
+        
         private byte[] Rotate180(byte[] raw)
         {
             byte[] resultData = new byte[Width * Height * 4];
@@ -227,73 +182,6 @@ namespace H3Engine.FileSystem
             }
 
             return resultData;
-        }
-
-        private byte[] GeneratePNGData(byte[] rawBytes)
-        {
-            using (MemoryStream output = new MemoryStream())
-            {
-                /*
-                Bitmap bmp = new Bitmap(this.Width, this.Height, PixelFormat.Format32bppArgb);
-                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, bmp.PixelFormat);
-
-                System.Runtime.InteropServices.Marshal.Copy(rawBytes, 0, bmpData.Scan0, rawBytes.Length);
-                bmp.UnlockBits(bmpData);
-                bmp.Save(output, ImageFormat.Png);
-                */
-                return StreamHelper.ReadToEnd(output);
-            }
-        }
-
-        /// <summary>
-        /// This version should be used on Windows
-        /// </summary>
-        /// <param name="raw"></param>
-        /// <returns></returns>
-        private byte[] GeneratePNGData2(byte[] raw)
-        {
-            using (MemoryStream output = new MemoryStream())
-            {
-                /*
-                unsafe
-                {
-                    fixed (byte* ptr = raw)
-                    {
-                        using (Bitmap image = new Bitmap(this.Width, this.Height, this.Width * 4, PixelFormat.Format32bppPArgb, new IntPtr(ptr)))
-                        {
-                            image.Save(output, ImageFormat.Png);
-                        }
-                    }
-                }
-                */
-
-                return StreamHelper.ReadToEnd(output);
-            }
-        }
-
-        /// <summary>
-        /// This should not be used any more, it's replaced by ExportDataToPNG()
-        /// </summary>
-        /// <param name="outputStream"></param>
-        public void SaveAsPNGStream(Stream outputStream)
-        {
-            if (outputStream == null)
-            {
-                return;
-            }
-
-            unsafe
-            {
-                /*
-                fixed (byte* ptr = rawData)
-                {
-                    using (Bitmap image = new Bitmap(this.Width, this.Height, this.Width * 4, PixelFormat.Format32bppRgb, new IntPtr(ptr)))
-                    {
-                        image.Save(outputStream, ImageFormat.Png);
-                    }
-                }
-                */
-            }
         }
     }
 }
