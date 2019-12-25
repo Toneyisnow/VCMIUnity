@@ -45,7 +45,7 @@ public class SampleTest : MonoBehaviour
 
         mainSprites = new List<Sprite>();
 
-        LoadCampaignMap();
+        // LoadCampaignMap();
 
         // LoadSimpleImage();
         // LoadH3Image();
@@ -55,6 +55,10 @@ public class SampleTest : MonoBehaviour
         // LoadAnimation();
 
         // TestTextureRenderer();
+
+        TestPlayVideo();
+
+        // Handheld.PlayFullScreenMovie(Path.Combine(HEROES3_DATA_FOLDER, "H3X1intr.mp4"));
 
         sceneLoaded = true;
         frameCount = 0;
@@ -186,6 +190,22 @@ public class SampleTest : MonoBehaviour
             SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
         }
+    }
+
+    void TestPlayVideo()
+    {
+        GameObject camera = GameObject.Find("Main Camera");
+        var videoPlayer = camera.AddComponent<UnityEngine.Video.VideoPlayer>();
+        videoPlayer.playOnAwake = false;
+
+        // videoPlayer.renderMode = UnityEngine.Video.VideoRenderMode.CameraNearPlane;
+        // videoPlayer.targetCameraAlpha = 0.5F;
+
+        videoPlayer.url = Path.Combine(HEROES3_DATA_FOLDER, "H3X1intr.mp4");
+        videoPlayer.frame = 100;
+        videoPlayer.isLooping = true;
+
+        videoPlayer.Play();
     }
 
     void LoadAnimation()
