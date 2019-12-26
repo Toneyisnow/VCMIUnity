@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\AnimatedMapArtifact.cs" />
     <Compile Include="Assets\Scripts\AnimatedMapObject.cs" />
     <Compile Include="Assets\Scripts\AnimatedObject.cs" />
+    <Compile Include="Assets\Scripts\Components\BundleImageSheet.cs" />
     <Compile Include="Assets\Scripts\Components\MapTextureManager.cs" />
     <Compile Include="Assets\Scripts\Components\Texture2DExtension.cs" />
     <Compile Include="Assets\Scripts\Components\TextureAtlas.cs" />
@@ -75,6 +76,8 @@
     <Compile Include="Assets\Scripts\MapCamera.cs" />
     <Compile Include="Assets\Scripts\MapLoader.cs" />
     <Compile Include="Assets\Scripts\SampleTest.cs" />
+    <Compile Include="Assets\Scripts\Scenes\GameMenuScene.cs" />
+    <Compile Include="Assets\Scripts\Scenes\GamePrologueScene.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/GitRoot/toneyisnow/VCMIUnity/UnityClient/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

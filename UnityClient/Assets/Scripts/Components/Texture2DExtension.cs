@@ -101,5 +101,16 @@ namespace Assets.Scripts.Components
         {
             return (h3Color.A == 0 && h3Color.R == 0 && h3Color.G == 255 && h3Color.B == 255);
         }
+
+        public static Sprite CreateSpriteFromTexture(Texture2D texture, Vector2? anchorPoint = null)
+        {
+            if (texture == null)
+            {
+                return null;
+            }
+
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), anchorPoint ?? Vector2.zero);
+            return sprite;
+        }
     }
 }
