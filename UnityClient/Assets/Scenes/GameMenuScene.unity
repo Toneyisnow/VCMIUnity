@@ -149,6 +149,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b2adafc1b2a3d94d919bf025c1fb544, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameMenuItemPrefab: {fileID: 1593912416857766301, guid: 1ecc3cf19470e9644860e7adae0fc361,
+    type: 3}
+  menuItem1Position: {x: 2.8, y: 2.4, z: -5}
+  menuItem2Position: {x: 2.8, y: 1.2, z: -5}
+  menuItem3Position: {x: 2.8, y: 0, z: -5}
+  menuItem4Position: {x: 2.8, y: -1.2, z: -5}
+  menuItem5Position: {x: 2.8, y: -2.4, z: -5}
 --- !u!4 &1758134310
 Transform:
   m_ObjectHideFlags: 0

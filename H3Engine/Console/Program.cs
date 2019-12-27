@@ -24,7 +24,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestRetrieveAllImages();
+            TestRetrieveAllBundleImages();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -72,6 +72,40 @@ namespace H3Console
             }
         }
 
+        static void TestRetrieveAllBundleImages()
+        {
+            Engine engine = Engine.GetInstance();
+
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+
+            List<string> defFiles = engine.SearchResourceFiles("*.def");
+
+            string exportFolderPath = @"D:\PlayGround\Heroes3\H3sprite\";
+            foreach (string defFile in defFiles)
+            {
+                BundleImageDefinition bundleImage = engine.RetrieveBundleImage(defFile);
+
+                string defId = defFile.Replace(".def", "");
+                string defFolder = Path.Combine(exportFolderPath, defId);
+                if (!Directory.Exists(defFolder))
+                {
+                    Directory.CreateDirectory(defFolder);
+                }
+                
+                for(int g = 0; g< bundleImage.Groups.Count; g++)
+                {
+                    for(int f = 0; f < bundleImage.Groups[g].Frames.Count; f++)
+                    {
+                        ImageData image = bundleImage.GetImageData(g, f);
+                        ImageDataExporter exporter = new ImageDataExporter(image);
+
+                        string fileName = string.Format(@"{0}_{1}_{2}.png", defId, g, f);
+                        exporter.ExportToPng(Path.Combine(defFolder, fileName));
+                    }
+                }
+            }
+        }
+        
         static void TestRetrieveBundleImage()
         {
             Engine engine = Engine.GetInstance();
@@ -94,7 +128,7 @@ namespace H3Console
             Engine engine = Engine.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
-            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("AVA0041.def");
+            BundleImageDefinition bundleImage = engine.RetrieveBundleImage("MMENUNG.def");
             
             ImageData image = bundleImage.GetImageData(0, 0);
             ImageDataExporter exporter = new ImageDataExporter(image);
