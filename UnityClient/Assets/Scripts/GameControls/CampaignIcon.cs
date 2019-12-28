@@ -1,0 +1,68 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+using H3Engine;
+using Assets.Scripts.Components;
+using UnityEngine.Video;
+using System.IO;
+
+namespace UnityClient.GameControls
+{
+    public class CampaignIcon : MonoBehaviour
+    {
+        private Sprite imageFile = null;
+
+        private int campaignFlag = 0;
+
+        private Action<int> callback = null;
+
+        private VideoPlayer videoPlayer = null;
+
+        public void Initialize(string imageFileName, string videoFileName, int campaignFlag, Action<int> action)
+        {
+            Engine h3Engine = Engine.GetInstance();
+
+            var imageData = h3Engine.RetrieveImage(imageFileName);
+            var renderer = gameObject.GetComponent<SpriteRenderer>();
+            renderer.sprite = Texture2DExtension.CreateSpriteFromImageData(imageData);
+            gameObject.AddComponent<BoxCollider2D>();
+
+            this.callback = action;
+
+            this.videoPlayer = gameObject.GetComponent<VideoPlayer>();
+            this.videoPlayer.url = Path.Combine(Application.streamingAssetsPath, @"Videos\CampaignIcons\", videoFileName);
+
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
+
+        private void OnMouseDown()
+        {
+            if (!this.videoPlayer.isPlaying)
+            {
+                this.videoPlayer.Play();
+            }
+            else
+            {
+                this.callback?.Invoke(campaignFlag);
+            }
+        }
+
+        public void StopVideo()
+        {
+            this.videoPlayer.Stop();
+        }
+    }
+}
