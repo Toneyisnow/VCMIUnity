@@ -109,8 +109,20 @@ namespace Assets.Scripts.Components
                 return null;
             }
 
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), anchorPoint ?? Vector2.zero);
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), anchorPoint ?? new Vector2(0.5f, 0.5f));
             return sprite;
         }
+
+        public static Sprite CreateSpriteFromImageData(ImageData image, Vector2? anchorPoint = null)
+        {
+            if (image == null)
+            {
+                return null;
+            }
+
+            Texture2D texture = LoadFromData(image);
+            return CreateSpriteFromTexture(texture, anchorPoint);
+        }
+
     }
 }

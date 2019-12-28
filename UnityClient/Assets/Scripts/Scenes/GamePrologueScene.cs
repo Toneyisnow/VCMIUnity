@@ -8,14 +8,13 @@ using UnityEngine.SceneManagement;
 public class GamePrologueScene : MonoBehaviour
 {
     private VideoPlayer videoPlayer = null;
-
     private int PlayerStatus = 0;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        GameObject camera = GameObject.Find("Main Camera");
+        GameObject camera = GameObject.Find("MainCamera");
         videoPlayer = camera.GetComponent<VideoPlayer>();
         videoPlayer.playOnAwake = false;
         videoPlayer.loopPointReached += EndReached;

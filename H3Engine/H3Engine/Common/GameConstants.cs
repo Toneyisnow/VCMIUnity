@@ -56,6 +56,14 @@ namespace H3Engine.Common
     }
 
 
+    public enum ECampaignVersion
+    {
+        INVALID = 0,
+        ROE = 1,
+        AB = 2,
+        SOD = 3,
+        WOG = 4
+    };
 
 
     public enum EVictoryConditionType

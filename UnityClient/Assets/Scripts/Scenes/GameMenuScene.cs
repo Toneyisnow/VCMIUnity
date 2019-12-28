@@ -6,8 +6,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityClient.Components;
 using UnityClient.GameControls;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameMenuScene : MonoBehaviour
 {
@@ -33,6 +35,12 @@ public class GameMenuScene : MonoBehaviour
     private GameObject menuItemNewCampaign = null;
     private GameObject menuItemNewTutor = null;
     private GameObject menuItemNewBack = null;
+
+    private GameObject menuItemCampaignSOD = null;
+    private GameObject menuItemCampaignROE = null;
+    private GameObject menuItemCampaignAB = null;
+    private GameObject menuItemCampaignCustom = null;
+    private GameObject menuItemCampaignBack = null;
 
 
     private static string GetGameDataFilePath(string filename)
@@ -103,6 +111,23 @@ public class GameMenuScene : MonoBehaviour
         // Back
         menuItemNewBack = CreateMenuItem("GTBACK.def", menuItem5Position, () => { this.NewBackClicked(); });
 
+
+        // Campaign SOD
+        menuItemCampaignSOD = CreateMenuItem("csssod.def", menuItem1Position, () => { this.CampaignSODClicked(); });
+
+        // Campaign ROE
+        menuItemCampaignROE = CreateMenuItem("cssroe.def", menuItem2Position, () => { this.CampaignROEClicked(); });
+
+        // Campaign AB
+        menuItemCampaignAB = CreateMenuItem("cssarm.def", menuItem3Position, () => { this.CampaignABClicked(); });
+
+        // Campaign Custom
+        menuItemCampaignCustom = CreateMenuItem("csscus.def", menuItem4Position, () => { this.CampaignCusClicked(); });
+
+        // Campaign SOD
+        menuItemCampaignBack = CreateMenuItem("cssexit.def", menuItem5Position, () => { this.CampaignBackClicked(); });
+
+
     }
 
     void ShowMainMenu(bool value)
@@ -121,6 +146,15 @@ public class GameMenuScene : MonoBehaviour
         menuItemNewCampaign.SetActive(value);
         menuItemNewTutor.SetActive(value);
         menuItemNewBack.SetActive(value);
+    }
+
+    void ShowCampaignMenu(bool value)
+    {
+        menuItemCampaignSOD.SetActive(value);
+        menuItemCampaignROE.SetActive(value);
+        menuItemCampaignAB.SetActive(value);
+        menuItemCampaignCustom.SetActive(value);
+        menuItemCampaignBack.SetActive(value);
 
     }
 
@@ -181,7 +215,8 @@ public class GameMenuScene : MonoBehaviour
 
     private void NewCampaignClicked()
     {
-
+        ShowNewGameMenu(false);
+        ShowCampaignMenu(true);
     }
 
     private void NewTutorClicked()
@@ -194,4 +229,35 @@ public class GameMenuScene : MonoBehaviour
         ShowNewGameMenu(false);
         ShowMainMenu(true);
     }
+
+    private void CampaignSODClicked()
+    {
+        CrossSceneData.SelectedCampaign = H3Engine.Common.ECampaignVersion.SOD;
+        SceneManager.LoadScene("CampaignSelectScene", LoadSceneMode.Single);
+        
+
+    }
+
+    private void CampaignROEClicked()
+    {
+
+    }
+
+    private void CampaignABClicked()
+    {
+
+    }
+
+    private void CampaignCusClicked()
+    {
+
+    }
+
+    private void CampaignBackClicked()
+    {
+        ShowNewGameMenu(true);
+        ShowCampaignMenu(false);
+    }
+
+
 }

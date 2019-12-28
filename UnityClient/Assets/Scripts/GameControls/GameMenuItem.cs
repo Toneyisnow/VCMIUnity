@@ -50,7 +50,7 @@ namespace UnityClient.GameControls
 
             idleSprite = CreateSpriteFromFrame(bundleDefinition, 0);
             clickedSprite = CreateSpriteFromFrame(bundleDefinition, 1);
-            hoverSprite = CreateSpriteFromFrame(bundleDefinition, 2);
+            hoverSprite = CreateSpriteFromFrame(bundleDefinition, 3);
 
             menuItemStatus = (Input.touchSupported ? MenuItemStatus.Hover : MenuItemStatus.Idle);
             StatusUpdated();
