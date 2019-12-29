@@ -28,6 +28,7 @@ public class CampaignSelectScene : MonoBehaviour
     void Start()
     {
         this.campaignVersion = CrossSceneData.SelectedCampaign;
+        this.campaignVersion = ECampaignVersion.SOD;
 
         Engine h3Engine = Engine.GetInstance();
         ImageData imageData = h3Engine.RetrieveImage("campback.PCX");
@@ -35,14 +36,31 @@ public class CampaignSelectScene : MonoBehaviour
 
         GameObject background = GameObject.Find("Background");
         var renderer = background.GetComponent<SpriteRenderer>();
-        
         renderer.sprite = Texture2DExtension.CreateSpriteFromImageData(imageData, new Vector2(0.5f, 0.5f));
+        background.transform.position = new Vector3(0, 0, 0.5f);
 
-        if (campaignVersion == ECampaignVersion.SOD)
+        if (campaignVersion == ECampaignVersion.ROE)
         {
-            CreateCampaignIcon(iconPosition1, "campev1s.PCX", "CEVIL1.mp4", 1);
+            CreateCampaignIcon(iconPosition1, "campgd1s.PCX", "CGOOD1.mp4", 1);
+            CreateCampaignIcon(iconPosition2, "campev1s.PCX", "CEVIL1.mp4", 2);
+            CreateCampaignIcon(iconPosition3, "campgd2s.PCX", "CGOOD2.mp4", 3);
+            CreateCampaignIcon(iconPosition4, "campneus.PCX", "CNEUTRAL.mp4", 4);
+            CreateCampaignIcon(iconPosition5, "campev2s.PCX", "CEVIL2.mp4", 5);
+            CreateCampaignIcon(iconPosition6, "campgd3s.PCX", "CGOOD3.mp4", 6);
         }
-
+        else if (campaignVersion == ECampaignVersion.AB)
+        {
+            CreateCampaignIcon(iconPosition1, "campgd1s.PCX", "CGOOD1.mp4", 1);
+            CreateCampaignIcon(iconPosition2, "campev1s.PCX", "CEVIL1.mp4", 2);
+            CreateCampaignIcon(iconPosition3, "campgd2s.PCX", "CGOOD2.mp4", 3);
+            CreateCampaignIcon(iconPosition4, "campneus.PCX", "CNEUTRAL.mp4", 4);
+            CreateCampaignIcon(iconPosition5, "campev2s.PCX", "CEVIL2.mp4", 5);
+            CreateCampaignIcon(iconPosition6, "campgd3s.PCX", "CGOOD3.mp4", 6);
+        }
+        else if (campaignVersion == ECampaignVersion.SOD)
+        {
+            CreateCampaignIcon(iconPosition1, "campgd1s.PCX", "CGOOD1.mp4", 1);
+        }
     }
 
     // Update is called once per frame
@@ -64,7 +82,7 @@ public class CampaignSelectScene : MonoBehaviour
 
     private void OnSelectedCampaign(int campaignFlag)
     {
-
+        print("OnSelectedCampaign: " + campaignFlag);
     }
 
 }

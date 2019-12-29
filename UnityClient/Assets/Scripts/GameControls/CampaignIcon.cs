@@ -24,16 +24,20 @@ namespace UnityClient.GameControls
         {
             Engine h3Engine = Engine.GetInstance();
 
+            this.campaignFlag = campaignFlag;
             var imageData = h3Engine.RetrieveImage(imageFileName);
             var renderer = gameObject.GetComponent<SpriteRenderer>();
             renderer.sprite = Texture2DExtension.CreateSpriteFromImageData(imageData);
             gameObject.AddComponent<BoxCollider2D>();
 
+            var canvasImage = GameObject.Find("RawImage");
+            ///canvasImage.transform.position = gameObject.transform.position;
+
             this.callback = action;
 
             this.videoPlayer = gameObject.GetComponent<VideoPlayer>();
             this.videoPlayer.url = Path.Combine(Application.streamingAssetsPath, @"Videos\CampaignIcons\", videoFileName);
-
+            this.videoPlayer.Stop();
         }
 
         // Start is called before the first frame update
@@ -50,6 +54,11 @@ namespace UnityClient.GameControls
 
         private void OnMouseDown()
         {
+            if (this.videoPlayer == null)
+            {
+                return;
+            }
+
             if (!this.videoPlayer.isPlaying)
             {
                 this.videoPlayer.Play();

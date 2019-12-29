@@ -234,18 +234,18 @@ public class GameMenuScene : MonoBehaviour
     {
         CrossSceneData.SelectedCampaign = H3Engine.Common.ECampaignVersion.SOD;
         SceneManager.LoadScene("CampaignSelectScene", LoadSceneMode.Single);
-        
-
     }
 
     private void CampaignROEClicked()
     {
-
+        CrossSceneData.SelectedCampaign = H3Engine.Common.ECampaignVersion.ROE;
+        SceneManager.LoadScene("CampaignSelectScene", LoadSceneMode.Single);
     }
 
     private void CampaignABClicked()
     {
-
+        CrossSceneData.SelectedCampaign = H3Engine.Common.ECampaignVersion.AB;
+        SceneManager.LoadScene("CampaignSelectScene", LoadSceneMode.Single);
     }
 
     private void CampaignCusClicked()

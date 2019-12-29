@@ -164,6 +164,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd593e68c19de444885bd9dda3ae9495, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CampaignIconPrefab: {fileID: 8750627120996920072, guid: c9a2f4b6ad1aab14895eca5641b2e122,
+    type: 3}
+  iconPosition1: {x: -2, y: 1, z: 0}
+  iconPosition2: {x: 2, y: 1, z: 0}
+  iconPosition3: {x: -2.2, y: 0, z: 0}
+  iconPosition4: {x: 0, y: 0, z: 0}
+  iconPosition5: {x: 2.2, y: 0, z: 0}
+  iconPosition6: {x: -2.2, y: -1, z: 0}
+  iconPosition7: {x: 0, y: -1, z: 0}
 --- !u!1 &1849573841
 GameObject:
   m_ObjectHideFlags: 0
