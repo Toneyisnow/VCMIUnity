@@ -61,6 +61,7 @@ namespace UnityClient.GameControls
 
             if (!this.videoPlayer.isPlaying)
             {
+                this.videoPlayer.isLooping = true;
                 this.videoPlayer.Play();
             }
             else

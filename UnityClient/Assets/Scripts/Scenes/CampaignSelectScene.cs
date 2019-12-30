@@ -38,6 +38,7 @@ public class CampaignSelectScene : MonoBehaviour
         var renderer = background.GetComponent<SpriteRenderer>();
         renderer.sprite = Texture2DExtension.CreateSpriteFromImageData(imageData, new Vector2(0.5f, 0.5f));
         background.transform.position = new Vector3(0, 0, 0.5f);
+        background.transform.localScale = new Vector3(1.6f, 1.6f, 1);
 
         if (campaignVersion == ECampaignVersion.ROE)
         {
