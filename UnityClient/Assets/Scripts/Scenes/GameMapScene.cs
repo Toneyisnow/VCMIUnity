@@ -36,6 +36,6 @@ public class GameMapScene : MonoBehaviour
 
     private static string GetGameDataFilePath(string filename)
     {
-        return Path.Combine(Application.streamingAssetsPath, filename);
+        return Path.Combine(Application.streamingAssetsPath, @"GameData\SOD.zh-cn", filename);
     }
 }

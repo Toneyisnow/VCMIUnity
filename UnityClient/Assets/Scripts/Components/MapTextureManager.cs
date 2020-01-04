@@ -8,6 +8,7 @@ using H3Engine;
 using H3Engine.FileSystem;
 using H3Engine.MapObjects;
 using H3Engine.GUI;
+using System;
 
 public class MapTextureManager
 {
@@ -39,11 +40,24 @@ public class MapTextureManager
     
     public void PreloadTextures()
     {
+        DateTime lastTime = DateTime.Now;
+
         PreloadTerrainTextures();
+        MonoBehaviour.print("PreloadTerrainTextures:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
+
         PreloadRoadTextures();
+        MonoBehaviour.print("PreloadRoadTextures:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
+
         PreloadRiverTextures();
+        MonoBehaviour.print("PreloadRiverTextures:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
 
         PreloadMapObjectTextures();
+        MonoBehaviour.print("PreloadMapObjectTextures:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
+
     }
 
     public Sprite LoadTerrainSprite(ETerrainType terrainType, byte terrainIndex, byte rotation)
@@ -200,6 +214,8 @@ public class MapTextureManager
 
     private void PreloadMapObjectTextures()
     {
+        ProfilerLogger.RecordProfile("PreloadMapObjectTextures: before");
+
         artifactTextureSheet = new BundleImageSheet();
         mineTextureSheet = new BundleImageSheet();
         heroTextureSheet = new BundleImageSheet();
@@ -209,6 +225,18 @@ public class MapTextureManager
         decorationTextureSheets = new Dictionary<int, BundleImageSheet>();
 
         singleBundleTextureSheets = new BundleImageSheet();
+        HashSet<string> loadedObjectTemplate = new HashSet<string>();
+
+        int artifactCount = 0;
+        int decorationCount = 0;
+        int heroCount = 0;
+        int resourceCount = 0;
+        int mineCount = 0;
+        int townCount = 0;
+        int singleCount = 0;
+
+        TimeSpan loadImageDataTimeSpan = new TimeSpan();
+        TimeSpan buildTextureTimeSpan = new TimeSpan();
 
         foreach (CGObject obj in h3Map.Objects)
         {
@@ -219,7 +247,11 @@ public class MapTextureManager
             }
 
             string defFileName = template.AnimationFile;
-
+            if (loadedObjectTemplate.Contains(defFileName))
+            {
+                continue;
+            }
+            
             if (MapObjectHelper.IsDecorationObject(template.Type))
             {
                 int decorationTypeId = template.Type.GetHashCode();
@@ -233,38 +265,56 @@ public class MapTextureManager
                     decorationTextureSheets[decorationTypeId] = new BundleImageSheet();
                     textureSheet = decorationTextureSheets[decorationTypeId];
                 }
-                textureSheet.AddBundleImage(defFileName);
 
+                textureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
+                decorationCount++;
+                loadedObjectTemplate.Add(defFileName);
                 continue;
             }
 
             switch (template.Type)
             {
                 case EObjectType.ARTIFACT:
-                    artifactTextureSheet.AddBundleImage(defFileName);
+                    artifactTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
+                    artifactCount++;
                     break;
                 case EObjectType.HERO:
                 case EObjectType.HERO_PLACEHOLDER:
                 case EObjectType.RANDOM_HERO:
-                    heroTextureSheet.AddBundleImage(defFileName);
+                    heroTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
+                    heroCount++;
                     break;
                 case EObjectType.MINE:
-                    mineTextureSheet.AddBundleImage(defFileName);
+                    mineTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
+                    mineCount++;
                     break;
                 case EObjectType.TOWN:
                 case EObjectType.RANDOM_TOWN:
-                    townTextureSheet.AddBundleImage(defFileName);
+                    townTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
+                    townCount++;
                     break;
                 case EObjectType.RESOURCE:
                 case EObjectType.RANDOM_RESOURCE:
-                    resourceTextureSheet.AddBundleImage(defFileName);
+                    resourceTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
+                    resourceCount++;
                     break;
                 default:
                     // For other types, just put them into Single Bundle Image Sheet
-                    singleBundleTextureSheets.AddBundleImage(defFileName);
+                    singleBundleTextureSheets.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
+                    singleCount++;
                     break;
             }
+
+            loadedObjectTemplate.Add(defFileName);
         }
+
+        ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheets filled:");
+
+        MonoBehaviour.print(string.Format(@"Total Templates: artifact={0}, decoration={1}, hero={2}, resource={3}, mine={4}, town={5}, single={6}",
+            artifactCount, decorationCount, heroCount, resourceCount, mineCount, townCount, singleCount));
+
+        MonoBehaviour.print(string.Format(@"Total time for loadImageData:" + loadImageDataTimeSpan.ToString()));
+        MonoBehaviour.print(string.Format(@"Total time for buildTexture:" + buildTextureTimeSpan.ToString()));
 
         artifactTextureSheet.PackTextures();
         mineTextureSheet.PackTextures();
@@ -272,11 +322,17 @@ public class MapTextureManager
         townTextureSheet.PackTextures();
         resourceTextureSheet.PackTextures();
 
+        ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheets packed:");
+
         foreach (var sheet in decorationTextureSheets.Values)
         {
             sheet.PackTextures();
         }
 
+        ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheets packed 2:");
+
         singleBundleTextureSheets.PackTextures();
+        ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheets packed 3:");
+
     }
 }

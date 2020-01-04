@@ -100,6 +100,15 @@ namespace H3Engine.API
             }
         }
 
+        public void ReleaseBundleImage(string defFileName)
+        {
+            defFileName = defFileName.ToLower();
+            if (bundleImageCache.ContainsKey(defFileName))
+            {
+                bundleImageCache.Remove(defFileName);
+            }
+        }
+
         /// <summary>
         /// Read the .msk file from resource storage, and fill the Width and Height information
         /// </summary>

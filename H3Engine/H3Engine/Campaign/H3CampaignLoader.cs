@@ -164,7 +164,7 @@ namespace H3Engine.Campaign
             header.Name = reader.ReadStringWithLength();
             header.Description = reader.ReadStringWithLength();
 
-            if (header.Version > ECampaignVersion.RoE)
+            if (header.Version > ECampaignVersion.ROE)
             {
                 header.DifficultyChoosenByPlayer = reader.ReadByte();
             }
@@ -228,7 +228,7 @@ namespace H3Engine.Campaign
             travelOption.WhatHeroKeeps = reader.ReadByte();
             travelOption.MonstersKeptByHero = reader.ReadBytes(ScenarioTravelOption.MONSTERS_KEPT_BY_HERO_COUNT);
 
-            if (version < ECampaignVersion.SoD)
+            if (version < ECampaignVersion.SOD)
             {
                 travelOption.ArtifactsKeptByHero = reader.ReadBytes(ScenarioTravelOption.ARTIFACTS_KEPT_BY_HERO_COUNT - 1);
             }

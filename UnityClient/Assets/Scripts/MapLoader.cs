@@ -4,6 +4,7 @@ using H3Engine.Core;
 using H3Engine.GUI;
 using H3Engine.MapObjects;
 using H3Engine.Mapping;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,15 +31,31 @@ public class MapLoader : MonoBehaviour
 
     public void RenderMap()
     {
+        var lastTime = DateTime.Now;
+
         this.mapTextureManager.PreloadTextures();
+        
+        print("PreloadTextures:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
 
         RenderTerrain();
+        print("RenderTerrain:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
+
         RenderRoad();
+        print("RenderRoad:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
+
         RenderRiver();
+        print("RenderRiver:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
 
         RenderMapObjects();
+        print("RenderMapObjects:" + (DateTime.Now - lastTime).ToString());
+        lastTime = DateTime.Now;
+
     }
-    
+
     // Start is called before the first frame update
     void Start()
     {

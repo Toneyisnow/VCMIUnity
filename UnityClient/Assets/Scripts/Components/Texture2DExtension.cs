@@ -37,10 +37,9 @@ namespace Assets.Scripts.Components
             return texture;
         }
 
-        public static Texture2D LoadFromData(ImageData imageData, byte rotateIndex = 0)
+        public static Texture2D LoadFromData2(ImageData imageData, byte rotateIndex = 0)
         {
             Texture2D texture = new Texture2D(imageData.Width, imageData.Height, TextureFormat.ARGB32, false);
-
             Color[] colors = new Color[imageData.Width * imageData.Height];
 
             for (int j = 0; j < imageData.Height; j++)
@@ -64,10 +63,9 @@ namespace Assets.Scripts.Components
             return texture;
         }
 
-        public static Texture2D LoadFromData3(ImageData imageData, byte rotateIndex = 0)
+        public static Texture2D LoadFromData(ImageData imageData, byte rotateIndex = 0)
         {
             Texture2D texture = new Texture2D(imageData.Width, imageData.Height, TextureFormat.ARGB32, false);
-
             Color32[] color32s = new Color32[imageData.Width * imageData.Height];
 
             for (int j = 0; j < imageData.Height; j++)
@@ -76,7 +74,7 @@ namespace Assets.Scripts.Components
                 for (int i = 0; i < imageData.Width; i++)
                 {
                     HCommon.Color sysColor = imageData.GetPixelColor(i, j, rotateIndex);
-                    color32s[baseIndex + i] = new UnityEngine.Color32(sysColor.R, sysColor.G, sysColor.B, sysColor.A);
+                    color32s[baseIndex + i] = new UnityEngine.Color32(sysColor.B, sysColor.G, sysColor.R, sysColor.A);
 
                     if (IsTransparentColor(sysColor))
                     {

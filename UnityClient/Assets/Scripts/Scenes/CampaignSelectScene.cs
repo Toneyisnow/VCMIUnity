@@ -8,6 +8,9 @@ using UnityClient.Components;
 using H3Engine.FileSystem;
 using Assets.Scripts.Components;
 using UnityClient.GameControls;
+using H3Engine.Campaign;
+using H3Engine.Mapping;
+using UnityEngine.SceneManagement;
 
 public class CampaignSelectScene : MonoBehaviour
 {
@@ -84,6 +87,7 @@ public class CampaignSelectScene : MonoBehaviour
     private void OnSelectedCampaign(int campaignFlag)
     {
         print("OnSelectedCampaign: " + campaignFlag);
+        SceneManager.LoadScene("GameMapScene");
     }
 
 }

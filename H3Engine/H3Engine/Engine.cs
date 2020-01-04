@@ -197,6 +197,10 @@ namespace H3Engine
             return resourceHandler.RetrieveBundleImage(defFileName);
         }
 
+        public void ReleaseBundleImage(string defFileName)
+        {
+            resourceHandler.ReleaseBundleImage(defFileName);
+        }
 
         ////// Resource Usage Layer ///////
 

@@ -54,6 +54,8 @@ public class GameMenuScene : MonoBehaviour
         h3Engine = Engine.GetInstance();
         h3Engine.LoadArchiveFile(GetGameDataFilePath("GameData/SOD.zh-cn/H3bitmap.lod"));
         h3Engine.LoadArchiveFile(GetGameDataFilePath("GameData/SOD.zh-cn/H3sprite.lod"));
+        h3Engine.LoadArchiveFile(GetGameDataFilePath("GameData/SOD.zh-cn/H3ab_spr.lod"));
+        h3Engine.LoadArchiveFile(GetGameDataFilePath("GameData/SOD.zh-cn/H3ab_bmp.lod"));
 
         LoadBackground();
 
