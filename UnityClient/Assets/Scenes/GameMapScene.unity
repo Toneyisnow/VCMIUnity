@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -132,7 +133,6 @@ GameObject:
   - component: {fileID: 73865958}
   - component: {fileID: 73865957}
   - component: {fileID: 73865960}
-  - component: {fileID: 73865961}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -158,7 +158,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.057760775, g: 0.41089535, b: 0.5566038, a: 1}
+  m_BackGroundColor: {r: 0.009122485, g: 0.009343233, b: 0.009433985, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -214,27 +214,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 73865956}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_AssetsPPU: 100
-  m_RefResolutionX: 800
-  m_RefResolutionY: 600
-  m_UpscaleRT: 0
-  m_PixelSnapping: 0
-  m_CropFrameX: 0
-  m_CropFrameY: 0
-  m_StretchFill: 0
---- !u!114 &73865961
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 73865956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 282b44bc6577ac64697f0126d59d2819, type: 3}
+  m_Script: {fileID: 11500000, guid: a9680574d36c64813b60f50771d1dece, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1016760870
@@ -277,7 +257,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1016760870}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1329962faf23b6644b924baead74a2a4, type: 3}
+  m_Script: {fileID: 11500000, guid: 6248ff505063e481f9df281a83040e20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1761168788
@@ -292,7 +272,7 @@ GameObject:
   - component: {fileID: 1761168790}
   - component: {fileID: 1761168789}
   m_Layer: 0
-  m_Name: MainObject
+  m_Name: SceneObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -307,13 +287,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1761168788}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 826db604f874d824493bf5bc40d21f1d, type: 3}
+  m_Script: {fileID: 11500000, guid: 11a30c24ac4df46cab1ddf0d9a7c88ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapObjectPrefab: {fileID: 386947536324583673, guid: 000791cb2bb481f47b78db6285439911,
-    type: 3}
-  mapArtifactPrefab: {fileID: 8660018978284094202, guid: 125299eca6727c24c9e3219444aeccfe,
-    type: 3}
 --- !u!212 &1761168790
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -328,6 +304,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
