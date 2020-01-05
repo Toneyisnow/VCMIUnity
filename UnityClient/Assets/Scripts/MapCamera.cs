@@ -4,79 +4,79 @@ using UnityEngine;
 
 public class MapCamera : MonoBehaviour
 {
-    private Vector3 anchorPosition = Vector3.zero;
-    private Vector3 lastPosition = Vector3.zero;
+    private Vector3 Origin;
+    private Vector3 Difference;
 
     private float anchorDistance = 0;
-    private float lastScale = 1;
+    private float lastScale = 0;
+
+    private bool isStartZooming = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
-    // Update is called once per frame
-    void Update()
+    private void LateUpdate()
     {
         int touchCount = Input.touchCount;
-        var cameraCom = this.GetComponent<Camera>();
-
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
         {
-            if (touchCount == 1 || touchCount == 0)
+            if (!Input.touchSupported || touchCount == 1)
             {
-                // Click on screen
-                anchorPosition = Input.mousePosition;
-                lastPosition = this.transform.position;
-                return;
+                Origin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             }
             else if (touchCount == 2)
             {
-                // Two touch on screen
+                print("start zooming.");
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
 
                 anchorDistance = Mathf.Abs(touch1.position.x - touch2.position.x) + Mathf.Abs(touch1.position.y - touch2.position.y);
+                lastScale = Camera.main.orthographicSize;
 
-                lastScale = cameraCom.orthographicSize;
-                return;
+                isStartZooming = true;
             }
         }
-
-        if (Input.GetMouseButton(0))
+        else if ((!Input.touchSupported && Input.GetMouseButton(0)) || touchCount >= 1)
         {
-            if (touchCount == 1 || touchCount == 0)
+            if (!Input.touchSupported || touchCount == 1)
             {
-                // Dragging
-                float deltaX = (Input.mousePosition.x - anchorPosition.x) / 100 * cameraCom.orthographicSize;
-                float deltaY = (Input.mousePosition.y - anchorPosition.y) / 100 * cameraCom.orthographicSize;
+                Difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - Camera.main.transform.position;
 
-                Vector3 newPosition = new Vector3(lastPosition.x - deltaX, lastPosition.y - deltaY, lastPosition.z);
-                this.transform.position = newPosition;
+                if(Difference != Vector3.zero)
+                {
+                    print("dragging.");
+                    Camera.main.transform.position = Origin - Difference;
+                }
             }
             else if (touchCount == 2)
             {
+                print("zooming/");
                 if (anchorDistance > 0)
                 {
+                    print("do zooming.");
                     Touch touch1 = Input.touches[0];
                     Touch touch2 = Input.touches[1];
 
                     float currentDistance = Mathf.Abs(touch1.position.x - touch2.position.x) + Mathf.Abs(touch1.position.y - touch2.position.y);
-
-                    
                     var currentScale = (anchorDistance / currentDistance) * lastScale;
                     currentScale = Mathf.Max(currentScale, 1.0f);
                     currentScale = Mathf.Min(currentScale, 6.0f);
 
-                    cameraCom.orthographicSize = currentScale;
+                    Camera.main.orthographicSize = currentScale;
 
+                    isStartZooming = false;
                 }
-
-                return;
             }
-
         }
-
+        else
+        {
+            if (!isStartZooming && anchorDistance > 0)
+            {
+                print("clearing.");
+                anchorDistance = 0;
+            }
+        }
     }
 }

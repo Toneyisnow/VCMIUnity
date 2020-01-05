@@ -75,10 +75,11 @@ public class MapLoader : MonoBehaviour
             for (int yy = 0; yy < h3Map.Header.Height; yy++)
             {
                 TerrainTile tile = h3Map.TerrainTiles[mapLevel, xx, yy];
-
                 Sprite sprite = mapTextureManager.LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
-                var position = GetMapPositionInPixel(xx, yy, 10);
-                CreateSubChildObject("Terrain", GetMapPositionInPixel(xx, yy, 10), sprite);
+
+                GameObject gametile = CreateSubChildObject("Terrain", GetMapPositionInPixel(xx, yy, 10), sprite);
+                gametile.AddComponent<MapTile>();
+
             }
         }
     }
