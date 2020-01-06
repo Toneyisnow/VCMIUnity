@@ -4,7 +4,7 @@ using UnityEngine;
 
 using H3Engine.Common;
 
-namespace UnityClient.Components
+namespace UnityClient.Components.Data
 {
     public static class CrossSceneData
     {

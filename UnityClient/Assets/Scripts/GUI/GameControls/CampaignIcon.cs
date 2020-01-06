@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using H3Engine;
-using Assets.Scripts.Components;
 using UnityEngine.Video;
 using System.IO;
+using UnityClient.GUI.Rendering;
 
-namespace UnityClient.GameControls
+namespace UnityClient.GUI.GameControls
 {
     public class CampaignIcon : MonoBehaviour
     {

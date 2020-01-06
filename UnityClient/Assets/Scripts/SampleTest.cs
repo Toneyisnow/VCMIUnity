@@ -8,11 +8,12 @@ using H3Engine.GUI;
 using H3Engine.Utils;
 using H3Engine.Mapping;
 using H3Engine.Campaign;
-using Assets.Scripts.Components;
 using H3Engine.MapObjects;
 using H3Engine.Core;
 using UnityEngine.U2D;
 using H3Engine.Common;
+using UnityClient.GUI.Rendering;
+using UnityClient.GUI.Mapping;
 
 public class SampleTest : MonoBehaviour
 {

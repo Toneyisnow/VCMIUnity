@@ -4,12 +4,11 @@ using H3Engine.GUI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.Scripts.Components;
 using H3Engine.FileSystem;
+using UnityClient.GUI.Rendering;
 
-namespace UnityClient.GameControls
+namespace UnityClient.GUI.GameControls
 {
-
     public class GameMenuItem : MonoBehaviour
     {
         public enum MenuItemStatus
