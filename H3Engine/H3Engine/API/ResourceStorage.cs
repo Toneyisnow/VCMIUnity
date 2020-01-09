@@ -103,6 +103,11 @@ namespace H3Engine.API
 
         public IFileData ExtractFileData(string fileName)
         {
+            if (fileName == "tl.def")
+            {
+                fileName = "grastl.def";
+            }
+
             if (DoesSupportCaching())
             {
                 foreach(string archiveKey in loadedArchiveDataDict.Keys)

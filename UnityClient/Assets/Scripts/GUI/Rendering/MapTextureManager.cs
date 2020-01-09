@@ -21,6 +21,8 @@ namespace UnityClient.GUI.Rendering
         private TextureSheet roadTextureSheet = null;
         private TextureSheet riverTextureSheet = null;
 
+        private TextureSheet edgeTextureSheet = null;
+
         private BundleImageSheet artifactTextureSheet = null;
         private BundleImageSheet heroTextureSheet = null;
         private BundleImageSheet mineTextureSheet = null;
@@ -55,6 +57,8 @@ namespace UnityClient.GUI.Rendering
             MonoBehaviour.print("PreloadRiverTextures:" + (DateTime.Now - lastTime).ToString());
             lastTime = DateTime.Now;
 
+            PreloadEdgeTextures();
+
             PreloadMapObjectTextures();
             MonoBehaviour.print("PreloadMapObjectTextures:" + (DateTime.Now - lastTime).ToString());
             lastTime = DateTime.Now;
@@ -80,6 +84,11 @@ namespace UnityClient.GUI.Rendering
             string textureKey = string.Format(@"{0}{1}{2}", riverType, riverDir, rotation);
 
             return riverTextureSheet.RetrieveSprite(textureKey);
+        }
+
+        public Sprite LoadEdgeSprite(string edgeKey)
+        {
+            return edgeTextureSheet.RetrieveSprite(edgeKey);
         }
 
         public Sprite[] LoadArtifactSprites(string defFileName)
@@ -141,7 +150,6 @@ namespace UnityClient.GUI.Rendering
         /// <summary>
         /// 
         /// </summary>
-
         private void PreloadTerrainTextures()
         {
             terrainTextureSheet = new TextureSheet();
@@ -211,6 +219,42 @@ namespace UnityClient.GUI.Rendering
             }
 
             riverTextureSheet.PackTextures();
+        }
+
+        private void PreloadEdgeTextures()
+        {
+            edgeTextureSheet = new TextureSheet();
+
+            BundleImageDefinition bundleImage = h3Engine.RetrieveBundleImage("EDG.def");
+
+            Texture2D texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 15));
+            edgeTextureSheet.AddImageData("X", texture);
+
+            texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 16));
+            edgeTextureSheet.AddImageData("UL", texture);
+
+            texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 17));
+            edgeTextureSheet.AddImageData("UR", texture);
+
+            texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 18));
+            edgeTextureSheet.AddImageData("DR", texture);
+
+            texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 19));
+            edgeTextureSheet.AddImageData("DL", texture);
+
+            texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 20));
+            edgeTextureSheet.AddImageData("U", texture);
+
+            texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 24));
+            edgeTextureSheet.AddImageData("R", texture);
+
+            texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 28));
+            edgeTextureSheet.AddImageData("D", texture);
+
+            texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 32));
+            edgeTextureSheet.AddImageData("L", texture);
+            
+            edgeTextureSheet.PackTextures();
         }
 
         private void PreloadMapObjectTextures()

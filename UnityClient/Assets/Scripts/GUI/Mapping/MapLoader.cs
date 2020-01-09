@@ -22,9 +22,10 @@ namespace UnityClient.GUI.Mapping
         private static float ZOrder_Resource = 5;
         private static float ZOrder_Artifact = 5;
         private static float ZOrder_Building = -5;
-        private static float ZOrder_Creature = -8;
-        private static float ZOrder_Hero = -9;
-        private static float ZOrder_Fog = -10;
+        private static float ZOrder_Creature = -6;
+        private static float ZOrder_Hero = -7;
+        private static float ZOrder_Fog = -9;
+        private static float ZOrder_Edge = -9;
 
 
         private H3Map h3Map = null;
@@ -69,6 +70,8 @@ namespace UnityClient.GUI.Mapping
             RenderMapObjects();
             print("RenderMapObjects:" + (DateTime.Now - lastTime).ToString());
             lastTime = DateTime.Now;
+
+            RenderEdge();
 
         }
 
@@ -193,6 +196,57 @@ namespace UnityClient.GUI.Mapping
 
                 objectIndex++;
             }
+        }
+
+        private void RenderEdge()
+        {
+            Sprite sprite = null;
+            int mapHeight = (int)h3Map.Header.Height;
+            int mapWidth = (int)h3Map.Header.Width;
+
+            Sprite spaceSprite = mapTextureManager.LoadEdgeSprite("X");
+
+            for (int xx = 0; xx < h3Map.Header.Width; xx++)
+            {
+                sprite = mapTextureManager.LoadEdgeSprite("U");
+                CreateSubChildObject("Edge", GetMapPositionInPixel(xx, -1, ZOrder_Edge), sprite);
+                CreateSubChildObject("Edge", GetMapPositionInPixel(xx, -2, ZOrder_Edge), spaceSprite);
+
+                sprite = mapTextureManager.LoadEdgeSprite("D");
+                CreateSubChildObject("Edge", GetMapPositionInPixel(xx, mapHeight, ZOrder_Edge), sprite);
+                CreateSubChildObject("Edge", GetMapPositionInPixel(xx, mapHeight + 1, ZOrder_Edge), spaceSprite);
+            }
+
+            for (int yy = 0; yy < h3Map.Header.Height; yy++)
+            {
+                sprite = mapTextureManager.LoadEdgeSprite("L");
+                CreateSubChildObject("Edge", GetMapPositionInPixel(-1, yy, ZOrder_Edge), sprite);
+                CreateSubChildObject("Edge", GetMapPositionInPixel(-2, yy, ZOrder_Edge), spaceSprite);
+
+                sprite = mapTextureManager.LoadEdgeSprite("R");
+                CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, yy, ZOrder_Edge), sprite);
+                CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth + 1, yy, ZOrder_Edge), spaceSprite);
+            }
+
+            sprite = mapTextureManager.LoadEdgeSprite("UL");
+            CreateSubChildObject("Edge", GetMapPositionInPixel(-1, -1, ZOrder_Edge), sprite);
+            CreateSubChildObject("Edge", GetMapPositionInPixel(-2, -1, ZOrder_Edge), spaceSprite);
+            CreateSubChildObject("Edge", GetMapPositionInPixel(-1, -2, ZOrder_Edge), spaceSprite);
+
+            sprite = mapTextureManager.LoadEdgeSprite("UR");
+            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, -1, ZOrder_Edge), sprite);
+            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, -2, ZOrder_Edge), spaceSprite);
+            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth + 1, -1, ZOrder_Edge), spaceSprite);
+
+            sprite = mapTextureManager.LoadEdgeSprite("DL");
+            CreateSubChildObject("Edge", GetMapPositionInPixel(-1, mapHeight, ZOrder_Edge), sprite);
+            CreateSubChildObject("Edge", GetMapPositionInPixel(-2, mapHeight, ZOrder_Edge), spaceSprite);
+            CreateSubChildObject("Edge", GetMapPositionInPixel(-1, mapHeight + 1, ZOrder_Edge), spaceSprite);
+
+            sprite = mapTextureManager.LoadEdgeSprite("DR");
+            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, mapHeight, ZOrder_Edge), sprite);
+            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth + 1, mapHeight, ZOrder_Edge), spaceSprite);
+            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, mapHeight + 1, ZOrder_Edge), spaceSprite);
         }
 
         private Vector3 GetMapPositionInPixel(int x, int y, float z)

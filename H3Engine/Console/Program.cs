@@ -24,7 +24,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestRetrieveAllBundleImages();
+            TestExportH3Map();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -273,6 +273,25 @@ namespace H3Console
                         }
                     }
                 }
+            }
+
+        }
+
+        static void TestExportH3Map()
+        {
+            Engine engine = Engine.GetInstance();
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+
+            H3Campaign campaign = engine.RetrieveCampaign("fool.h3c");
+
+            for(int i = 1; i < 4; i++)
+            {
+                H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, i);
+                MapExporter exporter = new MapExporter(map);
+                exporter.ExportToPng(@"D:\Temp\Fool_" + i);
             }
 
         }
