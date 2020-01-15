@@ -250,7 +250,7 @@ namespace H3Engine.Common
         ROCKLANDS = 231,
     };
 
-    public enum EActionType
+    public enum EBattleActionType
     {
         CANCEL = -3,
 	    END_TACTIC_PHASE = -2,

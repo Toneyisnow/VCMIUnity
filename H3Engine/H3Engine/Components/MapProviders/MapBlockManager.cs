@@ -11,6 +11,9 @@ using System.Text;
 namespace H3Engine.Components.MapProviders
 {
 
+    /// <summary>
+    /// Not used yet now.
+    /// </summary>
     public enum BlockAccessibility
     {
         FREE = 0,

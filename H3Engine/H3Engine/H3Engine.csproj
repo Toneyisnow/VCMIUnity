@@ -53,8 +53,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\ResourceHandler.cs" />
-    <Compile Include="API\ResourceUsage.cs" />
+    <Compile Include="Components\Data\GameData.cs" />
+    <Compile Include="Components\Data\GameMap.cs" />
+    <Compile Include="Components\GameManager.cs" />
+    <Compile Include="Components\Messages\DialogMessage.cs" />
+    <Compile Include="Components\Messages\GameMessage.cs" />
+    <Compile Include="Components\Messages\HeroMoveMessage.cs" />
+    <Compile Include="Components\Messages\NetMessage.cs" />
+    <Compile Include="Components\Protocols\IBattleCallback.cs" />
+    <Compile Include="Components\Protocols\IGameCallback.cs" />
+    <Compile Include="Components\Protocols\IGameEventReceiver.cs" />
+    <Compile Include="Components\Protocols\IGameInterface.cs" />
+    <Compile Include="Components\Protocols\IMapCallback.cs" />
+    <Compile Include="Components\Protocols\IPriviledgedMapCallback.cs" />
+    <Compile Include="Components\Queries\DialogQuery.cs" />
+    <Compile Include="Components\Queries\HeroMoveQuery.cs" />
+    <Compile Include="Components\Queries\MappingQuery.cs" />
+    <Compile Include="Components\Queries\Query.cs" />
+    <Compile Include="Components\Queries\QueryManager.cs" />
+    <Compile Include="Components\StandaloneGameHandler.cs" />
+    <Compile Include="DataAccess\ResourceHandler.cs" />
+    <Compile Include="DataAccess\ResourceUsage.cs" />
     <Compile Include="Campaign\CampaignHeader.cs" />
     <Compile Include="Campaign\CampaignScenario.cs" />
     <Compile Include="Campaign\H3Campaign.cs" />
@@ -62,9 +81,9 @@
     <Compile Include="Common\GameConstants.cs" />
     <Compile Include="Common\Color.cs" />
     <Compile Include="Common\ILogger.cs" />
-    <Compile Include="Components\ArtifactSet.cs" />
-    <Compile Include="Components\CreatureSet.cs" />
-    <Compile Include="Components\ResourceSet.cs" />
+    <Compile Include="Components\Data\ArtifactSet.cs" />
+    <Compile Include="Components\Data\CreatureSet.cs" />
+    <Compile Include="Components\Data\ResourceSet.cs" />
     <Compile Include="Core\AbilitySkill.cs" />
     <Compile Include="Core\H3Artifact.cs" />
     <Compile Include="Core\H3Creature.cs" />
@@ -74,8 +93,8 @@
     <Compile Include="Core\PlayerInfo.cs" />
     <Compile Include="FileSystem\BinaryData.cs" />
     <Compile Include="FileSystem\GZipStreamHelper.cs" />
-    <Compile Include="API\ResourceStorage.cs" />
-    <Compile Include="Engine.cs" />
+    <Compile Include="DataAccess\ResourceStorage.cs" />
+    <Compile Include="DataAccess\H3Data.cs" />
     <Compile Include="FileSystem\BinaryReaderExtension.cs" />
     <Compile Include="FileSystem\CompressedStreamReader.cs" />
     <Compile Include="FileSystem\H3ArchiveData.cs" />
