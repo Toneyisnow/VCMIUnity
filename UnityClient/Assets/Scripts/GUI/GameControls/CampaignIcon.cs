@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using H3Engine;
+using H3Engine.DataAccess;
 using UnityEngine.Video;
 using System.IO;
 using UnityClient.GUI.Rendering;
@@ -22,7 +22,7 @@ namespace UnityClient.GUI.GameControls
 
         public void Initialize(string imageFileName, string videoFileName, int campaignFlag, Action<int> action)
         {
-            Engine h3Engine = Engine.GetInstance();
+            H3DataAccess h3Engine = H3DataAccess.GetInstance();
 
             this.campaignFlag = campaignFlag;
             var imageData = h3Engine.RetrieveImage(imageFileName);

@@ -1,8 +1,14 @@
 ﻿using System.Collections;
 
-public interface IPriviledgedMapCallback 
-{
-    public MapPosition[] 
 
+namespace H3Engine.Components.Protocols
+{
+
+    public interface IPriviledgedMapCallback
+    {
+        // public MapPosition[] 
+
+
+    }
 
 }

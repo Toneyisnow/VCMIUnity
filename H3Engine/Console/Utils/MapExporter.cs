@@ -18,7 +18,7 @@ namespace H3Console.Utils
     {
         private H3Map h3Map = null;
 
-        private H3Engine.Engine h3Engine = null;
+        private H3Engine.DataAccess.H3DataAccess h3Engine = null;
 
         private int unitWidth = 32;
         private int unitHeight = 32;
@@ -34,7 +34,7 @@ namespace H3Console.Utils
         public MapExporter(H3Map h3Map)
         {
             this.h3Map = h3Map;
-            this.h3Engine = H3Engine.Engine.GetInstance();
+            this.h3Engine = H3Engine.DataAccess.H3DataAccess.GetInstance();
 
             mapWidth = (int)h3Map.Header.Width;
             mapHeight = (int)h3Map.Header.Height;

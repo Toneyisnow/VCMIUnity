@@ -1,4 +1,4 @@
-﻿using H3Engine;
+﻿using H3Engine.DataAccess;
 using H3Engine.Common;
 using H3Engine.Core;
 using H3Engine.GUI;
@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityClient.GUI.Rendering;
 using UnityEngine;
-
+using H3Engine.Components.Data;
 
 namespace UnityClient.GUI.Mapping
 {
@@ -28,22 +28,19 @@ namespace UnityClient.GUI.Mapping
         private static float ZOrder_Edge = -9;
 
 
-        private H3Map h3Map = null;
+        private GameMap gameMap = null;
 
         private int mapLevel = 0;
 
-        private Engine h3Engine = null;
+        private H3DataAccess h3dataAccess = null;
 
         private MapTextureManager mapTextureManager = null;
 
-        public void Initialize(H3Map h3Map, int mapLevel)
+        public void Initialize(GameMap gameMap)
         {
-            this.h3Engine = Engine.GetInstance();
-
-            this.h3Map = h3Map;
-            this.mapLevel = mapLevel;
-
-            this.mapTextureManager = new MapTextureManager(h3Map);
+            this.h3dataAccess = H3DataAccess.GetInstance();
+            this.gameMap = gameMap;
+            this.mapTextureManager = new MapTextureManager(gameMap.H3Map);
         }
 
         public void RenderMap()
@@ -89,11 +86,11 @@ namespace UnityClient.GUI.Mapping
 
         private void RenderTerrain()
         {
-            for (int xx = 0; xx < h3Map.Header.Width; xx++)
+            for (int xx = 0; xx < gameMap.Width; xx++)
             {
-                for (int yy = 0; yy < h3Map.Header.Height; yy++)
+                for (int yy = 0; yy < gameMap.Height; yy++)
                 {
-                    TerrainTile tile = h3Map.TerrainTiles[mapLevel, xx, yy];
+                    TerrainTile tile = gameMap.TerrainTiles[xx, yy];
                     Sprite sprite = mapTextureManager.LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
 
                     GameObject gametile = CreateSubChildObject("Terrain", GetMapPositionInPixel(xx, yy, ZOrder_Terrain), sprite);
@@ -105,11 +102,11 @@ namespace UnityClient.GUI.Mapping
 
         private void RenderRoad()
         {
-            for (int xx = 0; xx < h3Map.Header.Width; xx++)
+            for (int xx = 0; xx < gameMap.Width; xx++)
             {
-                for (int yy = 0; yy < h3Map.Header.Height; yy++)
+                for (int yy = 0; yy < gameMap.Height; yy++)
                 {
-                    TerrainTile tile = h3Map.TerrainTiles[mapLevel, xx, yy];
+                    TerrainTile tile = gameMap.TerrainTiles[xx, yy];
                     Sprite sprite = mapTextureManager.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
                     var position = GetMapPositionInPixel(xx, yy, 9);
                     CreateSubChildObject("Road", GetMapPositionInPixel(xx, yy, ZOrder_RoadRiver), sprite);
@@ -119,11 +116,11 @@ namespace UnityClient.GUI.Mapping
 
         private void RenderRiver()
         {
-            for (int xx = 0; xx < h3Map.Header.Width; xx++)
+            for (int xx = 0; xx < gameMap.Width; xx++)
             {
-                for (int yy = 0; yy < h3Map.Header.Height; yy++)
+                for (int yy = 0; yy < gameMap.Height; yy++)
                 {
-                    TerrainTile tile = h3Map.TerrainTiles[mapLevel, xx, yy];
+                    TerrainTile tile = gameMap.TerrainTiles[xx, yy];
                     Sprite sprite = mapTextureManager.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
 
                     CreateSubChildObject("River", GetMapPositionInPixel(xx, yy, ZOrder_RoadRiver), sprite);
@@ -134,21 +131,12 @@ namespace UnityClient.GUI.Mapping
         private void RenderMapObjects()
         {
             int objectIndex = 0;
-            foreach (CGObject obj in h3Map.Objects)
+            foreach (CGObject obj in gameMap.Objects)
             {
                 ObjectTemplate template = obj.Template;
-                if (template == null)
-                {
-                    continue;
-                }
-
                 MapPosition position = obj.Position;
-                if (position.Level != mapLevel)
-                {
-                    continue;
-                }
 
-                BundleImageDefinition bundleImage = h3Engine.RetrieveBundleImage(template.AnimationFile);
+                BundleImageDefinition bundleImage = h3dataAccess.RetrieveBundleImage(template.AnimationFile);
 
                 if (template.Type == EObjectType.ARTIFACT)
                 {
@@ -163,17 +151,17 @@ namespace UnityClient.GUI.Mapping
                 else if (template.Type == EObjectType.MINE)
                 {
                     Sprite[] sprites = mapTextureManager.LoadMineSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Mines", GetMapPositionInPixel(position.PosX, position.PosY, -2), sprites);
+                    CreateSubChildAnimatedObject("Mines", GetMapPositionInPixel(position.PosX, position.PosY, -2), sprites, "Mine_" + template.SubId);
                 }
                 else if (template.Type == EObjectType.RESOURCE)
                 {
                     Sprite[] sprites = mapTextureManager.LoadResourceSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Resources", GetMapPositionInPixel(position.PosX, position.PosY, -4), sprites);
+                    CreateSubChildAnimatedObject("Resources", GetMapPositionInPixel(position.PosX, position.PosY, -4), sprites, "Resource_" + template.SubId);
                 }
                 else if (template.Type == EObjectType.TOWN || template.Type == EObjectType.RANDOM_TOWN)
                 {
                     Sprite[] sprites = mapTextureManager.LoadTownSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Town", GetMapPositionInPixel(position.PosX, position.PosY, -7), sprites);
+                    CreateSubChildAnimatedObject("Town", GetMapPositionInPixel(position.PosX, position.PosY, -7), sprites, "Town_" + template.SubId);
                 }
                 else if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER)
                 {
@@ -191,7 +179,7 @@ namespace UnityClient.GUI.Mapping
                 else
                 {
                     Sprite[] sprites = mapTextureManager.LoadSingleBundleImageSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("AnimatedObjects", GetMapPositionInPixel(position.PosX, position.PosY, -5), sprites);
+                    CreateSubChildAnimatedObject("AnimatedObjects", GetMapPositionInPixel(position.PosX, position.PosY, -5), sprites, string.Format(@"{0}_{1}", template.Type.ToString(), template.SubId));
                 }
 
                 objectIndex++;
@@ -201,12 +189,12 @@ namespace UnityClient.GUI.Mapping
         private void RenderEdge()
         {
             Sprite sprite = null;
-            int mapHeight = (int)h3Map.Header.Height;
-            int mapWidth = (int)h3Map.Header.Width;
+            int mapHeight = gameMap.Height;
+            int mapWidth = gameMap.Width;
 
             Sprite spaceSprite = mapTextureManager.LoadEdgeSprite("X");
 
-            for (int xx = 0; xx < h3Map.Header.Width; xx++)
+            for (int xx = 0; xx < gameMap.Width; xx++)
             {
                 sprite = mapTextureManager.LoadEdgeSprite("U");
                 CreateSubChildObject("Edge", GetMapPositionInPixel(xx, -1, ZOrder_Edge), sprite);
@@ -217,7 +205,7 @@ namespace UnityClient.GUI.Mapping
                 CreateSubChildObject("Edge", GetMapPositionInPixel(xx, mapHeight + 1, ZOrder_Edge), spaceSprite);
             }
 
-            for (int yy = 0; yy < h3Map.Header.Height; yy++)
+            for (int yy = 0; yy < gameMap.Height; yy++)
             {
                 sprite = mapTextureManager.LoadEdgeSprite("L");
                 CreateSubChildObject("Edge", GetMapPositionInPixel(-1, yy, ZOrder_Edge), sprite);
@@ -255,10 +243,11 @@ namespace UnityClient.GUI.Mapping
             return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z);
         }
 
-        private GameObject CreateSubChildObject(string subName, Vector3 position, Sprite sprite)
+        private GameObject CreateSubChildObject(string subName, Vector3 position, Sprite sprite, string goName = "DefaultGameObject")
         {
             GameObject newObject = new GameObject();
             newObject.transform.position = position;
+            newObject.name = goName;
 
             Transform child = transform.Find(subName);
             if (child == null)
@@ -277,10 +266,11 @@ namespace UnityClient.GUI.Mapping
             return newObject;
         }
 
-        private GameObject CreateSubChildAnimatedObject(string subName, Vector3 position, Sprite[] sprites)
+        private GameObject CreateSubChildAnimatedObject(string subName, Vector3 position, Sprite[] sprites, string goName = "DefaultGameObject")
         {
             GameObject newObject = new GameObject();
             newObject.transform.position = position;
+            newObject.name = goName;
 
             Transform child = transform.Find(subName);
             if (child == null)

@@ -5,6 +5,7 @@ using UnityEngine;
 using H3Engine;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
+using H3Engine.DataAccess;
 using H3Engine.Utils;
 using H3Engine.Mapping;
 using H3Engine.Campaign;
@@ -14,6 +15,7 @@ using UnityEngine.U2D;
 using H3Engine.Common;
 using UnityClient.GUI.Rendering;
 using UnityClient.GUI.Mapping;
+using H3Engine.Components.Data;
 
 public class SampleTest : MonoBehaviour
 {
@@ -67,14 +69,14 @@ public class SampleTest : MonoBehaviour
 
     void LoadResource()
     {
-        Engine h3Engine = Engine.GetInstance();
+        H3DataAccess h3Engine = H3DataAccess.GetInstance();
         
         h3Engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
     }
 
     void LoadImage()
     {
-        Engine h3Engine = Engine.GetInstance();
+        H3DataAccess h3Engine = H3DataAccess.GetInstance();
         h3Engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
         ImageData image = h3Engine.RetrieveImage("Bo53Muck.pcx");
 
@@ -92,7 +94,7 @@ public class SampleTest : MonoBehaviour
 
     void LoadImage2()
     {
-        Engine h3Engine = Engine.GetInstance();
+        H3DataAccess h3Engine = H3DataAccess.GetInstance();
         h3Engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
         ImageData image = h3Engine.RetrieveImage("BoArt021.pcx");
 
@@ -151,7 +153,7 @@ public class SampleTest : MonoBehaviour
 
     void LoadH3Image()
     {
-        Engine engine = Engine.GetInstance();
+        H3DataAccess engine = H3DataAccess.GetInstance();
         engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
 
         string imagePath1 = Path.Combine(Application.dataPath, @"Images\HPL016Rn.png");
@@ -211,7 +213,7 @@ public class SampleTest : MonoBehaviour
 
     void LoadAnimation()
     {
-        Engine engine = Engine.GetInstance();
+        H3DataAccess engine = H3DataAccess.GetInstance();
         engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
 
 
@@ -237,7 +239,7 @@ public class SampleTest : MonoBehaviour
 
     void LoadAnimationToGameObject()
     {
-        Engine engine = Engine.GetInstance();
+        H3DataAccess engine = H3DataAccess.GetInstance();
         engine.LoadArchiveFile(GetGameDataFilePath("h3ab_spr.lod"));
 
 
@@ -255,7 +257,7 @@ public class SampleTest : MonoBehaviour
 
     void LoadCampaignMap()
     {
-        Engine engine = Engine.GetInstance();
+        H3DataAccess engine = H3DataAccess.GetInstance();
 
         engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
         engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));
@@ -264,120 +266,18 @@ public class SampleTest : MonoBehaviour
 
         H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
         H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
+        GameMap gameMap = GameMap.LoadFromH3Map(map, 0);
 
-        Transform gameMap = transform.Find("GameMap");
-        MapLoader mapLoader = gameMap.gameObject.GetComponent<MapLoader>();
-        mapLoader.Initialize(map, 0);
+        Transform gameMapGO = transform.Find("GameMap");
+        MapLoader mapLoader = gameMapGO.gameObject.GetComponent<MapLoader>();
+        mapLoader.Initialize(gameMap);
         mapLoader.RenderMap();
         
 
     }
 
-    void TestTileMap()
-    {
-        Engine engine = Engine.GetInstance();
-
-        engine.LoadArchiveFile(GetGameDataFilePath("h3ab_bmp.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("h3ab_spr.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("h3bitmap.lod"));
-        engine.LoadArchiveFile(GetGameDataFilePath("h3sprite.lod"));
-
-        H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-        H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
-
-        MapTextureManager mapTextureManager = new MapTextureManager(map);
-        mapTextureManager.PreloadTextures();
-
-        for (int i = 0; i <= 9; i++)
-        {
-            RenderTileMapByTerrainType(map, (ETerrainType)i, mapTextureManager);
-        }
-
-        RenderTileMapByRoadType(map, ERoadType.DIRT_ROAD);
-        RenderTileMapByRoadType(map, ERoadType.GRAVEL_ROAD);
-        RenderTileMapByRoadType(map, ERoadType.COBBLESTONE_ROAD);
-
-
-        RenderTileMapByRiverType(map, ERiverType.CLEAR_RIVER);
-        RenderTileMapByRiverType(map, ERiverType.LAVA_RIVER);
-
-        TextureStorage textureStorage = TextureStorage.GetInstance();
-
-        int objectIndex = 0;
-        foreach (CGObject obj in map.Objects)
-        {
-            ObjectTemplate template = obj.Template;
-            if (template == null)
-            {
-                continue;
-            }
-
-            MapPosition position = obj.Position;
-
-            BundleImageDefinition bundleImage = engine.RetrieveBundleImage(template.AnimationFile);
-
-            if (template.Type == H3Engine.Common.EObjectType.MONSTER
-                || template.Type == H3Engine.Common.EObjectType.CAMPFIRE
-                || template.Type == H3Engine.Common.EObjectType.LEARNING_STONE
-                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR1
-                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR2
-                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR3
-                || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR4
-                )
-            {
-                // Load Animation
-                LoadAnimatedMapObject(position.PosX, position.PosY, bundleImage);
-            }
-            else if (template.Type == EObjectType.ARTIFACT)
-            {
-                GameObject newObject = Instantiate(mapArtifactPrefab, transform);
-                newObject.transform.position = GetMapPositionInPixel(position.PosX, position.PosY, -9);
-
-                Sprite[] sprites = textureStorage.LoadMapArtifactSprites(template.AnimationFile);
-
-                //AdventureMapCoordinate mapCoordinate = newObject.GetComponent<AdventureMapCoordinate>();
-                //mapCoordinate.Initialize(bundleImage.Width, bundleImage.Height);
-
-                AnimatedMapObject animated = newObject.GetComponent<AnimatedMapObject>();
-                animated.Initialize(sprites);
-                
-            }
-            else if (template.Type.GetHashCode() > 110 && template.GetHashCode() < 200)     // Map Decorations
-            {
-                GameObject newObject = Instantiate(mapArtifactPrefab, transform);
-                newObject.transform.position = GetMapPositionInPixel(position.PosX, position.PosY, 2);
-
-                Sprite sprite = textureStorage.LoadMapDecorationSprite(template.AnimationFile, template.Type.GetHashCode());
-
-                //AdventureMapCoordinate mapCoordinate = newObject.GetComponent<AdventureMapCoordinate>();
-                //mapCoordinate.Initialize(bundleImage.Width, bundleImage.Height);
-
-                AnimatedMapObject animated = newObject.GetComponent<AnimatedMapObject>();
-                // animated.Initialize(sprite);
-
-            }
-            else
-            {
-                // Load Single Image
-                ImageData image = bundleImage.GetImageData(0, 0);
-                //// image.ExportDataToPNG();
-
-                //// Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
-                Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromImage(template.AnimationFile, image);
-                LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, 0);
-            }
-
-            objectIndex++;
-        }
-
-
-
-    }
-
     private void RenderTileMapByTerrainType(H3Map map, ETerrainType terrainType, MapTextureManager mapTextureManager)
     {
-        TextureStorage textureStorage = TextureStorage.GetInstance();
-
         int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
         for (int level = 0; level < 1; level++)
         {
@@ -419,8 +319,6 @@ public class SampleTest : MonoBehaviour
 
     private void RenderTileMapByRoadType(H3Map map, H3Engine.Common.ERoadType roadType)
     {
-        TextureStorage textureStorage = TextureStorage.GetInstance();
-
         int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
         for (int level = 0; level < 1; level++)
         {
@@ -439,7 +337,7 @@ public class SampleTest : MonoBehaviour
                         continue;
                     }
 
-                    Sprite sprite = textureStorage.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
+                    Sprite sprite = null; // textureStorage.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
                     var position = GetMapPositionInPixel(xx, yy, 1);
 
                     GameObject g1 = new GameObject();
@@ -456,8 +354,6 @@ public class SampleTest : MonoBehaviour
 
     private void RenderTileMapByRiverType(H3Map map, H3Engine.Common.ERiverType riverType)
     {
-        TextureStorage textureStorage = TextureStorage.GetInstance();
-
         int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
         for (int level = 0; level < 1; level++)
         {
@@ -471,7 +367,7 @@ public class SampleTest : MonoBehaviour
                         continue;
                     }
 
-                    Sprite sprite = textureStorage.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
+                    Sprite sprite = null; // textureStorage.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
                     var position = GetMapPositionInPixel(xx, yy, 1);
 
                     GameObject g1 = new GameObject();
@@ -488,7 +384,7 @@ public class SampleTest : MonoBehaviour
 
     void LoadTerrain()
     {
-        Engine engine = Engine.GetInstance();
+        H3DataAccess engine = H3DataAccess.GetInstance();
         
         engine.LoadArchiveFile(GetGameDataFilePath("H3ab_bmp.lod"));
         engine.LoadArchiveFile(GetGameDataFilePath("H3ab_spr.lod"));

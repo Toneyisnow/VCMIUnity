@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using H3Engine;
+using H3Engine.DataAccess;
 using H3Engine.Common;
 using H3Engine.Mapping;
 using H3Engine.FileSystem;
@@ -15,13 +15,14 @@ namespace UnityClient.GUI.Rendering
     {
         private H3Map h3Map;
 
-        private Engine h3Engine;
+        private H3DataAccess h3dataAccess;
 
         private TextureSheet terrainTextureSheet = null;
         private TextureSheet roadTextureSheet = null;
         private TextureSheet riverTextureSheet = null;
 
         private TextureSheet edgeTextureSheet = null;
+        private TextureSheet cursorTextureSheet = null;
 
         private BundleImageSheet artifactTextureSheet = null;
         private BundleImageSheet heroTextureSheet = null;
@@ -37,7 +38,7 @@ namespace UnityClient.GUI.Rendering
 
         public MapTextureManager(H3Map h3map)
         {
-            this.h3Engine = Engine.GetInstance();
+            this.h3dataAccess = H3DataAccess.GetInstance();
             this.h3Map = h3map;
         }
 
@@ -62,6 +63,9 @@ namespace UnityClient.GUI.Rendering
             PreloadMapObjectTextures();
             MonoBehaviour.print("PreloadMapObjectTextures:" + (DateTime.Now - lastTime).ToString());
             lastTime = DateTime.Now;
+
+            PreloadCursorTextures();
+
 
         }
 
@@ -160,7 +164,7 @@ namespace UnityClient.GUI.Rendering
                 {
                     TerrainTile tile = h3Map.TerrainTiles[0, xx, yy];
 
-                    ImageData imageData = h3Engine.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
+                    ImageData imageData = h3dataAccess.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
                     Texture2D texture = Texture2DExtension.LoadFromData(imageData, tile.TerrainRotation);
 
                     string textureKey = string.Format(@"{0}{1}{2}", tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
@@ -185,7 +189,7 @@ namespace UnityClient.GUI.Rendering
                         continue;
                     }
 
-                    ImageData imageData = h3Engine.RetrieveRoadImage(tile.RoadType, tile.RoadDir);
+                    ImageData imageData = h3dataAccess.RetrieveRoadImage(tile.RoadType, tile.RoadDir);
                     Texture2D texture = Texture2DExtension.LoadFromData(imageData, tile.RoadRotation);
 
                     string textureKey = string.Format(@"{0}{1}{2}", tile.RoadType, tile.RoadDir, tile.RoadRotation);
@@ -210,7 +214,7 @@ namespace UnityClient.GUI.Rendering
                         continue;
                     }
 
-                    ImageData imageData = h3Engine.RetrieveRiverImage(tile.RiverType, tile.RiverDir);
+                    ImageData imageData = h3dataAccess.RetrieveRiverImage(tile.RiverType, tile.RiverDir);
                     Texture2D texture = Texture2DExtension.LoadFromData(imageData, tile.RiverRotation);
 
                     string textureKey = string.Format(@"{0}{1}{2}", tile.RiverType, tile.RiverDir, tile.RiverRotation);
@@ -225,7 +229,7 @@ namespace UnityClient.GUI.Rendering
         {
             edgeTextureSheet = new TextureSheet();
 
-            BundleImageDefinition bundleImage = h3Engine.RetrieveBundleImage("EDG.def");
+            BundleImageDefinition bundleImage = h3dataAccess.RetrieveBundleImage("EDG.def");
 
             Texture2D texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, 15));
             edgeTextureSheet.AddImageData("X", texture);
@@ -255,6 +259,70 @@ namespace UnityClient.GUI.Rendering
             edgeTextureSheet.AddImageData("L", texture);
             
             edgeTextureSheet.PackTextures();
+        }
+
+        private void PreloadCursorTextures()
+        {
+            cursorTextureSheet = new TextureSheet();
+
+            BundleImageDefinition bundleImage = h3dataAccess.RetrieveBundleImage("adag.def");
+
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 0,  @"X");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 1,  @"/A");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 2,  @">/");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 3,  @"\>");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 4,  @"V\");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 5,  @"/V");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 6,  @"</");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 7,  @"<\");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 8,  @"A\");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 9,  @"AA");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 10, @"//A");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 11, @">>");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 12, @"\\V");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 13, @"VV");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 14, @"//V");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 15, @"<<");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 16, @"\\A");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 17, @"\A");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 18, @"A/");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 19, @"/>");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 20, @">\");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 21, @"\V");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 22, @"V/");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 23, @"/<");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 24, @"<\");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 25, @"X_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 26, @"/A_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 27, @">/_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 28, @"\>_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 29, @"V\_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 30, @"/V_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 31, @"</_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 32, @"<\_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 33, @"A\_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 34, @"AA_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 35, @"//A_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 36, @">>_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 37, @"\\V_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 38, @"VV_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 39, @"//V_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 40, @"<<_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 41, @"\\A_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 42, @"\A_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 43, @"A/_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 44, @"/>_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 45, @">\_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 46, @"\V_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 47, @"V/_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 48, @"/<_U");
+            AddToTextureSheet(cursorTextureSheet, bundleImage, 49, @"<\_U");
+        }
+
+        private void AddToTextureSheet(TextureSheet textureSheet, BundleImageDefinition bundleImage, int index, string key)
+        {
+            Texture2D texture = Texture2DExtension.LoadFromData(bundleImage.GetImageData(0, index));
+            textureSheet.AddImageData(key, texture);
         }
 
         private void PreloadMapObjectTextures()

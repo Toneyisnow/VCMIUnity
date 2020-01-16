@@ -1,5 +1,7 @@
 ﻿using H3Engine.FileSystem;
 using H3Engine.GUI;
+using H3Engine.DataAccess;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +13,7 @@ namespace UnityClient.GUI.Rendering
     {
         private TextureSheet textureSheet = null;
 
-        private H3Engine.Engine h3Engine = H3Engine.Engine.GetInstance();
+        private H3DataAccess h3Engine = H3DataAccess.GetInstance();
 
         private static string GetTextureKey(string defFileName, int index)
         {

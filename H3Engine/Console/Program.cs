@@ -15,6 +15,8 @@ using H3Engine.Mapping;
 using H3Engine.Utils;
 using H3Engine.Components.MapProviders;
 using H3Console.Utils;
+using H3Engine.DataAccess;
+using H3Engine.Components.Data;
 
 namespace H3Console
 {
@@ -24,7 +26,7 @@ namespace H3Console
 
         static void Main(string[] args)
         {
-            TestExportH3Map();
+            TestLoadGameMap();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -32,7 +34,7 @@ namespace H3Console
 
         static void TestRetrieveFile()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             BinaryData h3cFile = engine.RetrieveFileData("ab.h3c");
@@ -42,7 +44,7 @@ namespace H3Console
 
         static void TestRetrieveImage()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
 
@@ -58,7 +60,7 @@ namespace H3Console
 
         static void TestRetrieveAllImages()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
 
@@ -74,7 +76,7 @@ namespace H3Console
 
         static void TestRetrieveAllBundleImages()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
@@ -108,7 +110,7 @@ namespace H3Console
         
         static void TestRetrieveBundleImage()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             BundleImageDefinition bundleImage = engine.RetrieveBundleImage("lavatl.def");
@@ -125,7 +127,7 @@ namespace H3Console
 
         static void TestRetrieveBundleImage2()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             BundleImageDefinition bundleImage = engine.RetrieveBundleImage("MMENUNG.def");
@@ -137,7 +139,7 @@ namespace H3Console
 
         static void TestRetrieveRiverBundleImage()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             BundleImageDefinition bundleImage = engine.RetrieveBundleImage("clrrvr.def");
@@ -157,7 +159,7 @@ namespace H3Console
 
         static void TestRetrieveMap()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
@@ -181,9 +183,26 @@ namespace H3Console
             }
         }
 
+        static void TestLoadGameMap()
+        {
+            H3DataAccess engine = H3DataAccess.GetInstance();
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
+            engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+
+            H3Campaign campaign = engine.RetrieveCampaign("slayer.h3c");
+            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 3);
+
+            GameData gameData = GameData.LoadFromH3Map(map);
+            GameMap gameMap = gameData.MapAtLevel(0);
+            int length = gameMap.TerrainTiles.Length;
+
+        }
+
         static void TestRetrieveCampaign()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
@@ -279,7 +298,7 @@ namespace H3Console
 
         static void TestExportH3Map()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
@@ -302,7 +321,7 @@ namespace H3Console
             {
                 LoggerInstance.SetConsoleLogger(new ConsoleLogger());
 
-                Engine engine = Engine.GetInstance();
+                H3DataAccess engine = H3DataAccess.GetInstance();
                 engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
                 engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
                 engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
@@ -326,7 +345,7 @@ namespace H3Console
 
         static void TestResourceStorage()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
             engine.SetTemporaryCachePath(@"D:\Temp\h3");
 
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_bmp.lod");
@@ -363,7 +382,7 @@ namespace H3Console
         
         static void TestSearchResourceFiles()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess engine = H3DataAccess.GetInstance();
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
             List<string> files = engine.SearchResourceFiles(@"AVA*.def");

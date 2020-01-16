@@ -15,9 +15,9 @@ using System.Threading.Tasks;
 
 namespace H3Engine.DataAccess
 {
-    public class Engine
+    public class H3DataAccess
     {
-        private static Engine engineInstance = null;
+        private static H3DataAccess instance = null;
 
         private ResourceStorage resourceStorage = null;
 
@@ -26,17 +26,17 @@ namespace H3Engine.DataAccess
         private ResourceUsage resourceUsage = null;
 
 
-        public static Engine GetInstance()
+        public static H3DataAccess GetInstance()
         {
-            if (engineInstance == null)
+            if (instance == null)
             {
-                engineInstance = new Engine();
+                instance = new H3DataAccess();
             }
 
-            return engineInstance;
+            return instance;
         }
 
-        private Engine()
+        private H3DataAccess()
         {
             resourceStorage = new ResourceStorage();
 

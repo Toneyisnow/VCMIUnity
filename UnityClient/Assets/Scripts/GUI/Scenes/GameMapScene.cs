@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using H3Engine.DataAccess;
+using H3Engine.Components.Data;
 
 using H3Engine;
 using System.IO;
@@ -15,7 +17,7 @@ namespace UnityClient.GUI.Scenes
 {
     public class GameMapScene : MonoBehaviour
     {
-        private GameManager gameManager = null;
+        private PlayerInterface playerInterface = null;
 
         private GamerMapControl gamerMapControl = null;
 
@@ -25,24 +27,26 @@ namespace UnityClient.GUI.Scenes
         // Start is called before the first frame update
         void Start()
         {
-            Engine engine = Engine.GetInstance();
+            H3DataAccess dataAccess = H3DataAccess.GetInstance();
 
-            engine.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3ab_bmp.lod"));
-            engine.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3ab_spr.lod"));
-            engine.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3bitmap.lod"));
-            engine.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3sprite.lod"));
+            dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3ab_bmp.lod"));
+            dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3ab_spr.lod"));
+            dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3bitmap.lod"));
+            dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3sprite.lod"));
 
-            H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
+            H3Campaign campaign = dataAccess.RetrieveCampaign("slayer.h3c");
             H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 3);
 
-            gameManager = GameManager.StartGame(map);
+
+            playerInterface = PlayerInterface.StartGame(map);
 
             gamerMapControl = new GamerMapControl();
 
+            GameMap gameMap = playerInterface.GameData.MapAtLevel(0);
 
-            GameObject gameMap = GameObject.Find("GameMap");
-            MapLoader mapLoader = gameMap.GetComponent<MapLoader>();
-            mapLoader.Initialize(map, 0);
+            GameObject gameMapUI = GameObject.Find("GameMap");
+            MapLoader mapLoader = gameMapUI.GetComponent<MapLoader>();
+            mapLoader.Initialize(gameMap);
             mapLoader.RenderMap();
         }
 

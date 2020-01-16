@@ -20,5 +20,28 @@ namespace H3Engine.MapObjects
             return decorationTemplateIds.Contains(objectType.GetHashCode());
         }
 
+        /// <summary>
+        /// Return true if the map object is static and cannot be removed from map
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public static bool IsStaticObject(EObjectType objectType)
+        {
+            return decorationTemplateIds.Contains(objectType.GetHashCode())
+                || (objectType == EObjectType.MINE)
+                || (objectType == EObjectType.TOWN)
+                || (objectType == EObjectType.SCHOLAR);
+        }
+
+        public static bool IsRemovableObject(EObjectType objectType)
+        {
+            return (objectType == EObjectType.HERO)
+                || (objectType == EObjectType.ARTIFACT)
+                || (objectType == EObjectType.BOAT)
+                || (objectType == EObjectType.RESOURCE)
+                || (objectType == EObjectType.TREASURE_CHEST);
+        }
+
+
     }
 }

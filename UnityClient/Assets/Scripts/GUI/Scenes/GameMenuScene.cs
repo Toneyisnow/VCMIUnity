@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityClient.Components;
+using UnityClient.Components.Data;
 using UnityClient.GUI.GameControls;
 using UnityClient.GUI.Rendering;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace UnityClient.GUI.Scenes
         public GameObject gameMenuItemPrefab = null;
 
 
-        private Engine h3Engine = null;
+        private H3Engine.DataAccess.H3DataAccess h3Engine = null;
 
         public Vector3 menuItem1Position = Vector3.zero;
         public Vector3 menuItem2Position = Vector3.zero;
@@ -53,7 +54,7 @@ namespace UnityClient.GUI.Scenes
         // Start is called before the first frame update
         void Start()
         {
-            h3Engine = Engine.GetInstance();
+            h3Engine = H3Engine.DataAccess.H3DataAccess.GetInstance();
             h3Engine.LoadArchiveFile(GetGameDataFilePath("GameData/SOD.zh-cn/H3bitmap.lod"));
             h3Engine.LoadArchiveFile(GetGameDataFilePath("GameData/SOD.zh-cn/H3sprite.lod"));
             h3Engine.LoadArchiveFile(GetGameDataFilePath("GameData/SOD.zh-cn/H3ab_spr.lod"));

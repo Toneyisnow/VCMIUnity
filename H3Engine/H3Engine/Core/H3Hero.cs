@@ -1,5 +1,6 @@
 ﻿using H3Engine.Common;
 using H3Engine.Components;
+using H3Engine.Components.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;

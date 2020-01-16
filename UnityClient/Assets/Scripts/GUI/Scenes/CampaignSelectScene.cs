@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using H3Engine;
+using H3Engine.DataAccess;
 using H3Engine.Common;
 using UnityClient.Components;
 using H3Engine.FileSystem;
@@ -11,6 +11,7 @@ using H3Engine.Mapping;
 using UnityEngine.SceneManagement;
 using UnityClient.GUI.Rendering;
 using UnityClient.GUI.GameControls;
+using UnityClient.Components.Data;
 
 namespace UnityClient.GUI.Scenes
 {
@@ -35,7 +36,7 @@ namespace UnityClient.GUI.Scenes
             this.campaignVersion = CrossSceneData.SelectedCampaign;
             this.campaignVersion = ECampaignVersion.SOD;
 
-            Engine h3Engine = Engine.GetInstance();
+            H3DataAccess h3Engine = H3DataAccess.GetInstance();
             ImageData imageData = h3Engine.RetrieveImage("campback.PCX");
 
 
