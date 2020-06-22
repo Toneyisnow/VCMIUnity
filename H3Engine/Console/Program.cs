@@ -22,11 +22,12 @@ namespace H3Console
 {
     class Program
     {
-        static readonly string HEROES3_DATA_FOLDER = @"D:\PlayGround\Heroes3\SOD_DATA\";
+        static readonly string HEROES3_DATA_FOLDER = @"D:\PlayGround\Heroes3\==GameData==\SOD_DATA\";
 
         static void Main(string[] args)
         {
-            TestLoadGameMap();
+            TestExportH3Map();
+            // TestRetrieveMapBlock();
 
             Console.WriteLine("Press Any Key...");
             Console.ReadKey();
@@ -303,14 +304,18 @@ namespace H3Console
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3ab_spr.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
             engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
+            engine.LoadArchiveFile(@"D:\PlayGround\Heroes3\==GameData==\HotA_Data\HotA_lng.lod");
+            engine.LoadArchiveFile(@"D:\PlayGround\Heroes3\==GameData==\HotA_Data\HotA.lod");
 
-            H3Campaign campaign = engine.RetrieveCampaign("fool.h3c");
+            H3Campaign campaign = engine.RetrieveCampaign("H2Terror.h3c");
 
-            for(int i = 1; i < 4; i++)
+            //// File.WriteAllBytes(@"D:\PlayGround\Heroes3\==ExportedData==\HotA\H3HornA.h3m", campaign.CampaignMapBytes[0]);
+            
+            for (int i = 4; i < 6; i++)
             {
                 H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, i);
                 MapExporter exporter = new MapExporter(map);
-                exporter.ExportToPng(@"D:\Temp\Fool_" + i);
+                exporter.ExportToPng(@"D:\PlayGround\Heroes3\==ExportedData==\HotA\H2Terror_" + i);
             }
 
         }
@@ -327,7 +332,7 @@ namespace H3Console
                 engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3bitmap.lod");
                 engine.LoadArchiveFile(HEROES3_DATA_FOLDER + "H3sprite.lod");
 
-                H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
+                H3Campaign campaign = engine.RetrieveCampaign("Sandro.h3c");
 
                 for (int i = 0; i < campaign.Scenarios.Count; i++)
                 {

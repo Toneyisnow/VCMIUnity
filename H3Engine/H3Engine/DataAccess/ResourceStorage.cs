@@ -149,7 +149,8 @@ namespace H3Engine.DataAccess
                 }
             }
 
-            throw new FileNotFoundException();
+            //// throw new FileNotFoundException();
+            return null;
         }
 
         private string GetArchiveKey(string archiveFileFullPath)

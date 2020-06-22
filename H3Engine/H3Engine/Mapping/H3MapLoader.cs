@@ -46,18 +46,38 @@ namespace H3Engine.Mapping
             {
                 using (BinaryReader reader = new BinaryReader(streamData))
                 {
-
                     ReadHeader(reader);
 
+                    ReadPlayerInfo(reader);
+
+                    ReadVictoryLossConditions(reader);
+
+                    // 1 byte + N * 1
+                    ReadTeamInfo(reader);
+
+                    // 20 byte mask + placeholdercount + placeholder
+                    ReadAllowedHeroes(reader);
+                    
+                    // 417 
                     ReadDisposedHeroes(reader);
 
+                    // 18 bytes
                     ReadAllowedArtifacts(reader);
 
+                    // 13 bytes
                     ReadAllowedSpellsAbilities(reader);
+
+                    if (this.mapObject.Header.Version == EMapFormat.HOTA)
+                    {
+                        // Unknown
+                        reader.Seek(17, SeekOrigin.Current);
+                    }
 
                     ReadRumors(reader);
 
                     ReadPredefinedHeroes(reader);
+
+                    //// reader.Seek(1087, SeekOrigin.Begin);
 
                     ReadTerrain(reader);
 
@@ -93,6 +113,12 @@ namespace H3Engine.Mapping
             mapObject.Header.AreAnyPlayers = reader.ReadBoolean();
             logger.LogTrace("AreAnyPlayers:" + mapObject.Header.AreAnyPlayers);
 
+            if (mapObject.Header.Version == EMapFormat.HOTA)
+            {
+                reader.ReadUInt32();
+                reader.ReadBytes(2);
+            }
+
             mapObject.Header.Height = reader.ReadUInt32();
             mapObject.Header.Width = mapObject.Header.Height;
             logger.LogTrace("Map Height and Width:" + mapObject.Header.Height);
@@ -114,13 +140,6 @@ namespace H3Engine.Mapping
             logger.LogTrace("HeroLevelLimit:" + heroLevelLimit);
 
 
-            ReadPlayerInfo(reader);
-
-            ReadVictoryLossConditions(reader);
-
-            ReadTeamInfo(reader);
-
-            ReadAllowedHeroes(reader);
         }
 
 
@@ -143,6 +162,7 @@ namespace H3Engine.Mapping
                     {
                         case EMapFormat.SOD:
                         case EMapFormat.WOG:
+                        case EMapFormat.HOTA:
                             reader.Skip(13);
                             break;
                         case EMapFormat.AB:
@@ -158,7 +178,9 @@ namespace H3Engine.Mapping
                 playerInfo.AiTactic = (EAiTactic)reader.ReadByte();
                 logger.LogTrace("aiTactic:" + playerInfo.AiTactic);
 
-                if (mapObject.Header.Version == EMapFormat.SOD || mapObject.Header.Version == EMapFormat.WOG)
+                if (mapObject.Header.Version == EMapFormat.SOD 
+                    || mapObject.Header.Version == EMapFormat.WOG
+                    || mapObject.Header.Version == EMapFormat.HOTA)
                 {
                     playerInfo.P7 = reader.ReadByte();
                 }
@@ -300,6 +322,7 @@ namespace H3Engine.Mapping
                             {
                                 reader.ReadByte();
                             }
+                            reader.ReadUInt32();
                             break;
                         }
                     case EVictoryConditionType.GATHERRESOURCE:
@@ -405,13 +428,29 @@ namespace H3Engine.Mapping
 
         private void ReadAllowedHeroes(BinaryReader reader)
         {
+            // in HOTA, there seems a UINT32 here
+            if (mapObject.Header.Version == EMapFormat.HOTA)
+            {
+                reader.ReadUInt32();
+            }
+
             int byteCount = 20; //// mapHeader->version == EMapFormat::ROE ? 16 : 20;
+            if (mapObject.Header.Version == EMapFormat.ROE)
+            {
+                byteCount = 16;
+            }
 
             HashSet<int> allowedHeroSet = new HashSet<int>();
             reader.ReadBitMask(allowedHeroSet, byteCount, GameConstants.HEROES_QUANTITY, false);
 
+            // in HOTA, there seems 3 bytes unknown
+            if (mapObject.Header.Version == EMapFormat.HOTA)
+            {
+                reader.ReadBytes(3);
+            }
+
             // Probably reserved for further heroes
-            if (true)
+            if (mapObject.Header.Version > EMapFormat.ROE)
             {
                 uint placeholdersQty = reader.ReadUInt32();
 
@@ -515,9 +554,18 @@ namespace H3Engine.Mapping
         private void ReadPredefinedHeroes(BinaryReader reader)
         {
             mapObject.PredefinedHeroes = new List<HeroInstance>();
-            if (mapObject.Header.Version == EMapFormat.WOG || mapObject.Header.Version == EMapFormat.SOD)
+            if (mapObject.Header.Version == EMapFormat.WOG 
+                || mapObject.Header.Version == EMapFormat.SOD
+                || mapObject.Header.Version == EMapFormat.HOTA)
             {
-                for (int z = 0; z < GameConstants.HEROES_QUANTITY; z++)
+
+                int heroCount = GameConstants.HEROES_QUANTITY;
+                if (this.mapObject.Header.Version == EMapFormat.HOTA)
+                {
+                    heroCount += 19;
+                }
+
+                for (int z = 0; z < heroCount; z++)
                 {
                     logger.LogTrace(string.Format("===Reading Predefined Hero [{0}]", z));
 
@@ -725,12 +773,22 @@ namespace H3Engine.Mapping
                 */
 
                 MapPosition objectPosition = reader.ReadPosition();
+                if (objectPosition.Level != 0 && objectPosition.Level != 1)
+                {
+                    throw new InvalidDataException("MapPosition data is not correct.");
+                }
+
                 int objectTemplateIndex = (int)reader.ReadUInt32();
 
                 ObjectTemplate objTemplate = mapObject.ObjectTemplates[objectTemplateIndex];
                 reader.Skip(5);
 
                 MapObjectReader objectReader = MapObjectReaderFactory.GetObjectReader(objTemplate.Type);
+                if (objTemplate.Type == EObjectType.TOWN)
+                {
+                    int here = 1;
+                }
+
                 CGObject resultObject = null;
                 if (objectReader != null)
                 {
@@ -760,7 +818,8 @@ namespace H3Engine.Mapping
                 }
 
                 resultObject.InstanceName = string.Format("{0}_{1}", resultObject.Identifier, resultObject.Template.Type);
-                //// logger.LogTrace(string.Format(@"Readed object {0}, Position: [{1}, {2}, {3}]", resultObject.InstanceName, objectPosition.PosX, objectPosition.PosY, objectPosition.Level));
+                logger.LogTrace(string.Format(@"Readed object {0}, Position: [{1}, {2}, {3}]", resultObject.InstanceName, objectPosition.PosX, objectPosition.PosY, objectPosition.Level));
+                //// Console.WriteLine(string.Format(@"Readed object {0}, Position: [{1}, {2}, {3}]", resultObject.InstanceName, objectPosition.PosX, objectPosition.PosY, objectPosition.Level));
 
                 mapObject.Objects.Add(resultObject);
             }

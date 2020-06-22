@@ -160,7 +160,17 @@ namespace H3Engine.Campaign
             CampaignHeader header = new CampaignHeader();
 
             header.Version = (ECampaignVersion)reader.ReadUInt32();
-            header.MapVersion = reader.ReadByte() - 1;  //change range of it from [1, 20] to [0, 19]
+
+            if (header.Version < ECampaignVersion.HOTA)
+            {
+                header.MapVersion = reader.ReadByte() - 1;  //change range of it from [1, 20] to [0, 19]
+            }
+            else
+            {
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+            }
+
             header.Name = reader.ReadStringWithLength();
             header.Description = reader.ReadStringWithLength();
 

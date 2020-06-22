@@ -139,8 +139,13 @@ namespace H3Console.Utils
 
                 string defFileName = template.AnimationFile;
                 BundleImageDefinition bundleImage = h3Engine.RetrieveBundleImage(defFileName);
+                if (bundleImage == null)
+                {
+                    Console.WriteLine("Missing def file: " + defFileName);
+                    continue;
+                }
+                
                 ImageData imageData = bundleImage.GetImageData(0, 0);
-
                 DrawOnCanvas(imageData, obj.Position.PosX, obj.Position.PosY);
             }
         }
@@ -179,6 +184,11 @@ namespace H3Console.Utils
 
         private void DrawOnCanvas(ImageData imageData, int posX, int posY, byte rotation = 0)
         {
+            if (imageData == null)
+            {
+                return;
+            }
+
             int canvasX = (posX + 2) * unitWidth - 1;
             int canvasY = (posY + 2) * unitHeight - 1;
             

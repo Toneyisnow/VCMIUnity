@@ -387,7 +387,7 @@ namespace H3Engine.Mapping
             bool isArt = (aid != artmask);
             if (isArt)
             {
-                Console.WriteLine("loadArtifactToSlot: id={0}, slot={1}", aid, slotIndex);
+                //// Console.WriteLine("loadArtifactToSlot: id={0}, slot={1}", aid, slotIndex);
 
                 ArtifactSet artifactSet = hero.Data.Artifacts;
 
@@ -1090,6 +1090,13 @@ namespace H3Engine.Mapping
             //}
 
             // Read castle events
+
+            // TODO: seems there is an extra byte befure events
+            if(this.MapHeader.Version == EMapFormat.HOTA)
+            {
+                reader.ReadByte();
+            }
+
             int numberOfEvent = (int)reader.ReadUInt32();
             for (int gh = 0; gh < numberOfEvent; ++gh)
             {

@@ -61,7 +61,8 @@ namespace H3Engine.Common
         ROE = 4,
         AB = 5,
         SOD = 6,
-        WOG = 6
+        WOG = 6,
+        HOTA = 32,
     };
 
 

@@ -16,9 +16,9 @@ namespace H3Engine.FileSystem
         }
 
 
-        public static void Seek(this BinaryReader reader, int count)
+        public static void Seek(this BinaryReader reader, int count, SeekOrigin origin = SeekOrigin.Begin)
         {
-            reader.BaseStream.Seek(count, SeekOrigin.Begin);
+            reader.BaseStream.Seek(count, origin);
         }
 
         public static MapPosition ReadPosition(this BinaryReader reader)
@@ -72,9 +72,17 @@ namespace H3Engine.FileSystem
         public static string ReadStringWithLength(this BinaryReader reader)
         {
             UInt32 length = reader.ReadUInt32();
-            if (length > 2048)
+            if (length > 4096)
             {
-                throw new ArgumentOutOfRangeException("ReadStringWithLength: length is out of range: " + length);
+                //// throw new ArgumentOutOfRangeException("ReadStringWithLength: length is out of range: " + length);
+                ///
+                reader.Seek(-4, SeekOrigin.Current);
+                return ReadStringToEnd(reader);
+            }
+
+            if (length == 0)
+            {
+                return string.Empty;
             }
 
             byte[] result = new byte[length];
@@ -95,13 +103,41 @@ namespace H3Engine.FileSystem
 
         public static string ReadStringToEnd(this BinaryReader reader)
         {
-            byte[] result = new byte[2048];
-            for (var i = 0; i < 2048; i++)
+            byte[] str = new byte[4096];
+            int length = 0;
+            bool isQuoted = false;
+
+            if (str[0] == '\"')
             {
-                result[i] = reader.ReadByte();
-                if (result[i] == '\0')
-                    break;
+                isQuoted = true;
             }
+
+            for (var i = 0; i < 4096; i++)
+            {
+                try
+                {
+                    str[i] = reader.ReadByte();
+                    if (isQuoted && str[i] == '\"'
+                        || !isQuoted && (str[i] == '\t' || str[i] == '\r'))
+                    {
+                        length = isQuoted ? i - 1 : i;
+                        break;
+                    }
+                }
+                catch(Exception)
+                {
+                    length = isQuoted ? i - 1 : i;
+                    break;
+                }
+            }
+
+            if (length == 0)
+            {
+                return string.Empty;
+            }
+
+            byte[] result = new byte[length];
+            Buffer.BlockCopy(str, (isQuoted ? 1 : 0), result, 0, length);
 
             return Encoding.ASCII.GetString(result);
         }
