@@ -307,15 +307,30 @@ namespace H3Console
             engine.LoadArchiveFile(@"D:\PlayGround\Heroes3\==GameData==\HotA_Data\HotA_lng.lod");
             engine.LoadArchiveFile(@"D:\PlayGround\Heroes3\==GameData==\HotA_Data\HotA.lod");
 
-            H3Campaign campaign = engine.RetrieveCampaign("H2Terror.h3c");
+            H3Campaign campaign = engine.RetrieveCampaign("H1Roger.h3c");
 
-            //// File.WriteAllBytes(@"D:\PlayGround\Heroes3\==ExportedData==\HotA\H3HornA.h3m", campaign.CampaignMapBytes[0]);
+            File.WriteAllBytes(@"D:\PlayGround\Heroes3\==ExportedData==\HotA\H1Roger3.h3m", campaign.CampaignMapBytes[2]);
             
-            for (int i = 4; i < 6; i++)
+            H3MapLoader h3MapLoader = new H3MapLoader(campaign.CampaignMapBytes[1]);
+            byte[] data = h3MapLoader.MapData;
+            int index = 0;
+            using (FileStream fileStream = new FileStream(@"D:\Temp\h3horn.dat", FileMode.Create))
+            {
+                using (StreamWriter writer = new StreamWriter(@"D:\Temp\pointer.out"))
+                {
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        writer.WriteLine("Position: " + fileStream.Position.ToString("X4") + " Value: " + data[i].ToString("X4"));
+                        fileStream.WriteByte(data[i]);
+                    }
+                }
+            }
+
+            for (int i = 1; i < 5; i++)
             {
                 H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, i);
                 MapExporter exporter = new MapExporter(map);
-                exporter.ExportToPng(@"D:\PlayGround\Heroes3\==ExportedData==\HotA\H2Terror_" + i);
+                exporter.ExportToPng(@"D:\PlayGround\Heroes3\==ExportedData==\HotA\H3Horn_" + i);
             }
 
         }

@@ -498,29 +498,35 @@ namespace H3Engine.Mapping
 
             EPlayerColor owner = (EPlayerColor)reader.ReadByte();
             hero.SubId = reader.ReadByte();
-            
+
             //If hero of this type has been predefined, use that as a base.
             //Instance data will overwrite the predefined values where appropriate.
-            foreach(var preHero in this.Map.PredefinedHeroes)
-            {
-                if (preHero.SubId == hero.SubId)
+            if (this.Map.PredefinedHeroes != null)
+            { 
+                foreach (var preHero in this.Map.PredefinedHeroes)
                 {
-                    //logGlobal->debug("Hero %d will be taken from the predefined heroes list.", nhi->subID);
-                    //delete nhi;
-                    hero = preHero;
-                    break;
+                    if (preHero.SubId == hero.SubId)
+                    {
+                        //logGlobal->debug("Hero %d will be taken from the predefined heroes list.", nhi->subID);
+                        //delete nhi;
+                        hero = preHero;
+                        break;
+                    }
                 }
+                hero.SetOwner(owner);
             }
-            hero.SetOwner(owner);
-            
+
             //// nhi->portrait = nhi->subID;
-            foreach( DisposedHero disHero in this.Map.DisposedHeroes)
+            if (this.Map.DisposedHeroes != null)
             {
-                if (disHero.HeroId == hero.SubId)
+                foreach (DisposedHero disHero in this.Map.DisposedHeroes)
                 {
-                    hero.Data.Name = disHero.Name;
-                    hero.Data.PortaitIndex = disHero.Portrait;
-                    break;
+                    if (disHero.HeroId == hero.SubId)
+                    {
+                        hero.Data.Name = disHero.Name;
+                        hero.Data.PortaitIndex = disHero.Portrait;
+                        break;
+                    }
                 }
             }
 

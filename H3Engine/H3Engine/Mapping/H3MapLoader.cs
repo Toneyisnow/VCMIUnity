@@ -38,13 +38,21 @@ namespace H3Engine.Mapping
             mapData = GZipStreamHelper.DecompressBytes(rawData);
         }
 
+        public byte[] MapData
+        {
+            get
+            {
+                return this.mapData;
+            }
+        }
+
         public H3Map LoadMap()
         {
             mapObject = new H3Map();
 
             using (MemoryStream streamData = new MemoryStream(mapData))
             {
-                using (BinaryReader reader = new BinaryReader(streamData))
+                using (BinaryReader reader = new BinaryReader(streamData, Encoding.UTF8))
                 {
                     ReadHeader(reader);
 
@@ -77,7 +85,7 @@ namespace H3Engine.Mapping
 
                     ReadPredefinedHeroes(reader);
 
-                    //// reader.Seek(1087, SeekOrigin.Begin);
+                    //// reader.Seek(646, SeekOrigin.Begin);
 
                     ReadTerrain(reader);
 
@@ -162,8 +170,11 @@ namespace H3Engine.Mapping
                     {
                         case EMapFormat.SOD:
                         case EMapFormat.WOG:
-                        case EMapFormat.HOTA:
+                        // case EMapFormat.HOTA:
                             reader.Skip(13);
+                            break;
+                        case EMapFormat.HOTA:
+                            reader.Skip(15);
                             break;
                         case EMapFormat.AB:
                             reader.Skip(12);
