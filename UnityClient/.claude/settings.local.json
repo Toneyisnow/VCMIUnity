@@ -7,7 +7,9 @@
       "Bash(mkdir -p \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Temp/bin/Debug\")",
       "Bash(dotnet build UnityClient.sln)",
       "Bash(dotnet build -c Debug)",
-      "Bash(grep -rh \"guid:\" Assets/Scenes/*.unity Assets/Prefabs/*.prefab)"
+      "Bash(grep -rh \"guid:\" Assets/Scenes/*.unity Assets/Prefabs/*.prefab)",
+      "Bash(dotnet build Assembly-CSharp.csproj)",
+      "Bash(dotnet build -c Release)"
     ]
   }
 }

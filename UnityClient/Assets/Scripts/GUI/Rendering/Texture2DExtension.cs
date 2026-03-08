@@ -12,60 +12,18 @@ namespace UnityClient.GUI.Rendering
 {
     public static class Texture2DExtension
     {
-        public static Texture2D LoadFromData1(ImageData imageData, byte rotateIndex = 0)
-        {
-            Texture2D texture = new Texture2D(imageData.Width, imageData.Height, TextureFormat.ARGB32, false);
-            
-            for (int j = 0; j < imageData.Height; j++)
-            {
-                for (int i = 0; i < imageData.Width; i++)
-                {
-                    HCommon.Color sysColor = imageData.GetPixelColor(i, j, rotateIndex);
-                    Color clr = ToColor(sysColor);
-
-                    if (IsTransparentColor(sysColor))
-                    {
-                        clr = UnityEngine.Color.clear;
-                    }
-
-                    texture.SetPixel(i, imageData.Height - j, clr);
-                }
-            }
-
-            texture.Apply();
-
-            return texture;
-        }
-
-        public static Texture2D LoadFromData2(ImageData imageData, byte rotateIndex = 0)
-        {
-            Texture2D texture = new Texture2D(imageData.Width, imageData.Height, TextureFormat.ARGB32, false);
-            Color[] colors = new Color[imageData.Width * imageData.Height];
-
-            for (int j = 0; j < imageData.Height; j++)
-            {
-                int baseIndex = (imageData.Height - 1 - j) * imageData.Width;
-                for (int i = 0; i < imageData.Width; i++)
-                {
-                    HCommon.Color sysColor = imageData.GetPixelColor(i, j, rotateIndex);
-                    colors[baseIndex + i] = ToColor(sysColor);
-
-                    if (IsTransparentColor(sysColor))
-                    {
-                        colors[baseIndex + i] = UnityEngine.Color.clear;
-                    }
-                }
-            }
-
-            texture.SetPixels(0, 0, imageData.Width, imageData.Height, colors);
-            texture.Apply();
-
-            return texture;
-        }
+        /// <summary>
+        /// Pixels per unit for all sprites. H3 tiles are 32x32 pixels,
+        /// and we want each tile to occupy 0.32 world units, so PPU = 32 / 0.32 = 100.
+        /// </summary>
+        public const float PIXELS_PER_UNIT = 100f;
 
         public static Texture2D LoadFromData(ImageData imageData, byte rotateIndex = 0)
         {
             Texture2D texture = new Texture2D(imageData.Width, imageData.Height, TextureFormat.ARGB32, false);
+            texture.filterMode = FilterMode.Point;
+            texture.wrapMode = TextureWrapMode.Clamp;
+
             Color32[] color32s = new Color32[imageData.Width * imageData.Height];
 
             for (int j = 0; j < imageData.Height; j++)
@@ -107,7 +65,7 @@ namespace UnityClient.GUI.Rendering
                 return null;
             }
 
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), anchorPoint ?? new Vector2(0.5f, 0.5f));
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), anchorPoint ?? new Vector2(0.5f, 0.5f), PIXELS_PER_UNIT);
             return sprite;
         }
 

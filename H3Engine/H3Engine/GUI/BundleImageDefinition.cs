@@ -101,6 +101,18 @@ namespace H3Engine.GUI
             BundleImageFrame frame = this.Groups[groupIndex].Frames[frameIndex];
             if (frame.ImageData == null)
             {
+                // Log dimension mismatch: DEF global size vs frame-level FullWidth/FullHeight
+                if (frame.FullWidth != Width || frame.FullHeight != Height)
+                {
+                    Console.WriteLine(string.Format(
+                        "[ImageData] {0} [{1}][{2}]: DEF global={3}x{4}, frame Full={5}x{6}, content={7}x{8} at ({9},{10})",
+                        Identity, groupIndex, frameIndex,
+                        Width, Height,
+                        frame.FullWidth, frame.FullHeight,
+                        frame.Width, frame.Height,
+                        frame.LeftMargin, frame.TopMargin));
+                }
+
                 ImageData image = new ImageData(Width, Height);
 
                 byte[] imageData = this.Groups[groupIndex].Frames[frameIndex].RawData;

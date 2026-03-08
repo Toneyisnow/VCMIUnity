@@ -16,25 +16,27 @@ namespace UnityClient.GUI.Mapping
 
     public class MapLoader : MonoBehaviour
     {
-        private static float ZOrder_Terrain = 10;
-        private static float ZOrder_RoadRiver = 9;
-        private static float ZOrder_Decoration = 6;
-        private static float ZOrder_Resource = 5;
-        private static float ZOrder_Artifact = 5;
-        private static float ZOrder_Building = -5;
-        private static float ZOrder_Creature = -6;
-        private static float ZOrder_Hero = -7;
-        private static float ZOrder_Fog = -9;
-        private static float ZOrder_Edge = -9;
-
+        // Sorting order layers (higher = rendered on top)
+        private const int SortOrder_Terrain = 0;
+        private const int SortOrder_Road = 10;
+        private const int SortOrder_River = 20;
+        private const int SortOrder_Decoration = 30;
+        private const int SortOrder_Resource = 40;
+        private const int SortOrder_Artifact = 50;
+        private const int SortOrder_Mine = 60;
+        private const int SortOrder_Building = 70;
+        private const int SortOrder_Town = 80;
+        private const int SortOrder_Hero = 90;
+        private const int SortOrder_Edge = 100;
 
         private GameMap gameMap = null;
-
-        private int mapLevel = 0;
 
         private H3DataAccess h3dataAccess = null;
 
         private MapTextureManager mapTextureManager = null;
+
+        // Cache parent transforms to avoid repeated Find() calls
+        private Dictionary<string, Transform> parentCache = new Dictionary<string, Transform>();
 
         public void Initialize(GameMap gameMap)
         {
@@ -93,7 +95,7 @@ namespace UnityClient.GUI.Mapping
                     TerrainTile tile = gameMap.TerrainTiles[xx, yy];
                     Sprite sprite = mapTextureManager.LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
 
-                    GameObject gametile = CreateSubChildObject("Terrain", GetMapPositionInPixel(xx, yy, ZOrder_Terrain), sprite);
+                    GameObject gametile = CreateSubChildObject("Terrain", GetMapPosition(xx, yy), sprite, SortOrder_Terrain);
                     MapTile mapTileComponent = gametile.AddComponent<MapTile>();
                     mapTileComponent.Initialize(new Vector2(xx, yy), null);
                 }
@@ -108,8 +110,7 @@ namespace UnityClient.GUI.Mapping
                 {
                     TerrainTile tile = gameMap.TerrainTiles[xx, yy];
                     Sprite sprite = mapTextureManager.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
-                    var position = GetMapPositionInPixel(xx, yy, 9);
-                    CreateSubChildObject("Road", GetMapPositionInPixel(xx, yy, ZOrder_RoadRiver), sprite);
+                    CreateSubChildObject("Road", GetMapPosition(xx, yy), sprite, SortOrder_Road);
                 }
             }
         }
@@ -122,8 +123,7 @@ namespace UnityClient.GUI.Mapping
                 {
                     TerrainTile tile = gameMap.TerrainTiles[xx, yy];
                     Sprite sprite = mapTextureManager.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
-
-                    CreateSubChildObject("River", GetMapPositionInPixel(xx, yy, ZOrder_RoadRiver), sprite);
+                    CreateSubChildObject("River", GetMapPosition(xx, yy), sprite, SortOrder_River);
                 }
             }
         }
@@ -136,50 +136,40 @@ namespace UnityClient.GUI.Mapping
                 ObjectTemplate template = obj.Template;
                 MapPosition position = obj.Position;
 
-                BundleImageDefinition bundleImage = h3dataAccess.RetrieveBundleImage(template.AnimationFile);
-
                 if (template.Type == EObjectType.ARTIFACT)
                 {
                     Sprite[] sprites = mapTextureManager.LoadArtifactSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Artifacts", GetMapPositionInPixel(position.PosX, position.PosY, ZOrder_Artifact), sprites);
+                    CreateSubChildAnimatedObject("Artifacts", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Artifact);
                 }
                 else if (MapObjectHelper.IsDecorationObject(template.Type))
                 {
                     Sprite sprite = mapTextureManager.LoadDecorationSprite(template.AnimationFile, template.Type.GetHashCode());
-                    CreateSubChildObject("Decorations", GetMapPositionInPixel(position.PosX, position.PosY, -1), sprite);
+                    CreateSubChildObject("Decorations", GetMapPosition(position.PosX, position.PosY), sprite, SortOrder_Decoration);
                 }
                 else if (template.Type == EObjectType.MINE)
                 {
                     Sprite[] sprites = mapTextureManager.LoadMineSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Mines", GetMapPositionInPixel(position.PosX, position.PosY, -2), sprites, "Mine_" + template.SubId);
+                    CreateSubChildAnimatedObject("Mines", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Mine, "Mine_" + template.SubId);
                 }
                 else if (template.Type == EObjectType.RESOURCE)
                 {
                     Sprite[] sprites = mapTextureManager.LoadResourceSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Resources", GetMapPositionInPixel(position.PosX, position.PosY, -4), sprites, "Resource_" + template.SubId);
+                    CreateSubChildAnimatedObject("Resources", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Resource, "Resource_" + template.SubId);
                 }
                 else if (template.Type == EObjectType.TOWN || template.Type == EObjectType.RANDOM_TOWN)
                 {
                     Sprite[] sprites = mapTextureManager.LoadTownSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Town", GetMapPositionInPixel(position.PosX, position.PosY, -7), sprites, "Town_" + template.SubId);
+                    CreateSubChildAnimatedObject("Town", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Town, "Town_" + template.SubId);
                 }
                 else if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER)
                 {
                     Sprite[] sprites = mapTextureManager.LoadHeroSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Heroes", GetMapPositionInPixel(position.PosX, position.PosY, -8), sprites);
-
-                    // Load Single Image
-                    ////ImageData image = bundleImage.GetImageData(0, 0);
-                    //// image.ExportDataToPNG();
-
-                    //// Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromPNGData(template.AnimationFile, image.GetPNGData());
-                    ////Texture2D objTexture = TextureStorage.GetInstance().LoadTextureFromImage(template.AnimationFile, image);
-                    ////LoadImageSprite(objTexture, "Obj" + objectIndex, position.PosX, position.PosY, 0);
+                    CreateSubChildAnimatedObject("Heroes", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Hero);
                 }
                 else
                 {
                     Sprite[] sprites = mapTextureManager.LoadSingleBundleImageSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("AnimatedObjects", GetMapPositionInPixel(position.PosX, position.PosY, -5), sprites, string.Format(@"{0}_{1}", template.Type.ToString(), template.SubId));
+                    CreateSubChildAnimatedObject("AnimatedObjects", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Building, string.Format(@"{0}_{1}", template.Type.ToString(), template.SubId));
                 }
 
                 objectIndex++;
@@ -197,93 +187,95 @@ namespace UnityClient.GUI.Mapping
             for (int xx = 0; xx < gameMap.Width; xx++)
             {
                 sprite = mapTextureManager.LoadEdgeSprite("U");
-                CreateSubChildObject("Edge", GetMapPositionInPixel(xx, -1, ZOrder_Edge), sprite);
-                CreateSubChildObject("Edge", GetMapPositionInPixel(xx, -2, ZOrder_Edge), spaceSprite);
+                CreateSubChildObject("Edge", GetMapPosition(xx, -1), sprite, SortOrder_Edge);
+                CreateSubChildObject("Edge", GetMapPosition(xx, -2), spaceSprite, SortOrder_Edge);
 
                 sprite = mapTextureManager.LoadEdgeSprite("D");
-                CreateSubChildObject("Edge", GetMapPositionInPixel(xx, mapHeight, ZOrder_Edge), sprite);
-                CreateSubChildObject("Edge", GetMapPositionInPixel(xx, mapHeight + 1, ZOrder_Edge), spaceSprite);
+                CreateSubChildObject("Edge", GetMapPosition(xx, mapHeight), sprite, SortOrder_Edge);
+                CreateSubChildObject("Edge", GetMapPosition(xx, mapHeight + 1), spaceSprite, SortOrder_Edge);
             }
 
             for (int yy = 0; yy < gameMap.Height; yy++)
             {
                 sprite = mapTextureManager.LoadEdgeSprite("L");
-                CreateSubChildObject("Edge", GetMapPositionInPixel(-1, yy, ZOrder_Edge), sprite);
-                CreateSubChildObject("Edge", GetMapPositionInPixel(-2, yy, ZOrder_Edge), spaceSprite);
+                CreateSubChildObject("Edge", GetMapPosition(-1, yy), sprite, SortOrder_Edge);
+                CreateSubChildObject("Edge", GetMapPosition(-2, yy), spaceSprite, SortOrder_Edge);
 
                 sprite = mapTextureManager.LoadEdgeSprite("R");
-                CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, yy, ZOrder_Edge), sprite);
-                CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth + 1, yy, ZOrder_Edge), spaceSprite);
+                CreateSubChildObject("Edge", GetMapPosition(mapWidth, yy), sprite, SortOrder_Edge);
+                CreateSubChildObject("Edge", GetMapPosition(mapWidth + 1, yy), spaceSprite, SortOrder_Edge);
             }
 
             sprite = mapTextureManager.LoadEdgeSprite("UL");
-            CreateSubChildObject("Edge", GetMapPositionInPixel(-1, -1, ZOrder_Edge), sprite);
-            CreateSubChildObject("Edge", GetMapPositionInPixel(-2, -1, ZOrder_Edge), spaceSprite);
-            CreateSubChildObject("Edge", GetMapPositionInPixel(-1, -2, ZOrder_Edge), spaceSprite);
+            CreateSubChildObject("Edge", GetMapPosition(-1, -1), sprite, SortOrder_Edge);
+            CreateSubChildObject("Edge", GetMapPosition(-2, -1), spaceSprite, SortOrder_Edge);
+            CreateSubChildObject("Edge", GetMapPosition(-1, -2), spaceSprite, SortOrder_Edge);
 
             sprite = mapTextureManager.LoadEdgeSprite("UR");
-            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, -1, ZOrder_Edge), sprite);
-            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, -2, ZOrder_Edge), spaceSprite);
-            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth + 1, -1, ZOrder_Edge), spaceSprite);
+            CreateSubChildObject("Edge", GetMapPosition(mapWidth, -1), sprite, SortOrder_Edge);
+            CreateSubChildObject("Edge", GetMapPosition(mapWidth, -2), spaceSprite, SortOrder_Edge);
+            CreateSubChildObject("Edge", GetMapPosition(mapWidth + 1, -1), spaceSprite, SortOrder_Edge);
 
             sprite = mapTextureManager.LoadEdgeSprite("DL");
-            CreateSubChildObject("Edge", GetMapPositionInPixel(-1, mapHeight, ZOrder_Edge), sprite);
-            CreateSubChildObject("Edge", GetMapPositionInPixel(-2, mapHeight, ZOrder_Edge), spaceSprite);
-            CreateSubChildObject("Edge", GetMapPositionInPixel(-1, mapHeight + 1, ZOrder_Edge), spaceSprite);
+            CreateSubChildObject("Edge", GetMapPosition(-1, mapHeight), sprite, SortOrder_Edge);
+            CreateSubChildObject("Edge", GetMapPosition(-2, mapHeight), spaceSprite, SortOrder_Edge);
+            CreateSubChildObject("Edge", GetMapPosition(-1, mapHeight + 1), spaceSprite, SortOrder_Edge);
 
             sprite = mapTextureManager.LoadEdgeSprite("DR");
-            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, mapHeight, ZOrder_Edge), sprite);
-            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth + 1, mapHeight, ZOrder_Edge), spaceSprite);
-            CreateSubChildObject("Edge", GetMapPositionInPixel(mapWidth, mapHeight + 1, ZOrder_Edge), spaceSprite);
+            CreateSubChildObject("Edge", GetMapPosition(mapWidth, mapHeight), sprite, SortOrder_Edge);
+            CreateSubChildObject("Edge", GetMapPosition(mapWidth + 1, mapHeight), spaceSprite, SortOrder_Edge);
+            CreateSubChildObject("Edge", GetMapPosition(mapWidth, mapHeight + 1), spaceSprite, SortOrder_Edge);
         }
 
-        private Vector3 GetMapPositionInPixel(int x, int y, float z)
+        private Vector3 GetMapPosition(int x, int y)
         {
-            //// return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z - (float)(y * 0.01));
-            return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), z);
+            return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), 0);
         }
 
-        private GameObject CreateSubChildObject(string subName, Vector3 position, Sprite sprite, string goName = "DefaultGameObject")
+        private Transform GetOrCreateParent(string subName)
         {
-            GameObject newObject = new GameObject();
-            newObject.transform.position = position;
-            newObject.name = goName;
+            if (parentCache.TryGetValue(subName, out Transform cached))
+            {
+                return cached;
+            }
 
             Transform child = transform.Find(subName);
             if (child == null)
             {
-                GameObject artifacts = new GameObject();
-                artifacts.name = subName;
-                artifacts.transform.parent = transform;
-                child = artifacts.transform;
+                GameObject parent = new GameObject();
+                parent.name = subName;
+                parent.transform.parent = transform;
+                child = parent.transform;
             }
 
-            newObject.transform.parent = child;
+            parentCache[subName] = child;
+            return child;
+        }
+
+        private GameObject CreateSubChildObject(string subName, Vector3 position, Sprite sprite, int sortingOrder, string goName = "DefaultGameObject")
+        {
+            GameObject newObject = new GameObject();
+            newObject.transform.position = position;
+            newObject.name = goName;
+            newObject.transform.parent = GetOrCreateParent(subName);
 
             SpriteRenderer renderer = newObject.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
+            renderer.sortingOrder = sortingOrder;
 
             return newObject;
         }
 
-        private GameObject CreateSubChildAnimatedObject(string subName, Vector3 position, Sprite[] sprites, string goName = "DefaultGameObject")
+        private GameObject CreateSubChildAnimatedObject(string subName, Vector3 position, Sprite[] sprites, int sortingOrder, string goName = "DefaultGameObject")
         {
             GameObject newObject = new GameObject();
             newObject.transform.position = position;
             newObject.name = goName;
+            newObject.transform.parent = GetOrCreateParent(subName);
 
-            Transform child = transform.Find(subName);
-            if (child == null)
-            {
-                GameObject artifacts = new GameObject();
-                artifacts.name = subName;
-                artifacts.transform.parent = transform;
-                child = artifacts.transform;
-            }
+            SpriteRenderer renderer = newObject.AddComponent<SpriteRenderer>();
+            renderer.sortingOrder = sortingOrder;
 
-            newObject.transform.parent = child;
-
-            newObject.AddComponent<SpriteRenderer>();
             AnimatedMapObject animated = newObject.AddComponent<AnimatedMapObject>();
             animated.Initialize(sprites);
 

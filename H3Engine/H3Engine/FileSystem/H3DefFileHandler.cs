@@ -166,7 +166,7 @@ namespace H3Engine.FileSystem
             }
 
             bundleImage.Palette = palette;
-            //// Console.WriteLine(string.Format("Type: {0} Width: {1} Height: {2} GroupCount: {3}", bundleImage.Type, bundleImage.Width, bundleImage.Height, groupCount));
+            Console.WriteLine(string.Format("[DEF Header] Name={0} Type={1} Width={2} Height={3} GroupCount={4}", bundleImage.Name, bundleImage.Type, bundleImage.Width, bundleImage.Height, groupCount));
 
             for(int i = 0; i < groupCount; i++)
             {
@@ -256,8 +256,8 @@ namespace H3Engine.FileSystem
                 baseOffset = 16;
             }
 
-            //// Console.WriteLine(string.Format(@"Frame [{0}][{1}]: format={2} FullWidth={3} FullHeight={4} Width={5} Height={6} Left={7} Top={8} Size={9}", 
-            //// groupIndex, frameIndex, format, frame.FullWidth, frame.FullHeight, frame.Width, frame.Height, frame.LeftMargin, frame.TopMargin, size));
+            Console.WriteLine(string.Format(@"[DEF Frame] [{0}][{1}]: format={2} FullWidth={3} FullHeight={4} Width={5} Height={6} Left={7} Top={8} Size={9}",
+                groupIndex, frameIndex, format, frame.FullWidth, frame.FullHeight, frame.Width, frame.Height, frame.LeftMargin, frame.TopMargin, size));
 
             UInt32 currentOffset = baseOffset;
             long basePosition = inputStream.Position;

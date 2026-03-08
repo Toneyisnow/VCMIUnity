@@ -24,15 +24,9 @@ namespace UnityClient.GUI.Rendering
         private TextureSheet edgeTextureSheet = null;
         private TextureSheet cursorTextureSheet = null;
 
-        private BundleImageSheet artifactTextureSheet = null;
-        private BundleImageSheet heroTextureSheet = null;
-        private BundleImageSheet mineTextureSheet = null;
-        private BundleImageSheet resourceTextureSheet = null;
-        private BundleImageSheet townTextureSheet = null;
-
-        private Dictionary<int, BundleImageSheet> decorationTextureSheets = null;
-
-        private BundleImageSheet singleBundleTextureSheets = null;
+        // All map objects (artifacts, heroes, mines, resources, towns, decorations, etc.)
+        // share a single atlas to maximize sprite batching and minimize draw calls.
+        private BundleImageSheet mapObjectTextureSheet = null;
 
 
 
@@ -97,39 +91,32 @@ namespace UnityClient.GUI.Rendering
 
         public Sprite[] LoadArtifactSprites(string defFileName)
         {
-            return artifactTextureSheet.LoadSprites(defFileName);
+            return mapObjectTextureSheet.LoadSprites(defFileName);
         }
 
         public Sprite[] LoadMineSprites(string defFileName)
         {
-            return mineTextureSheet.LoadSprites(defFileName);
+            return mapObjectTextureSheet.LoadSprites(defFileName);
         }
 
         public Sprite[] LoadHeroSprites(string defFileName)
         {
-            return heroTextureSheet.LoadSprites(defFileName);
+            return mapObjectTextureSheet.LoadSprites(defFileName);
         }
 
         public Sprite[] LoadTownSprites(string defFileName)
         {
-            return townTextureSheet.LoadSprites(defFileName);
+            return mapObjectTextureSheet.LoadSprites(defFileName);
         }
 
         public Sprite[] LoadResourceSprites(string defFileName)
         {
-            return resourceTextureSheet.LoadSprites(defFileName);
+            return mapObjectTextureSheet.LoadSprites(defFileName);
         }
 
         public Sprite LoadDecorationSprite(string defFileName, int decorationTypeId)
         {
-            if (!decorationTextureSheets.ContainsKey(decorationTypeId))
-            {
-                return null;
-            }
-
-            BundleImageSheet textureSheet = decorationTextureSheets[decorationTypeId];
-
-            Sprite[] sprites = textureSheet.LoadSprites(defFileName);
+            Sprite[] sprites = mapObjectTextureSheet.LoadSprites(defFileName);
             if (sprites == null || sprites.Length < 1)
             {
                 return null;
@@ -138,14 +125,9 @@ namespace UnityClient.GUI.Rendering
             return sprites[0];
         }
 
-        /// <summary>
-        /// This is for map objects that with animation all within one DEF file
-        /// </summary>
-        /// <param name="defFileName"></param>
-        /// <returns></returns>
         public Sprite[] LoadSingleBundleImageSprites(string defFileName)
         {
-            return singleBundleTextureSheets.LoadSprites(defFileName);
+            return mapObjectTextureSheet.LoadSprites(defFileName);
         }
 
         //////////////////// Preload Functions ///////////////////
@@ -329,25 +311,10 @@ namespace UnityClient.GUI.Rendering
         {
             ProfilerLogger.RecordProfile("PreloadMapObjectTextures: before");
 
-            artifactTextureSheet = new BundleImageSheet();
-            mineTextureSheet = new BundleImageSheet();
-            heroTextureSheet = new BundleImageSheet();
-            townTextureSheet = new BundleImageSheet();
-            resourceTextureSheet = new BundleImageSheet();
-
-            decorationTextureSheets = new Dictionary<int, BundleImageSheet>();
-
-            singleBundleTextureSheets = new BundleImageSheet();
+            mapObjectTextureSheet = new BundleImageSheet();
             HashSet<string> loadedObjectTemplate = new HashSet<string>();
 
-            int artifactCount = 0;
-            int decorationCount = 0;
-            int heroCount = 0;
-            int resourceCount = 0;
-            int mineCount = 0;
-            int townCount = 0;
-            int singleCount = 0;
-
+            int objectCount = 0;
             TimeSpan loadImageDataTimeSpan = new TimeSpan();
             TimeSpan buildTextureTimeSpan = new TimeSpan();
 
@@ -365,88 +332,19 @@ namespace UnityClient.GUI.Rendering
                     continue;
                 }
 
-                if (MapObjectHelper.IsDecorationObject(template.Type))
-                {
-                    int decorationTypeId = template.Type.GetHashCode();
-                    BundleImageSheet textureSheet = null;
-                    if (decorationTextureSheets.ContainsKey(decorationTypeId))
-                    {
-                        textureSheet = decorationTextureSheets[decorationTypeId];
-                    }
-                    else
-                    {
-                        decorationTextureSheets[decorationTypeId] = new BundleImageSheet();
-                        textureSheet = decorationTextureSheets[decorationTypeId];
-                    }
-
-                    textureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
-                    decorationCount++;
-                    loadedObjectTemplate.Add(defFileName);
-                    continue;
-                }
-
-                switch (template.Type)
-                {
-                    case EObjectType.ARTIFACT:
-                        artifactTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
-                        artifactCount++;
-                        break;
-                    case EObjectType.HERO:
-                    case EObjectType.HERO_PLACEHOLDER:
-                    case EObjectType.RANDOM_HERO:
-                        heroTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
-                        heroCount++;
-                        break;
-                    case EObjectType.MINE:
-                        mineTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
-                        mineCount++;
-                        break;
-                    case EObjectType.TOWN:
-                    case EObjectType.RANDOM_TOWN:
-                        townTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
-                        townCount++;
-                        break;
-                    case EObjectType.RESOURCE:
-                    case EObjectType.RANDOM_RESOURCE:
-                        resourceTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
-                        resourceCount++;
-                        break;
-                    default:
-                        // For other types, just put them into Single Bundle Image Sheet
-                        singleBundleTextureSheets.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
-                        singleCount++;
-                        break;
-                }
-
+                mapObjectTextureSheet.AddBundleImage(defFileName, ref loadImageDataTimeSpan, ref buildTextureTimeSpan);
+                objectCount++;
                 loadedObjectTemplate.Add(defFileName);
             }
 
-            ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheets filled:");
+            ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheet filled:");
 
-            MonoBehaviour.print(string.Format(@"Total Templates: artifact={0}, decoration={1}, hero={2}, resource={3}, mine={4}, town={5}, single={6}",
-                artifactCount, decorationCount, heroCount, resourceCount, mineCount, townCount, singleCount));
-
+            MonoBehaviour.print(string.Format(@"Total map object templates: {0}", objectCount));
             MonoBehaviour.print(string.Format(@"Total time for loadImageData:" + loadImageDataTimeSpan.ToString()));
             MonoBehaviour.print(string.Format(@"Total time for buildTexture:" + buildTextureTimeSpan.ToString()));
 
-            artifactTextureSheet.PackTextures();
-            mineTextureSheet.PackTextures();
-            heroTextureSheet.PackTextures();
-            townTextureSheet.PackTextures();
-            resourceTextureSheet.PackTextures();
-
-            ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheets packed:");
-
-            foreach (var sheet in decorationTextureSheets.Values)
-            {
-                sheet.PackTextures();
-            }
-
-            ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheets packed 2:");
-
-            singleBundleTextureSheets.PackTextures();
-            ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheets packed 3:");
-
+            mapObjectTextureSheet.PackTextures();
+            ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheet packed:");
         }
     }
 }
