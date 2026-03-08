@@ -265,8 +265,8 @@ public class SampleTest : MonoBehaviour
         engine.LoadArchiveFile(GetGameDataFilePath("H3sprite.lod"));
 
         H3Campaign campaign = engine.RetrieveCampaign("ab.h3c");
-        H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 0);
-        GameMap gameMap = GameMap.LoadFromH3Map(map, 0);
+        H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 2);
+        GameMap gameMap = GameMap.LoadFromH3Map(map, 2);
 
         Transform gameMapGO = transform.Find("GameMap");
         MapLoader mapLoader = gameMapGO.gameObject.GetComponent<MapLoader>();

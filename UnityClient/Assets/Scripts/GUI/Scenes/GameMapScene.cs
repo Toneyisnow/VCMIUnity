@@ -15,6 +15,16 @@ using UnityClient.Components.Mapping;
 
 namespace UnityClient.GUI.Scenes
 {
+    /// <summary>
+    /// All campaign file names (SOD + AB, 28 entries across both LODs, unique names):
+    ///   ab.h3c, blood.h3c, crag.h3c, evil1.h3c, evil2.h3c,
+    ///   festival.h3c, final.h3c, fire.h3c, fool.h3c,
+    ///   gelu.h3c, gem.h3c,
+    ///   good1.h3c, good2.h3c, good3.h3c,
+    ///   neutral.h3c, neutral1.h3c,
+    ///   sandro.h3c, slayer.h3c, yog.h3c,
+    ///   secret.h3c, secret1.h3c
+    /// </summary>
     public class GameMapScene : MonoBehaviour
     {
         private PlayerInterface playerInterface = null;
@@ -34,7 +44,7 @@ namespace UnityClient.GUI.Scenes
             dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3bitmap.lod"));
             dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3sprite.lod"));
 
-            H3Campaign campaign = dataAccess.RetrieveCampaign("slayer.h3c");
+            H3Campaign campaign = dataAccess.RetrieveCampaign("final.h3c");
             H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 3);
 
 
