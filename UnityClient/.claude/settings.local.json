@@ -9,7 +9,8 @@
       "Bash(dotnet build -c Debug)",
       "Bash(grep -rh \"guid:\" Assets/Scenes/*.unity Assets/Prefabs/*.prefab)",
       "Bash(dotnet build Assembly-CSharp.csproj)",
-      "Bash(dotnet build -c Release)"
+      "Bash(dotnet build -c Release)",
+      "Bash(dotnet build --no-restore)"
     ]
   }
 }

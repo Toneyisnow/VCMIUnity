@@ -1,4 +1,4 @@
-﻿using H3Engine.DataAccess;
+using H3Engine.DataAccess;
 using H3Engine.Common;
 using H3Engine.Core;
 using H3Engine.GUI;
@@ -27,7 +27,12 @@ namespace UnityClient.GUI.Mapping
         private const int SortOrder_Building = 70;
         private const int SortOrder_Town = 80;
         private const int SortOrder_Hero = 90;
+        private const int SortOrder_PathArrow = 95;
         private const int SortOrder_Edge = 100;
+
+        private const float TILE_SIZE = 0.32f;
+        private const float MAP_OFFSET_X = -4f;
+        private const float MAP_OFFSET_Y = 4f;
 
         private GameMap gameMap = null;
 
@@ -37,6 +42,14 @@ namespace UnityClient.GUI.Mapping
 
         // Cache parent transforms to avoid repeated Find() calls
         private Dictionary<string, Transform> parentCache = new Dictionary<string, Transform>();
+
+        // Hero tracking: maps HeroInstance identifier to the hero's GameObject
+        private Dictionary<uint, GameObject> heroGameObjects = new Dictionary<uint, GameObject>();
+
+        // Path arrow GameObjects currently displayed on map
+        private List<GameObject> pathArrowObjects = new List<GameObject>();
+
+        public GameMap GameMap { get { return gameMap; } }
 
         public void Initialize(GameMap gameMap)
         {
@@ -86,6 +99,137 @@ namespace UnityClient.GUI.Mapping
 
         }
 
+        #region Public API for Hero Movement
+
+        /// <summary>
+        /// Find the HeroInstance at a given tile coordinate, or null if none.
+        /// Hero sprites are larger than one tile and the Position is the bottom-right
+        /// action tile, so we check a small area around each hero's position.
+        /// </summary>
+        public HeroInstance GetHeroAtTile(int tileX, int tileY)
+        {
+            if (gameMap.Heroes == null) return null;
+            foreach (HeroInstance hero in gameMap.Heroes)
+            {
+                int hx = hero.Position.PosX;
+                int hy = hero.Position.PosY;
+                // Hero sprite covers roughly a 3x3 area with position at bottom-right
+                if (tileX >= hx - 2 && tileX <= hx && tileY >= hy - 2 && tileY <= hy)
+                {
+                    return hero;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get the GameObject for a given hero.
+        /// </summary>
+        public GameObject GetHeroGameObject(HeroInstance hero)
+        {
+            if (hero == null) return null;
+            heroGameObjects.TryGetValue(hero.Identifier, out GameObject go);
+            return go;
+        }
+
+        /// <summary>
+        /// Display path arrows on the map for a list of tile positions.
+        /// path[0] = start (hero position), path[last] = destination.
+        /// </summary>
+        public void ShowPath(List<Vector2Int> path)
+        {
+            ClearPath();
+
+            if (path == null || path.Count < 2) return;
+
+            // For each tile in the path (skip the start, which is the hero's current tile)
+            for (int i = 1; i < path.Count; i++)
+            {
+                Vector2Int current = path[i];
+                bool isDestination = (i == path.Count - 1);
+
+                Sprite arrowSprite;
+                if (isDestination)
+                {
+                    arrowSprite = mapTextureManager.LoadCursorSprite("X");
+                }
+                else
+                {
+                    // Calculate direction from current to next
+                    Vector2Int next = path[i + 1];
+                    string key = GetDirectionSpriteKey(current, next);
+                    arrowSprite = mapTextureManager.LoadCursorSprite(key);
+                    if (arrowSprite == null)
+                    {
+                        arrowSprite = mapTextureManager.LoadCursorSprite("X");
+                    }
+                }
+
+                if (arrowSprite != null)
+                {
+                    GameObject arrow = CreateSubChildObject("PathArrows", GetMapPosition(current.x, current.y), arrowSprite, SortOrder_PathArrow, "PathArrow");
+                    pathArrowObjects.Add(arrow);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove all path arrow objects from the map.
+        /// </summary>
+        public void ClearPath()
+        {
+            foreach (GameObject arrow in pathArrowObjects)
+            {
+                if (arrow != null) Destroy(arrow);
+            }
+            pathArrowObjects.Clear();
+        }
+
+        /// <summary>
+        /// Convert tile coordinates to world position.
+        /// </summary>
+        public Vector3 TileToWorldPosition(int tileX, int tileY)
+        {
+            return GetMapPosition(tileX, tileY);
+        }
+
+        /// <summary>
+        /// Update the hero's data position after movement completes.
+        /// </summary>
+        public void UpdateHeroPosition(HeroInstance hero, int newTileX, int newTileY)
+        {
+            hero.Position = new MapPosition(newTileX, newTileY, hero.Position.Level);
+        }
+
+        #endregion
+
+        #region Direction Sprite Key Mapping
+
+        /// <summary>
+        /// Map movement direction (from current to next tile) to an adag.def sprite key.
+        /// Uses the double-arrow keys for path continuation tiles.
+        /// </summary>
+        private string GetDirectionSpriteKey(Vector2Int from, Vector2Int to)
+        {
+            int dx = to.x - from.x;
+            int dy = to.y - from.y;
+
+            // dy is inverted: positive dy = moving down on screen
+            // Map (dx, dy) to H3 path arrow keys
+            if (dx == 0 && dy == -1) return "AA";     // North
+            if (dx == 1 && dy == -1) return @"//A";   // NE
+            if (dx == 1 && dy == 0) return ">>";       // East
+            if (dx == 1 && dy == 1) return @"\\V";     // SE
+            if (dx == 0 && dy == 1) return "VV";       // South
+            if (dx == -1 && dy == 1) return @"//V";    // SW
+            if (dx == -1 && dy == 0) return "<<";      // West
+            if (dx == -1 && dy == -1) return @"\\A";   // NW
+
+            return "X"; // fallback
+        }
+
+        #endregion
+
         private void RenderTerrain()
         {
             for (int xx = 0; xx < gameMap.Width; xx++)
@@ -97,7 +241,7 @@ namespace UnityClient.GUI.Mapping
 
                     GameObject gametile = CreateSubChildObject("Terrain", GetMapPosition(xx, yy), sprite, SortOrder_Terrain);
                     MapTile mapTileComponent = gametile.AddComponent<MapTile>();
-                    mapTileComponent.Initialize(new Vector2(xx, yy), null);
+                    mapTileComponent.Initialize(xx, yy);
                 }
             }
         }
@@ -164,7 +308,10 @@ namespace UnityClient.GUI.Mapping
                 else if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER)
                 {
                     Sprite[] sprites = mapTextureManager.LoadHeroSprites(template.AnimationFile);
-                    CreateSubChildAnimatedObject("Heroes", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Hero);
+                    GameObject heroGO = CreateSubChildAnimatedObject("Heroes", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Hero, "Hero_" + obj.Identifier);
+
+                    // Track hero GameObjects for movement
+                    heroGameObjects[obj.Identifier] = heroGO;
                 }
                 else
                 {
@@ -229,7 +376,7 @@ namespace UnityClient.GUI.Mapping
 
         private Vector3 GetMapPosition(int x, int y)
         {
-            return new Vector3((float)(x * 0.32 - 4), 4 - (float)(y * 0.32), 0);
+            return new Vector3(x * TILE_SIZE + MAP_OFFSET_X, MAP_OFFSET_Y - y * TILE_SIZE, 0);
         }
 
         private Transform GetOrCreateParent(string subName)

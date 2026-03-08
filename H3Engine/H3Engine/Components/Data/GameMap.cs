@@ -1,8 +1,10 @@
-﻿using H3Engine.Core;
+using H3Engine.Common;
+using H3Engine.Core;
 using H3Engine.MapObjects;
 using H3Engine.Mapping;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace H3Engine.Components.Data
 {
@@ -43,6 +45,7 @@ namespace H3Engine.Components.Data
             }
 
             gameMap.Objects = new List<CGObject>();
+            gameMap.Heroes = new List<HeroInstance>();
             foreach (CGObject mapObject in h3Map.Objects)
             {
                 MapPosition position = mapObject.Position;
@@ -64,6 +67,20 @@ namespace H3Engine.Components.Data
                 }
 
                 gameMap.Objects.Add(mapObject);
+
+                if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER)
+                {
+                    if (mapObject is HeroInstance hero)
+                    {
+                        gameMap.Heroes.Add(hero);
+                    }
+                    else
+                    {
+                        // Debug: object has HERO type but is not HeroInstance - log the actual type
+                        Debug.WriteLine("[GameMap] WARNING: Object at ({0},{1}) has type {2} but runtime type is {3}, not HeroInstance",
+                            position.PosX, position.PosY, template.Type, mapObject.GetType().Name);
+                    }
+                }
             }
 
             return gameMap;

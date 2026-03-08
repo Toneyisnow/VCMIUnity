@@ -130,6 +130,19 @@ namespace UnityClient.GUI.Rendering
             return mapObjectTextureSheet.LoadSprites(defFileName);
         }
 
+        /// <summary>
+        /// Retrieve a path/cursor sprite by key from the preloaded adag.def texture sheet.
+        /// Keys correspond to directional path arrows (e.g. "X", "/A", ">>", "VV", etc.)
+        /// </summary>
+        public Sprite LoadCursorSprite(string cursorKey)
+        {
+            if (cursorTextureSheet == null)
+            {
+                return null;
+            }
+            return cursorTextureSheet.RetrieveSprite(cursorKey);
+        }
+
         //////////////////// Preload Functions ///////////////////
 
 
