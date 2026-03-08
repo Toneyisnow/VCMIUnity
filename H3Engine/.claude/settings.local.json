@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet --version)",
+      "Bash(dotnet --list-sdks)",
+      "Bash(dotnet restore)",
+      "Bash(dotnet build)",
+      "Bash(dotnet tool list -g)",
+      "Bash(dotnet ~/.nuget/packages/zlib.net-mutliplatform/1.0.6/lib/net6.0/zlib.net.dll)"
+    ]
+  }
+}

@@ -1,7 +1,4 @@
-﻿using ComponentAce.Compression.Archiver;
-using ComponentAce.Compression.Libs.ZLib;
-using ComponentAce.Compression.ZipForge;
-using H3Engine.Utils;
+﻿using H3Engine.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,37 +1,16 @@
-﻿
-#define Z_OK           // 0
-#define Z_STREAM_END   // 1
-#define Z_NEED_DICT    // 2
-#define Z_ERRNO        //(-1)
-#define Z_STREAM_ERROR //(-2)
-#define Z_DATA_ERROR   //(-3)
-#define Z_MEM_ERROR    //(-4)
-#define Z_BUF_ERROR    //(-5)
-#define Z_VERSION_ERROR // (-6)
-
-using ComponentAce.Compression.Libs.ZLib;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO.Compression;
 
 namespace H3Engine.FileSystem
 {
     public class CompressedStreamReader : IDisposable
     {
-        private static readonly int InflateBlockSize = 10000;
-
         private bool endOfFileReached = false;
-
-        private byte[] compressedBuffer = null;
 
         private MemoryStream buffer = null;
 
-        private Stream inputStream = null;
-
-        private ZStream inflateState = null;
+        private Stream decompressStream = null;
 
         private UInt64 ReadPosition
         {
@@ -45,38 +24,49 @@ namespace H3Engine.FileSystem
 
         public CompressedStreamReader(Stream input, bool isGZip)
         {
-            this.inputStream = input;
-            this.compressedBuffer = new byte[InflateBlockSize];
             this.buffer = new MemoryStream();
 
             this.ReadPosition = 0;
             this.WritePosition = 0;
 
-            ////this.buffer.Length
-
-            this.inflateState = new ZStream();
-            this.inflateState.avail_in = 0;
-            this.inflateState.next_in = null;
-
-            int windowBits = 15;
             if (isGZip)
             {
-                windowBits += 16;
+                this.decompressStream = new GZipStream(input, CompressionMode.Decompress, leaveOpen: true);
             }
-
-            int ret = inflateState.inflateInit(windowBits);
-            if (ret != 0)
+            else
             {
-                // Log Error
-                throw new Exception("inflateInit failed.");
+                // Raw deflate (zlib format) - skip 2-byte zlib header
+                // zlib header is typically 0x78 0x01/0x5E/0x9C/0xDA
+                int b1 = input.ReadByte();
+                int b2 = input.ReadByte();
+                if (b1 == -1 || b2 == -1)
+                {
+                    this.endOfFileReached = true;
+                    this.decompressStream = null;
+                    return;
+                }
+
+                // Check if this looks like a zlib header
+                bool isZlibHeader = (b1 == 0x78) && ((b1 * 256 + b2) % 31 == 0);
+                if (!isZlibHeader)
+                {
+                    // Not a zlib header, put bytes back by wrapping in a new stream
+                    byte[] headerBytes = new byte[] { (byte)b1, (byte)b2 };
+                    Stream remaining = input;
+                    MemoryStream headerStream = new MemoryStream(headerBytes);
+                    input = new ConcatenatedStream(headerStream, remaining);
+                }
+
+                this.decompressStream = new DeflateStream(input, CompressionMode.Decompress, leaveOpen: true);
             }
         }
 
         public void Dispose()
         {
-            if (this.inflateState != null)
+            if (this.decompressStream != null)
             {
-                this.inflateState.inflateEnd();
+                this.decompressStream.Dispose();
+                this.decompressStream = null;
             }
         }
 
@@ -85,8 +75,7 @@ namespace H3Engine.FileSystem
             EnsureSize(this.ReadPosition + size);
 
             var toRead = Math.Min(size, (ulong)buffer.Length - this.ReadPosition);
-            /// buffer.Seek(this.Position, SeekOrigin.Begin);
-            
+
             if (toRead > 0)
             {
                 buffer.Seek((long)this.ReadPosition, SeekOrigin.Begin);
@@ -99,7 +88,7 @@ namespace H3Engine.FileSystem
 
         public void EnsureSize(UInt64 size)
         {
-            while(buffer.Length < (long)size && !this.endOfFileReached)
+            while (buffer.Length < (long)size && !this.endOfFileReached)
             {
                 var initialSize = buffer.Length;
                 var currentStep = (long)size - initialSize;
@@ -112,7 +101,7 @@ namespace H3Engine.FileSystem
                 }
             }
         }
-        
+
         public UInt64 GetSize()
         {
             return (UInt64)buffer.Length;
@@ -125,126 +114,104 @@ namespace H3Engine.FileSystem
             this.endOfFileReached = false;
         }
 
-
-
         /// <summary>
         /// Read more data into Buffer
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="size"></param>
-        /// <returns></returns>
         public UInt64 ReadMore(UInt64 size)
         {
-            if (this.inflateState == null)
+            if (this.decompressStream == null)
             {
                 return 0;
             }
 
-            bool fileEnded = false;
-            bool endLoop = false;
-
-            long decompressed = this.inflateState.total_out;
-
             byte[] data = new byte[(int)size];
+            int totalRead = 0;
 
-            this.inflateState.avail_out = (int)size;
-            this.inflateState.next_out = data;
-            this.inflateState.next_out_index = 0;
-
-            do
+            try
             {
-                if (this.inflateState.avail_in == 0)
+                while (totalRead < (int)size)
                 {
-                    //// byte[] newBuffer = inputReader.ReadBytes(compressedBuffer.Length);
-                    //// int availableSize = newBuffer.Length;
-                    //// compressedBuffer = newBuffer;
-                    ///
-                    byte[] newBuffer = new byte[compressedBuffer.Length];
-                    int availableSize = inputStream.Read(newBuffer, 0, compressedBuffer.Length);
-                    
-                    if (availableSize != compressedBuffer.Length)
+                    int bytesRead = this.decompressStream.Read(data, totalRead, (int)size - totalRead);
+                    if (bytesRead == 0)
                     {
-                        this.inputStream = null;
+                        this.endOfFileReached = true;
+                        break;
                     }
-
-                    this.inflateState.avail_in = availableSize;
-                    this.inflateState.next_in = newBuffer;
-                    this.inflateState.next_in_index = 0;
+                    totalRead += bytesRead;
                 }
-
-                try
-                {
-                    int ret = this.inflateState.inflate(FlushStrategy.Z_NO_FLUSH);
-
-                    if (this.inflateState.avail_in == 0 && inputStream == null)
-                    {
-                        fileEnded = true;
-                    }
-
-                    switch (ret)
-                    {
-                        case 0: // Z_OK
-                            break;
-                        case 1: // Z_STREAM_END
-                            endLoop = true;
-                            //// this.inflateState.inflate(FlushStrategy.Z_FULL_FLUSH);
-                            break;
-                        case -5: // Z_BUF_ERROR
-                            endLoop = true;
-                            break;
-                        default:
-                            throw new Exception("Inflate Error: " + this.inflateState.msg);
-                    }
-                }
-                catch(Exception ex)
-                {
-                    endLoop = true;
-                }
-
             }
-            while (!endLoop && inflateState.avail_out != 0);
-
-            /*
-            buffer.Seek((long)this.WritePosition, SeekOrigin.Begin);
-            buffer.Write(data, 0, data.Length);
-            this.WritePosition += (ulong)data.Length;
-            */
-            long newDecompressed = inflateState.total_out - decompressed;
-
-            buffer.Seek(0, SeekOrigin.End);
-            buffer.Write(data, 0, (int)newDecompressed);
-
-            //// this.WritePosition = (ulong)inflateState.total_out;
-            decompressed = inflateState.total_out;
-            if (fileEnded)
+            catch (Exception)
             {
                 this.endOfFileReached = true;
-                this.inflateState.inflateEnd();
-                this.inflateState = null;
             }
 
-            return (UInt64)decompressed;
+            if (totalRead > 0)
+            {
+                buffer.Seek(0, SeekOrigin.End);
+                buffer.Write(data, 0, totalRead);
+            }
+
+            if (this.endOfFileReached)
+            {
+                this.decompressStream.Dispose();
+                this.decompressStream = null;
+            }
+
+            return (UInt64)totalRead;
         }
 
         public bool GetNextBlock()
         {
-            if(this.inflateState == null)
+            if (this.decompressStream == null)
             {
                 return false;
             }
 
-            if (this.inflateState.inflateEnd() < 0)
-            {
-                return false;
-            }
-
-            if (this.inflateState.inflateInit() < 0)
-            {
-                return false;
-            }
-
+            // Reset buffer for next block
             Reset();
             return true;
         }
+    }
+
+    /// <summary>
+    /// Helper stream that concatenates two streams sequentially
+    /// </summary>
+    internal class ConcatenatedStream : Stream
+    {
+        private Stream first;
+        private Stream second;
+        private bool firstDone = false;
+
+        public ConcatenatedStream(Stream first, Stream second)
+        {
+            this.first = first;
+            this.second = second;
+        }
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            if (!firstDone)
+            {
+                int read = first.Read(buffer, offset, count);
+                if (read > 0) return read;
+                firstDone = true;
+            }
+            return second.Read(buffer, offset, count);
+        }
+
+        public override void Flush() { }
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
     }
 }

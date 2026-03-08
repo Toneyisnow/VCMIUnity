@@ -1,146 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6B2F62BF-4CFE-4DD0-BC3E-C37B4B00D980}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>H3Engine</RootNamespace>
     <AssemblyName>H3Engine</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <Optimize>true</Optimize>
   </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="ZipForge, Version=3.0.5.0, Culture=neutral, PublicKeyToken=3a6e82ca8e39718a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\ComponentAce\ZipForge.NET\Bin\ZipForge.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Components\Data\GameData.cs" />
-    <Compile Include="Components\Data\GameMap.cs" />
-    <Compile Include="Components\GameManager.cs" />
-    <Compile Include="Components\MapProviders\GameMapProvider.cs" />
-    <Compile Include="Components\MapProviders\MapPathFinder.cs" />
-    <Compile Include="Components\MapProviders\MapPathNode.cs" />
-    <Compile Include="Components\MapProviders\MapPathNodeInfo.cs" />
-    <Compile Include="Components\Messages\DialogMessage.cs" />
-    <Compile Include="Components\Messages\GameMessage.cs" />
-    <Compile Include="Components\Messages\HeroMovedMessage.cs" />
-    <Compile Include="Components\Messages\HeroMoveMessage.cs" />
-    <Compile Include="Components\Messages\NetMessage.cs" />
-    <Compile Include="Components\Messages\QueryReply.cs" />
-    <Compile Include="Components\OnlineGameClient.cs" />
-    <Compile Include="Components\Protocols\IBattleCallback.cs" />
-    <Compile Include="Components\Protocols\IGameCallback.cs" />
-    <Compile Include="Components\Protocols\IGameEventReceiver.cs" />
-    <Compile Include="Components\Protocols\IGameInterface.cs" />
-    <Compile Include="Components\Protocols\IMapCallback.cs" />
-    <Compile Include="Components\Protocols\IPriviledgedMapCallback.cs" />
-    <Compile Include="Components\Queries\DialogQuery.cs" />
-    <Compile Include="Components\Queries\HeroMoveQuery.cs" />
-    <Compile Include="Components\Queries\MappingQuery.cs" />
-    <Compile Include="Components\Queries\Query.cs" />
-    <Compile Include="Components\Queries\QueryManager.cs" />
-    <Compile Include="Components\StandaloneGameHandler.cs" />
-    <Compile Include="DataAccess\ResourceHandler.cs" />
-    <Compile Include="DataAccess\ResourceUsage.cs" />
-    <Compile Include="Campaign\CampaignHeader.cs" />
-    <Compile Include="Campaign\CampaignScenario.cs" />
-    <Compile Include="Campaign\H3Campaign.cs" />
-    <Compile Include="Campaign\H3CampaignLoader.cs" />
-    <Compile Include="Common\GameConstants.cs" />
-    <Compile Include="Common\Color.cs" />
-    <Compile Include="Common\ILogger.cs" />
-    <Compile Include="Components\Data\ArtifactSet.cs" />
-    <Compile Include="Components\Data\CreatureSet.cs" />
-    <Compile Include="Components\Data\ResourceSet.cs" />
-    <Compile Include="Core\AbilitySkill.cs" />
-    <Compile Include="Core\H3Artifact.cs" />
-    <Compile Include="Core\H3Creature.cs" />
-    <Compile Include="Core\H3Hero.cs" />
-    <Compile Include="Core\H3Spell.cs" />
-    <Compile Include="Core\MapPosition.cs" />
-    <Compile Include="Core\PlayerInfo.cs" />
-    <Compile Include="FileSystem\BinaryData.cs" />
-    <Compile Include="FileSystem\GZipStreamHelper.cs" />
-    <Compile Include="DataAccess\ResourceStorage.cs" />
-    <Compile Include="DataAccess\H3DataAccess.cs" />
-    <Compile Include="FileSystem\BinaryReaderExtension.cs" />
-    <Compile Include="FileSystem\CompressedStreamReader.cs" />
-    <Compile Include="FileSystem\H3ArchiveData.cs" />
-    <Compile Include="FileSystem\H3DefFileHandler.cs" />
-    <Compile Include="FileSystem\H3Save.cs" />
-    <Compile Include="FileSystem\IFileData.cs" />
-    <Compile Include="FileSystem\ImageData.cs" />
-    <Compile Include="FileSystem\ImageFileHandler.cs" />
-    <Compile Include="GUI\BundleImageDefinition.cs" />
-    <Compile Include="GUI\BundleImageFrame.cs" />
-    <Compile Include="GUI\BundleImageGroup.cs" />
-    <Compile Include="MapObjects\ArmedInstance.cs" />
-    <Compile Include="MapObjects\CGCreature.cs" />
-    <Compile Include="MapObjects\CGDwelling.cs" />
-    <Compile Include="MapObjects\CGEvent.cs" />
-    <Compile Include="MapObjects\CGObject.cs" />
-    <Compile Include="MapObjects\CGPandoraBox.cs" />
-    <Compile Include="MapObjects\CQuest.cs" />
-    <Compile Include="MapObjects\HeroInstance.cs" />
-    <Compile Include="MapObjects\MapObjectHelper.cs" />
-    <Compile Include="MapObjects\MiscObjects.cs" />
-    <Compile Include="MapObjects\ObjectTemplate.cs" />
-    <Compile Include="MapObjects\TownInstance.cs" />
-    <Compile Include="Mapping\CMapEvent.cs" />
-    <Compile Include="Mapping\H3Map.cs" />
-    <Compile Include="Mapping\H3MapLoader.cs" />
-    <Compile Include="Components\MapProviders\MapBlockManager.cs" />
-    <Compile Include="Mapping\MapHeader.cs" />
-    <Compile Include="Mapping\MapObjectReader.cs" />
-    <Compile Include="Mapping\TerrainTile.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\StreamHelper.cs" />
-    <Compile Include="Utils\StringUtils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>copy $(TargetDir)*.dll $(SolutionDir)..\UnityClient\Assets\Plugins /Y</PostBuildEvent>
-  </PropertyGroup>
+
 </Project>

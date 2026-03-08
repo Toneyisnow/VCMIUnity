@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Console",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Console/bin/Debug/net8.0/H3Console.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Console",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        }
+    ]
+}
