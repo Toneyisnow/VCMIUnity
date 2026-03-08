@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>H3Engine</RootNamespace>
     <AssemblyName>H3Engine</AssemblyName>
     <OutputType>Library</OutputType>

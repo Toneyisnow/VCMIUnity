@@ -1,0 +1,14 @@
+{
+    "dotnet.preferCSharpExtension": true,
+    "omnisharp.projectLoadTimeout": 120,
+    "dotnet.defaultSolution": "UnityClient.sln",
+    "files.exclude": {
+        "**/.git": true,
+        "**/*.meta": true,
+        "Library/": true,
+        "Temp/": true,
+        "obj/": true,
+        "Logs/": true,
+        "UserSettings/": true
+    }
+}

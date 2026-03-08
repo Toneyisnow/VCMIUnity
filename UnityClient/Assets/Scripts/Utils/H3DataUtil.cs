@@ -10,9 +10,11 @@ namespace Assets.Scripts.Utils
 {
     public class H3DataUtil
     {
+        private static readonly string GAME_DATA_FOLDER = Path.Combine(Application.dataPath, @"..\..\GameData\SOD");
+
         public static string GetGameDataFilePath(string filename)
         {
-            return Path.Combine(Application.streamingAssetsPath, @"GameData\SOD.zh-cn", filename);
+            return Path.Combine(GAME_DATA_FOLDER, filename);
         }
     }
 }

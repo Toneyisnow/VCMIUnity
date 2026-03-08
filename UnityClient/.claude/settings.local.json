@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -NoProfile -Command \"Get-ChildItem ''HKLM:\\\\SOFTWARE\\\\Unity'' -ErrorAction SilentlyContinue 2>$null | Select-Object Name\")",
+      "Bash(grep -v '^--$')",
+      "Bash(grep \"\\\\.dll$\")",
+      "Bash(mkdir -p \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Temp/bin/Debug\")",
+      "Bash(dotnet build UnityClient.sln)",
+      "Bash(dotnet build -c Debug)",
+      "Bash(grep -rh \"guid:\" Assets/Scenes/*.unity Assets/Prefabs/*.prefab)"
+    ]
+  }
+}
