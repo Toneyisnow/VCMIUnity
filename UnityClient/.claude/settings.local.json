@@ -17,7 +17,9 @@
       "Bash(xargs grep -l \"animation.*map\")",
       "Bash(xargs grep -l \"heroClass\\\\|animation.*map\")",
       "Bash(xargs grep -l \"ah0\\\\|imageMapMale\\\\|imageMapFemale\")",
-      "Bash(xargs grep -l \"mapObject\\\\|heroClass\")"
+      "Bash(xargs grep -l \"mapObject\\\\|heroClass\")",
+      "Bash(dotnet build H3Engine/H3Engine.csproj)",
+      "Bash(dotnet build H3Engine/H3Engine.csproj -c Release)"
     ]
   }
 }

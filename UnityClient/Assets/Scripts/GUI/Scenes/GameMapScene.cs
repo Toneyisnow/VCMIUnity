@@ -14,6 +14,7 @@ using UnityClient.Components;
 using UnityClient.Components.Mapping;
 using H3Engine.MapObjects;
 using H3Engine.Core;
+using H3Engine.Components.MapProviders;
 
 namespace UnityClient.GUI.Scenes
 {
@@ -47,7 +48,13 @@ namespace UnityClient.GUI.Scenes
 
         private MapCamera mapCamera = null;
 
-        private SimplePathFinder pathFinder = null;
+        // --- Pathfinder (replaces SimplePathFinder) ---
+        private PathfinderCache pathFinderCache = null;
+        private MapPathFinder pathFinder = null;
+
+        // Default hero movement points per turn (no hero-specific data yet).
+        // Typical H3 value: 1500 points = ~15 tiles on normal terrain per turn.
+        private const int DEFAULT_MAX_MOVEMENT_POINTS = 1500;
 
         // Tile size constants (must match MapLoader)
         private const float TILE_SIZE = 0.32f;
@@ -62,7 +69,7 @@ namespace UnityClient.GUI.Scenes
 
         // Destination and path
         private Vector2Int selectedDestination;
-        private List<Vector2Int> currentPath = null;
+        private List<MapPathNode> currentPath = null;
 
         // Movement animation
         private const float MOVE_SPEED = 3.0f; // tiles per second
@@ -90,7 +97,9 @@ namespace UnityClient.GUI.Scenes
             mapLoader.Initialize(gameMap);
             mapLoader.RenderMap();
 
-            pathFinder = new SimplePathFinder(gameMap);
+            // Initialize pathfinder (cache + Dijkstra engine)
+            pathFinderCache = new PathfinderCache();
+            pathFinder = new MapPathFinder(pathFinderCache);
 
             // Get MapCamera for click detection
             GameObject cameraObj = GameObject.Find("GameMap");
@@ -257,10 +266,16 @@ namespace UnityClient.GUI.Scenes
         {
             if (selectedHero == null) return;
 
-            int heroX = selectedHero.Position.PosX;
-            int heroY = selectedHero.Position.PosY;
+            // Build a pathfinding context for this hero.
+            // CurrentMovePoints == MaxMovePoints: hero has a full turn's movement available.
+            var ctx = new PathfinderContext(
+                selectedHero,
+                DEFAULT_MAX_MOVEMENT_POINTS,
+                DEFAULT_MAX_MOVEMENT_POINTS,
+                mapLoader.GameMap,
+                pathFinderCache.CurrentGameStateVersion);
 
-            List<Vector2Int> path = pathFinder.FindPath(heroX, heroY, tileX, tileY);
+            List<MapPathNode> path = pathFinder.GetPath(ctx, tileX, tileY);
             if (path == null || path.Count < 2)
             {
                 print(string.Format("No path to ({0}, {1})", tileX, tileY));
@@ -271,7 +286,7 @@ namespace UnityClient.GUI.Scenes
             selectedDestination = new Vector2Int(tileX, tileY);
             currentState = GameMapState.DestinationSelected;
 
-            // Display path on map
+            // Display path arrows on map
             mapLoader.ShowPath(currentPath);
 
             print(string.Format("Destination selected at ({0}, {1}), path length: {2}", tileX, tileY, path.Count));
@@ -309,18 +324,20 @@ namespace UnityClient.GUI.Scenes
             // Move along each segment of the path (skip index 0 which is the start)
             for (int i = 1; i < currentPath.Count; i++)
             {
-                Vector2Int prevTile = currentPath[i - 1];
-                Vector2Int targetTile = currentPath[i];
+                int prevX = currentPath[i - 1].Position.PosX;
+                int prevY = currentPath[i - 1].Position.PosY;
+                int targetX = currentPath[i].Position.PosX;
+                int targetY = currentPath[i].Position.PosY;
 
                 // Set hero walking animation to face the movement direction
-                int dx = Mathf.Clamp(targetTile.x - prevTile.x, -1, 1);
-                int dy = Mathf.Clamp(targetTile.y - prevTile.y, -1, 1);
+                int dx = Mathf.Clamp(targetX - prevX, -1, 1);
+                int dy = Mathf.Clamp(targetY - prevY, -1, 1);
                 lastDx = dx;
                 lastDy = dy;
                 mapLoader.SetHeroMovingAnimation(selectedHero, dx, dy);
 
                 Vector3 startPos = heroGO.transform.position;
-                Vector3 endPos = mapLoader.HeroTileToWorldPosition(targetTile.x, targetTile.y);
+                Vector3 endPos = mapLoader.HeroTileToWorldPosition(targetX, targetY);
 
                 float distance = Vector3.Distance(startPos, endPos);
                 float duration = distance / (MOVE_SPEED * 0.32f);
@@ -340,10 +357,19 @@ namespace UnityClient.GUI.Scenes
             // Movement complete - idle in the last facing direction
             mapLoader.SetHeroIdleAnimation(selectedHero, lastDx, lastDy);
 
-            Vector2Int finalTile = currentPath[currentPath.Count - 1];
-            mapLoader.UpdateHeroPosition(selectedHero, finalTile.x, finalTile.y);
+            MapPathNode finalNode = currentPath[currentPath.Count - 1];
+            int finalX = finalNode.Position.PosX;
+            int finalY = finalNode.Position.PosY;
+            mapLoader.UpdateHeroPosition(selectedHero, finalX, finalY);
 
-            print(string.Format("Hero arrived at ({0}, {1})", finalTile.x, finalTile.y));
+            print(string.Format("Hero arrived at ({0}, {1})", finalX, finalY));
+
+            // Invalidate cached paths for this hero: it has moved so all previously
+            // computed routes from its old position are now stale.
+            // Also bump the game-state version so other heroes' caches that might
+            // reference this hero's old position are invalidated on next use.
+            pathFinderCache.Invalidate(selectedHero.Identifier);
+            pathFinderCache.NextGameStateVersion();
 
             // Reset state
             currentPath = null;

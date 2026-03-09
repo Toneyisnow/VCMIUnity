@@ -4,12 +4,13 @@ using H3Engine.Core;
 using H3Engine.GUI;
 using H3Engine.MapObjects;
 using H3Engine.Mapping;
+using H3Engine.Components.Data;
+using H3Engine.Components.MapProviders;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityClient.GUI.Rendering;
 using UnityEngine;
-using H3Engine.Components.Data;
 
 namespace UnityClient.GUI.Mapping
 {
@@ -215,6 +216,21 @@ namespace UnityClient.GUI.Mapping
                     pathArrowObjects.Add(arrow);
                 }
             }
+        }
+
+        /// <summary>
+        /// Display path arrows for a list of MapPathNodes (from the new pathfinder).
+        /// Converts to tile positions and delegates to the Vector2Int overload.
+        /// </summary>
+        public void ShowPath(List<MapPathNode> path)
+        {
+            if (path == null || path.Count < 2) { ClearPath(); return; }
+
+            var tileList = new List<Vector2Int>(path.Count);
+            foreach (var node in path)
+                tileList.Add(new Vector2Int(node.Position.PosX, node.Position.PosY));
+
+            ShowPath(tileList);
         }
 
         /// <summary>
