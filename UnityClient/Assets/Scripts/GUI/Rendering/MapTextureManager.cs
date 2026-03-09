@@ -24,9 +24,15 @@ namespace UnityClient.GUI.Rendering
         private TextureSheet edgeTextureSheet = null;
         private TextureSheet cursorTextureSheet = null;
 
+        // Index-based cursor sprite array (adag.def has 50 sprites: 0-24 reachable, 25-49 unreachable)
+        private Sprite[] cursorSprites = null;
+
         // All map objects (artifacts, heroes, mines, resources, towns, decorations, etc.)
         // share a single atlas to maximize sprite batching and minimize draw calls.
         private BundleImageSheet mapObjectTextureSheet = null;
+
+        // Cache for hero directional sprites: defFileName → (groupIndex → Sprite[])
+        private Dictionary<string, Dictionary<int, Sprite[]>> heroGroupSpriteCache = new Dictionary<string, Dictionary<int, Sprite[]>>();
 
 
 
@@ -104,6 +110,59 @@ namespace UnityClient.GUI.Rendering
             return mapObjectTextureSheet.LoadSprites(defFileName);
         }
 
+        /// <summary>
+        /// Load hero sprites for a specific animation group from the DEF file.
+        /// Hero walking DEF structure: groups 0-4 = standing (N, NE, E, SE, S),
+        /// groups 5-9 = walking (N, NE, E, SE, S).
+        /// For NW/W/SW, caller should use NE/E/SE groups with horizontal flip.
+        /// </summary>
+        public Sprite[] LoadHeroGroupSprites(string defFileName, int groupIndex)
+        {
+            if (!heroGroupSpriteCache.TryGetValue(defFileName, out var groupDict))
+            {
+                groupDict = new Dictionary<int, Sprite[]>();
+                heroGroupSpriteCache[defFileName] = groupDict;
+            }
+
+            if (groupDict.TryGetValue(groupIndex, out Sprite[] cached))
+            {
+                return cached;
+            }
+
+            BundleImageDefinition bundleImage = h3dataAccess.RetrieveBundleImage(defFileName);
+            if (bundleImage == null)
+            {
+                MonoBehaviour.print(string.Format("[MapTextureManager] LoadHeroGroupSprites: bundleImage is null for {0}", defFileName));
+                return null;
+            }
+
+            MonoBehaviour.print(string.Format("[MapTextureManager] LoadHeroGroupSprites: {0} has {1} groups, requesting group {2}",
+                defFileName, bundleImage.Groups.Count, groupIndex));
+
+            if (groupIndex >= bundleImage.Groups.Count)
+            {
+                return null;
+            }
+
+            var group = bundleImage.Groups[groupIndex];
+            Sprite[] sprites = new Sprite[group.Frames.Count];
+            for (int f = 0; f < group.Frames.Count; f++)
+            {
+                ImageData imgData = bundleImage.GetImageData(groupIndex, f);
+                if (imgData == null) continue;
+                Texture2D tex = Texture2DExtension.LoadFromData(imgData);
+                if (tex == null) continue;
+                sprites[f] = Sprite.Create(
+                    tex,
+                    new Rect(0, 0, tex.width, tex.height),
+                    new Vector2(1, 0),
+                    Texture2DExtension.PIXELS_PER_UNIT);
+            }
+
+            groupDict[groupIndex] = sprites;
+            return sprites;
+        }
+
         public Sprite[] LoadTownSprites(string defFileName)
         {
             return mapObjectTextureSheet.LoadSprites(defFileName);
@@ -141,6 +200,19 @@ namespace UnityClient.GUI.Rendering
                 return null;
             }
             return cursorTextureSheet.RetrieveSprite(cursorKey);
+        }
+
+        /// <summary>
+        /// Retrieve a path/cursor sprite by index (0-49) from the preloaded adag.def sprites.
+        /// Indices 0-24 are reachable arrows, 25-49 are unreachable variants.
+        /// </summary>
+        public Sprite LoadCursorSpriteByIndex(int index)
+        {
+            if (cursorSprites == null || index < 0 || index >= cursorSprites.Length)
+            {
+                return null;
+            }
+            return cursorSprites[index];
         }
 
         //////////////////// Preload Functions ///////////////////
@@ -259,6 +331,7 @@ namespace UnityClient.GUI.Rendering
         private void PreloadCursorTextures()
         {
             cursorTextureSheet = new TextureSheet();
+            cursorSprites = new Sprite[50];
 
             BundleImageDefinition bundleImage = h3dataAccess.RetrieveBundleImage("adag.def");
 
@@ -312,6 +385,24 @@ namespace UnityClient.GUI.Rendering
             AddToTextureSheet(cursorTextureSheet, bundleImage, 47, @"V/_U");
             AddToTextureSheet(cursorTextureSheet, bundleImage, 48, @"/<_U");
             AddToTextureSheet(cursorTextureSheet, bundleImage, 49, @"<\_U");
+
+            cursorTextureSheet.PackTextures();
+
+            // Populate index-based sprite array directly from bundle image data.
+            // Cannot rely on TextureSheet keys because some indices share the same key
+            // (e.g. index 7 and 24 both map to "<\"), causing duplicates to be dropped.
+            for (int i = 0; i < 50; i++)
+            {
+                ImageData imgData = bundleImage.GetImageData(0, i);
+                if (imgData == null) continue;
+                Texture2D tex = Texture2DExtension.LoadFromData(imgData);
+                if (tex == null) continue;
+                cursorSprites[i] = Sprite.Create(
+                    tex,
+                    new Rect(0, 0, tex.width, tex.height),
+                    new Vector2(1, 0),
+                    Texture2DExtension.PIXELS_PER_UNIT);
+            }
         }
 
         private void AddToTextureSheet(TextureSheet textureSheet, BundleImageDefinition bundleImage, int index, string key)

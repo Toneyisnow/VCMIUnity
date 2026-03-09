@@ -46,8 +46,46 @@ namespace UnityClient.GUI.Mapping
         // Hero tracking: maps HeroInstance identifier to the hero's GameObject
         private Dictionary<uint, GameObject> heroGameObjects = new Dictionary<uint, GameObject>();
 
+        // Hero DEF file names: maps HeroInstance identifier to animation file name
+        private Dictionary<uint, string> heroDefFileNames = new Dictionary<uint, string>();
+
+        // Hero original sprites (all groups flat) for restoring after movement
+        private Dictionary<uint, Sprite[]> heroOriginalSprites = new Dictionary<uint, Sprite[]>();
+
         // Path arrow GameObjects currently displayed on map
         private List<GameObject> pathArrowObjects = new List<GameObject>();
+
+        /// <summary>
+        /// Hero DEF group mapping by movement direction (dx, dy).
+        /// Hero DEF structure: groups 0-4 = standing (N, NE, E, SE, S),
+        /// groups 5-9 = walking (N, NE, E, SE, S).
+        /// NW/W/SW use flipped NE/E/SE groups.
+        /// Based on VCMI moveGroups: {0, 10, 5, 6, 7, 8, 9, 12, 11}
+        /// Returns (groupIndex, flipX).
+        /// </summary>
+        private static (int group, bool flipX) GetHeroMoveGroup(int dx, int dy)
+        {
+            // Walking groups start at 5
+            // N
+            if (dx == 0 && dy == -1) return (5, false);
+            // NE
+            if (dx == 1 && dy == -1) return (6, false);
+            // E
+            if (dx == 1 && dy == 0) return (7, false);
+            // SE
+            if (dx == 1 && dy == 1) return (8, false);
+            // S
+            if (dx == 0 && dy == 1) return (9, false);
+            // SW = flipped SE (group 8)
+            if (dx == -1 && dy == 1) return (8, true);
+            // W = flipped E (group 7)
+            if (dx == -1 && dy == 0) return (7, true);
+            // NW = flipped NE (group 6)
+            if (dx == -1 && dy == -1) return (6, true);
+
+            // Fallback: standing N
+            return (0, false);
+        }
 
         public GameMap GameMap { get { return gameMap; } }
 
@@ -135,6 +173,7 @@ namespace UnityClient.GUI.Mapping
         /// <summary>
         /// Display path arrows on the map for a list of tile positions.
         /// path[0] = start (hero position), path[last] = destination.
+        /// Uses VCMI's 9x9 direction lookup table considering both enter and leave directions.
         /// </summary>
         public void ShowPath(List<Vector2Int> path)
         {
@@ -151,18 +190,21 @@ namespace UnityClient.GUI.Mapping
                 Sprite arrowSprite;
                 if (isDestination)
                 {
-                    arrowSprite = mapTextureManager.LoadCursorSprite("X");
+                    // Destination marker: index 0 = "X"
+                    arrowSprite = mapTextureManager.LoadCursorSpriteByIndex(0);
                 }
                 else
                 {
-                    // Calculate direction from current to next
+                    // Calculate enter direction (from previous tile to current)
+                    Vector2Int prev = path[i - 1];
+                    int enterDir = GetDirectionIndex(prev, current);
+
+                    // Calculate leave direction (from current tile to next)
                     Vector2Int next = path[i + 1];
-                    string key = GetDirectionSpriteKey(current, next);
-                    arrowSprite = mapTextureManager.LoadCursorSprite(key);
-                    if (arrowSprite == null)
-                    {
-                        arrowSprite = mapTextureManager.LoadCursorSprite("X");
-                    }
+                    int leaveDir = GetDirectionIndex(current, next);
+
+                    int arrowIndex = DirectionToArrowIndex[enterDir, leaveDir];
+                    arrowSprite = mapTextureManager.LoadCursorSpriteByIndex(arrowIndex);
                 }
 
                 if (arrowSprite != null)
@@ -201,31 +243,85 @@ namespace UnityClient.GUI.Mapping
             hero.Position = new MapPosition(newTileX, newTileY, hero.Position.Level);
         }
 
-        #endregion
+        /// <summary>
+        /// Set the hero's animation to the walking sprites for the given movement direction.
+        /// dx, dy: tile movement direction (-1, 0, or 1).
+        /// </summary>
+        public void SetHeroMovingAnimation(HeroInstance hero, int dx, int dy)
+        {
+            if (hero == null) return;
+            if (!heroGameObjects.TryGetValue(hero.Identifier, out GameObject heroGO)) return;
+            if (!heroDefFileNames.TryGetValue(hero.Identifier, out string defFileName)) return;
 
-        #region Direction Sprite Key Mapping
+            var (group, flipX) = GetHeroMoveGroup(dx, dy);
+            Sprite[] groupSprites = mapTextureManager.LoadHeroGroupSprites(defFileName, group);
+
+            Debug.Log(string.Format("[MapLoader] SetHeroMovingAnimation: dx={0} dy={1} -> group={2} flipX={3}, defFile={4}, sprites={5}",
+                dx, dy, group, flipX, defFileName,
+                groupSprites != null ? groupSprites.Length.ToString() : "null"));
+
+            AnimatedMapObject animated = heroGO.GetComponent<AnimatedMapObject>();
+            if (animated != null && groupSprites != null && groupSprites.Length > 0)
+            {
+                animated.SetSprites(groupSprites, 4);
+                animated.SetFlipX(flipX);
+            }
+            else
+            {
+                Debug.Log(string.Format("[MapLoader] SetHeroMovingAnimation FAILED: animated={0}, groupSprites={1}",
+                    animated != null, groupSprites != null ? groupSprites.Length.ToString() : "null"));
+            }
+        }
 
         /// <summary>
-        /// Map movement direction (from current to next tile) to an adag.def sprite key.
-        /// Uses the double-arrow keys for path continuation tiles.
+        /// Restore the hero's animation to the default (all groups) after movement.
         /// </summary>
-        private string GetDirectionSpriteKey(Vector2Int from, Vector2Int to)
+        public void SetHeroIdleAnimation(HeroInstance hero)
         {
-            int dx = to.x - from.x;
-            int dy = to.y - from.y;
+            if (hero == null) return;
+            if (!heroGameObjects.TryGetValue(hero.Identifier, out GameObject heroGO)) return;
+            if (!heroOriginalSprites.TryGetValue(hero.Identifier, out Sprite[] originalSprites)) return;
 
-            // dy is inverted: positive dy = moving down on screen
-            // Map (dx, dy) to H3 path arrow keys
-            if (dx == 0 && dy == -1) return "AA";     // North
-            if (dx == 1 && dy == -1) return @"//A";   // NE
-            if (dx == 1 && dy == 0) return ">>";       // East
-            if (dx == 1 && dy == 1) return @"\\V";     // SE
-            if (dx == 0 && dy == 1) return "VV";       // South
-            if (dx == -1 && dy == 1) return @"//V";    // SW
-            if (dx == -1 && dy == 0) return "<<";      // West
-            if (dx == -1 && dy == -1) return @"\\A";   // NW
+            AnimatedMapObject animated = heroGO.GetComponent<AnimatedMapObject>();
+            if (animated != null)
+            {
+                animated.SetSprites(originalSprites, 18);
+                animated.SetFlipX(false);
+            }
+        }
 
-            return "X"; // fallback
+        #endregion
+
+        #region VCMI Direction Lookup Table
+
+        /// <summary>
+        /// VCMI's 9x9 direction-to-arrow-index lookup table from MapRenderer.cpp.
+        /// Rows = enter direction (from previous tile), Columns = leave direction (to next tile).
+        /// Direction index: (dx+1) + 3*(dy+1) where dx/dy are -1, 0, or 1.
+        /// 0=NW, 1=N, 2=NE, 3=W, 4=center, 5=E, 6=SW, 7=S, 8=SE
+        /// </summary>
+        private static readonly int[,] DirectionToArrowIndex = new int[,]
+        {
+            {16, 17, 18, 7,  0, 19, 6,  5,  12},
+            {8,  9,  18, 7,  0, 19, 6,  13, 20},
+            {8,  1,  10, 7,  0, 19, 14, 21, 20},
+            {24, 17, 18, 15, 0, 11, 6,  5,  4 },
+            {0,  0,  0,  0,  0, 0,  0,  0,  0 },
+            {8,  1,  2,  15, 0, 11, 22, 21, 20},
+            {24, 17, 10, 23, 0, 3,  14, 5,  4 },
+            {24, 9,  2,  23, 0, 3,  22, 13, 4 },
+            {16, 1,  2,  23, 0, 3,  22, 21, 12},
+        };
+
+        /// <summary>
+        /// Calculate the direction index (0-8) for movement from one tile to an adjacent tile.
+        /// Formula: (dx+1) + 3*(dy+1)
+        /// </summary>
+        private int GetDirectionIndex(Vector2Int from, Vector2Int to)
+        {
+            int dx = Mathf.Clamp(to.x - from.x, -1, 1);
+            int dy = Mathf.Clamp(to.y - from.y, -1, 1);
+            return (dx + 1) + 3 * (dy + 1);
         }
 
         #endregion
@@ -310,8 +406,19 @@ namespace UnityClient.GUI.Mapping
                     Sprite[] sprites = mapTextureManager.LoadHeroSprites(template.AnimationFile);
                     GameObject heroGO = CreateSubChildAnimatedObject("Heroes", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Hero, "Hero_" + obj.Identifier);
 
-                    // Track hero GameObjects for movement
+                    // Track hero GameObjects and original sprites for movement
                     heroGameObjects[obj.Identifier] = heroGO;
+                    heroOriginalSprites[obj.Identifier] = sprites;
+
+                    // Derive the walking animation DEF file name:
+                    // Template uses editor sprite (e.g. "ah02_e.def"), walking animation is "ah02_.def"
+                    string walkDefFile = template.AnimationFile;
+                    if (walkDefFile.Contains("_e.def"))
+                    {
+                        walkDefFile = walkDefFile.Replace("_e.def", "_.def");
+                    }
+                    heroDefFileNames[obj.Identifier] = walkDefFile;
+                    Debug.Log(string.Format("[MapLoader] Hero {0}: templateDef={1}, walkDef={2}", obj.Identifier, template.AnimationFile, walkDefFile));
                 }
                 else
                 {

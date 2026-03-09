@@ -305,7 +305,14 @@ namespace UnityClient.GUI.Scenes
             // Move along each segment of the path (skip index 0 which is the start)
             for (int i = 1; i < currentPath.Count; i++)
             {
+                Vector2Int prevTile = currentPath[i - 1];
                 Vector2Int targetTile = currentPath[i];
+
+                // Set hero walking animation to face the movement direction
+                int dx = Mathf.Clamp(targetTile.x - prevTile.x, -1, 1);
+                int dy = Mathf.Clamp(targetTile.y - prevTile.y, -1, 1);
+                mapLoader.SetHeroMovingAnimation(selectedHero, dx, dy);
+
                 Vector3 startPos = heroGO.transform.position;
                 Vector3 endPos = mapLoader.TileToWorldPosition(targetTile.x, targetTile.y);
 
@@ -324,7 +331,9 @@ namespace UnityClient.GUI.Scenes
                 heroGO.transform.position = endPos;
             }
 
-            // Movement complete - update hero data position
+            // Movement complete - restore idle animation and update position
+            mapLoader.SetHeroIdleAnimation(selectedHero);
+
             Vector2Int finalTile = currentPath[currentPath.Count - 1];
             mapLoader.UpdateHeroPosition(selectedHero, finalTile.x, finalTile.y);
 

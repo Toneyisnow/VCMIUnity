@@ -31,6 +31,36 @@ namespace UnityClient.GUI.Mapping
             }
         }
 
+        /// <summary>
+        /// Swap the animation sprites at runtime (e.g. for directional movement).
+        /// Optionally set a faster tick count for walking animation.
+        /// </summary>
+        public void SetSprites(Sprite[] sprites, int tickCount = -1)
+        {
+            mainSprites = sprites;
+            if (tickCount > 0)
+            {
+                frameTickCount = tickCount;
+            }
+            frameTick = 0;
+            frameIndex = 0;
+            if (mainSprites != null && mainSprites.Length > 0 && cachedRenderer != null)
+            {
+                cachedRenderer.sprite = mainSprites[0];
+            }
+        }
+
+        /// <summary>
+        /// Set horizontal flip on the SpriteRenderer.
+        /// </summary>
+        public void SetFlipX(bool flip)
+        {
+            if (cachedRenderer != null)
+            {
+                cachedRenderer.flipX = flip;
+            }
+        }
+
         void Update()
         {
             if (mainSprites == null || mainSprites.Length == 0)

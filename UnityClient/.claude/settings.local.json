@@ -10,7 +10,14 @@
       "Bash(grep -rh \"guid:\" Assets/Scenes/*.unity Assets/Prefabs/*.prefab)",
       "Bash(dotnet build Assembly-CSharp.csproj)",
       "Bash(dotnet build -c Release)",
-      "Bash(dotnet build --no-restore)"
+      "Bash(dotnet build --no-restore)",
+      "Bash(grep -E \"\\\\.\\(h|cpp|md|txt\\)$\")",
+      "Bash(xargs grep -l \"class.*Hero\\\\|CHero\")",
+      "Bash(xargs grep -l \"imageMapMale\\\\|imageMapFemale\")",
+      "Bash(xargs grep -l \"animation.*map\")",
+      "Bash(xargs grep -l \"heroClass\\\\|animation.*map\")",
+      "Bash(xargs grep -l \"ah0\\\\|imageMapMale\\\\|imageMapFemale\")",
+      "Bash(xargs grep -l \"mapObject\\\\|heroClass\")"
     ]
   }
 }
