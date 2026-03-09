@@ -65,7 +65,9 @@ namespace UnityClient.GUI.Mapping
         /// </summary>
         private static (int group, bool flipX) GetHeroMoveGroup(int dx, int dy)
         {
-            // Walking groups start at 5
+            // Walking groups in DEF: 5=N, 6=NE, 7=E, 8=SE, 9=S
+            // Groups 6/7/8 face right (NE/E/SE) natively.
+            // For NW/W/SW, flip the corresponding right-facing group.
             // N
             if (dx == 0 && dy == -1) return (5, false);
             // NE
@@ -230,9 +232,14 @@ namespace UnityClient.GUI.Mapping
         /// <summary>
         /// Convert tile coordinates to world position.
         /// </summary>
-        public Vector3 TileToWorldPosition(int tileX, int tileY)
+        /// <summary>
+        /// Convert tile coordinates to hero world position.
+        /// Hero sprites are wider than 1 tile, so X is shifted +1 to align the
+        /// visible character with the correct terrain tile.
+        /// </summary>
+        public Vector3 HeroTileToWorldPosition(int tileX, int tileY)
         {
-            return GetMapPosition(tileX, tileY);
+            return GetMapPosition(tileX + 1, tileY);
         }
 
         /// <summary>
@@ -254,39 +261,36 @@ namespace UnityClient.GUI.Mapping
             if (!heroDefFileNames.TryGetValue(hero.Identifier, out string defFileName)) return;
 
             var (group, flipX) = GetHeroMoveGroup(dx, dy);
-            Sprite[] groupSprites = mapTextureManager.LoadHeroGroupSprites(defFileName, group);
-
-            Debug.Log(string.Format("[MapLoader] SetHeroMovingAnimation: dx={0} dy={1} -> group={2} flipX={3}, defFile={4}, sprites={5}",
-                dx, dy, group, flipX, defFileName,
-                groupSprites != null ? groupSprites.Length.ToString() : "null"));
+            // Pass flipX to create pre-flipped sprites with correct pivot (0,0) for flipped, (1,0) for normal
+            Sprite[] groupSprites = mapTextureManager.LoadHeroGroupSprites(defFileName, group, flipX);
 
             AnimatedMapObject animated = heroGO.GetComponent<AnimatedMapObject>();
             if (animated != null && groupSprites != null && groupSprites.Length > 0)
             {
-                animated.SetSprites(groupSprites, 4);
-                animated.SetFlipX(flipX);
-            }
-            else
-            {
-                Debug.Log(string.Format("[MapLoader] SetHeroMovingAnimation FAILED: animated={0}, groupSprites={1}",
-                    animated != null, groupSprites != null ? groupSprites.Length.ToString() : "null"));
+                animated.SetSprites(groupSprites, 8);
             }
         }
 
         /// <summary>
-        /// Restore the hero's animation to the default (all groups) after movement.
+        /// Set hero to idle/standing animation facing the given movement direction.
+        /// Standing groups 0-4 correspond to walking groups 5-9 (N, NE, E, SE, S).
         /// </summary>
-        public void SetHeroIdleAnimation(HeroInstance hero)
+        public void SetHeroIdleAnimation(HeroInstance hero, int dx, int dy)
         {
             if (hero == null) return;
             if (!heroGameObjects.TryGetValue(hero.Identifier, out GameObject heroGO)) return;
-            if (!heroOriginalSprites.TryGetValue(hero.Identifier, out Sprite[] originalSprites)) return;
+            if (!heroDefFileNames.TryGetValue(hero.Identifier, out string defFileName)) return;
+
+            // Standing group = walking group - 5 (groups 0-4 = standing N, NE, E, SE, S)
+            var (walkGroup, flipX) = GetHeroMoveGroup(dx, dy);
+            int standGroup = walkGroup - 5;
+
+            Sprite[] groupSprites = mapTextureManager.LoadHeroGroupSprites(defFileName, standGroup, flipX);
 
             AnimatedMapObject animated = heroGO.GetComponent<AnimatedMapObject>();
-            if (animated != null)
+            if (animated != null && groupSprites != null && groupSprites.Length > 0)
             {
-                animated.SetSprites(originalSprites, 18);
-                animated.SetFlipX(false);
+                animated.SetSprites(groupSprites, 18);
             }
         }
 
@@ -404,7 +408,9 @@ namespace UnityClient.GUI.Mapping
                 else if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER)
                 {
                     Sprite[] sprites = mapTextureManager.LoadHeroSprites(template.AnimationFile);
-                    GameObject heroGO = CreateSubChildAnimatedObject("Heroes", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Hero, "Hero_" + obj.Identifier);
+                    // Hero sprites are wider than 1 tile; with pivot (1,0) the character
+                    // appears 1 tile to the left of the position. Shift X+1 to compensate.
+                    GameObject heroGO = CreateSubChildAnimatedObject("Heroes", GetMapPosition(position.PosX + 1, position.PosY), sprites, SortOrder_Hero, "Hero_" + obj.Identifier);
 
                     // Track hero GameObjects and original sprites for movement
                     heroGameObjects[obj.Identifier] = heroGO;

@@ -122,10 +122,11 @@ namespace UnityClient.GUI.Scenes
                 return;
 
             // Convert world position to tile coordinates
-            // Sprite pivot is (1, 0) = bottom-right, so tiles extend left and up from anchor
+            // Pivot (1,0) shifts visual tile area by 1 cell from the Floor grid.
+            // Add +1 to both axes to compensate.
             Vector3 worldPos = mapCamera.ClickWorldPosition;
             int tileX = Mathf.FloorToInt((worldPos.x - MAP_OFFSET_X) / TILE_SIZE) + 1;
-            int tileY = Mathf.FloorToInt((MAP_OFFSET_Y - worldPos.y) / TILE_SIZE);
+            int tileY = Mathf.FloorToInt((MAP_OFFSET_Y - worldPos.y) / TILE_SIZE) + 1;
 
             Debug.Log(string.Format("[GameMapScene] Click detected! world=({0:F2}, {1:F2}) -> tile=({2}, {3}) state={4}",
                 worldPos.x, worldPos.y, tileX, tileY, currentState));
@@ -302,6 +303,9 @@ namespace UnityClient.GUI.Scenes
                 yield break;
             }
 
+            // Track last movement direction for idle pose
+            int lastDx = 0, lastDy = 1;
+
             // Move along each segment of the path (skip index 0 which is the start)
             for (int i = 1; i < currentPath.Count; i++)
             {
@@ -311,10 +315,12 @@ namespace UnityClient.GUI.Scenes
                 // Set hero walking animation to face the movement direction
                 int dx = Mathf.Clamp(targetTile.x - prevTile.x, -1, 1);
                 int dy = Mathf.Clamp(targetTile.y - prevTile.y, -1, 1);
+                lastDx = dx;
+                lastDy = dy;
                 mapLoader.SetHeroMovingAnimation(selectedHero, dx, dy);
 
                 Vector3 startPos = heroGO.transform.position;
-                Vector3 endPos = mapLoader.TileToWorldPosition(targetTile.x, targetTile.y);
+                Vector3 endPos = mapLoader.HeroTileToWorldPosition(targetTile.x, targetTile.y);
 
                 float distance = Vector3.Distance(startPos, endPos);
                 float duration = distance / (MOVE_SPEED * 0.32f);
@@ -331,8 +337,8 @@ namespace UnityClient.GUI.Scenes
                 heroGO.transform.position = endPos;
             }
 
-            // Movement complete - restore idle animation and update position
-            mapLoader.SetHeroIdleAnimation(selectedHero);
+            // Movement complete - idle in the last facing direction
+            mapLoader.SetHeroIdleAnimation(selectedHero, lastDx, lastDy);
 
             Vector2Int finalTile = currentPath[currentPath.Count - 1];
             mapLoader.UpdateHeroPosition(selectedHero, finalTile.x, finalTile.y);

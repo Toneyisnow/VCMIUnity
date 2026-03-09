@@ -114,17 +114,20 @@ namespace UnityClient.GUI.Rendering
         /// Load hero sprites for a specific animation group from the DEF file.
         /// Hero walking DEF structure: groups 0-4 = standing (N, NE, E, SE, S),
         /// groups 5-9 = walking (N, NE, E, SE, S).
-        /// For NW/W/SW, caller should use NE/E/SE groups with horizontal flip.
+        /// For NW/W/SW, use NE/E/SE groups with flipX=true to create pre-flipped sprites.
         /// </summary>
-        public Sprite[] LoadHeroGroupSprites(string defFileName, int groupIndex)
+        public Sprite[] LoadHeroGroupSprites(string defFileName, int groupIndex, bool flipX = false)
         {
+            // Use negative groupIndex in cache key for flipped versions
+            int cacheKey = flipX ? -(groupIndex + 1) : groupIndex;
+
             if (!heroGroupSpriteCache.TryGetValue(defFileName, out var groupDict))
             {
                 groupDict = new Dictionary<int, Sprite[]>();
                 heroGroupSpriteCache[defFileName] = groupDict;
             }
 
-            if (groupDict.TryGetValue(groupIndex, out Sprite[] cached))
+            if (groupDict.TryGetValue(cacheKey, out Sprite[] cached))
             {
                 return cached;
             }
@@ -132,12 +135,8 @@ namespace UnityClient.GUI.Rendering
             BundleImageDefinition bundleImage = h3dataAccess.RetrieveBundleImage(defFileName);
             if (bundleImage == null)
             {
-                MonoBehaviour.print(string.Format("[MapTextureManager] LoadHeroGroupSprites: bundleImage is null for {0}", defFileName));
                 return null;
             }
-
-            MonoBehaviour.print(string.Format("[MapTextureManager] LoadHeroGroupSprites: {0} has {1} groups, requesting group {2}",
-                defFileName, bundleImage.Groups.Count, groupIndex));
 
             if (groupIndex >= bundleImage.Groups.Count)
             {
@@ -152,6 +151,13 @@ namespace UnityClient.GUI.Rendering
                 if (imgData == null) continue;
                 Texture2D tex = Texture2DExtension.LoadFromData(imgData);
                 if (tex == null) continue;
+
+                if (flipX)
+                {
+                    FlipTextureHorizontally(tex);
+                }
+
+                // Always use pivot (1, 0) = bottom-right to match action tile anchor
                 sprites[f] = Sprite.Create(
                     tex,
                     new Rect(0, 0, tex.width, tex.height),
@@ -159,7 +165,7 @@ namespace UnityClient.GUI.Rendering
                     Texture2DExtension.PIXELS_PER_UNIT);
             }
 
-            groupDict[groupIndex] = sprites;
+            groupDict[cacheKey] = sprites;
             return sprites;
         }
 
@@ -449,6 +455,28 @@ namespace UnityClient.GUI.Rendering
 
             mapObjectTextureSheet.PackTextures();
             ProfilerLogger.RecordProfile("PreloadMapObjectTextures: texturesheet packed:");
+        }
+
+        /// <summary>
+        /// Flip a Texture2D horizontally in-place (mirror left-right).
+        /// </summary>
+        private static void FlipTextureHorizontally(Texture2D texture)
+        {
+            Color32[] pixels = texture.GetPixels32();
+            int width = texture.width;
+            int height = texture.height;
+            Color32[] flipped = new Color32[pixels.Length];
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    flipped[y * width + x] = pixels[y * width + (width - 1 - x)];
+                }
+            }
+
+            texture.SetPixels32(flipped);
+            texture.Apply();
         }
     }
 }
