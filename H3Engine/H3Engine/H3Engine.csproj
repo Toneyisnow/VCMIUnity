@@ -22,4 +22,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
+  <Target Name="CopyToUnityPlugins" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFolder="$(ProjectDir)..\..\UnityClient\Assets\Plugins\"
+          SkipUnchangedFiles="true" />
+    <Message Importance="high" Text="Copied $(TargetFileName) to UnityClient/Assets/Plugins/" />
+  </Target>
+
 </Project>

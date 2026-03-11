@@ -88,6 +88,11 @@ namespace H3Engine.Core
             get; set;
         }
 
+        public int Speed
+        {
+            get; set;
+        }
+
         #endregion
 
         #region Battle Field

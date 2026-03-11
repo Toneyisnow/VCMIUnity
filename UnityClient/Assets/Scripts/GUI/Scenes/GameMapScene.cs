@@ -52,8 +52,7 @@ namespace UnityClient.GUI.Scenes
         private PathfinderCache pathFinderCache = null;
         private MapPathFinder pathFinder = null;
 
-        // Default hero movement points per turn (no hero-specific data yet).
-        // Typical H3 value: 1500 points = ~15 tiles on normal terrain per turn.
+        // Fallback movement points if hero data is unavailable.
         private const int DEFAULT_MAX_MOVEMENT_POINTS = 1500;
 
         // Tile size constants (must match MapLoader)
@@ -266,14 +265,19 @@ namespace UnityClient.GUI.Scenes
         {
             if (selectedHero == null) return;
 
-            // Build a pathfinding context for this hero.
-            // CurrentMovePoints == MaxMovePoints: hero has a full turn's movement available.
+            // Use hero's actual movement points
+            int maxMP = selectedHero.GetEffectiveMovePoint();
+            int currentMP = selectedHero.GetCurrentMovePoint();
+
             var ctx = new PathfinderContext(
                 selectedHero,
-                DEFAULT_MAX_MOVEMENT_POINTS,
-                DEFAULT_MAX_MOVEMENT_POINTS,
+                maxMP,
+                currentMP,
                 mapLoader.GameMap,
                 pathFinderCache.CurrentGameStateVersion);
+
+            // Debug: dump accessibility around hero's position
+            print(pathFinder.DebugDumpAccessibility(ctx));
 
             List<MapPathNode> path = pathFinder.GetPath(ctx, tileX, tileY);
             if (path == null || path.Count < 2)
@@ -286,10 +290,11 @@ namespace UnityClient.GUI.Scenes
             selectedDestination = new Vector2Int(tileX, tileY);
             currentState = GameMapState.DestinationSelected;
 
-            // Display path arrows on map
+            // Display path arrows on map (green for reachable, orange for unreachable this turn)
             mapLoader.ShowPath(currentPath);
 
-            print(string.Format("Destination selected at ({0}, {1}), path length: {2}", tileX, tileY, path.Count));
+            print(string.Format("Destination selected at ({0}, {1}), path length: {2}, maxMP: {3}, currentMP: {4}",
+                tileX, tileY, path.Count, maxMP, currentMP));
         }
 
         private void StartHeroMovement()
@@ -309,11 +314,47 @@ namespace UnityClient.GUI.Scenes
 
         #region Movement Animation
 
+        /// <summary>
+        /// Find the index of the last node in the path that is reachable this turn (Turns == 0).
+        /// Returns -1 if no node is reachable (shouldn't happen since path[0] is always Turns == 0).
+        /// </summary>
+        private int FindLastReachableIndex(List<MapPathNode> path)
+        {
+            int lastReachable = 0;
+            for (int i = 1; i < path.Count; i++)
+            {
+                if (path[i].Turns == 0)
+                {
+                    lastReachable = i;
+                }
+                else
+                {
+                    break; // Nodes beyond are all future turns
+                }
+            }
+            return lastReachable;
+        }
+
         private IEnumerator MoveHeroAlongPath()
         {
             GameObject heroGO = mapLoader.GetHeroGameObject(selectedHero);
             if (heroGO == null)
             {
+                print("[MoveHero] heroGO is null, aborting.");
+                currentState = GameMapState.Idle;
+                yield break;
+            }
+
+            // Determine how far the hero can move this turn
+            int lastReachableIndex = FindLastReachableIndex(currentPath);
+            print(string.Format("[MoveHero] path.Count={0}, lastReachableIndex={1}, node[1].Turns={2}",
+                currentPath.Count, lastReachableIndex,
+                currentPath.Count > 1 ? currentPath[1].Turns.ToString() : "N/A"));
+
+            if (lastReachableIndex < 1)
+            {
+                // No reachable tile beyond start - hero can't move
+                print("Hero has no movement points remaining this turn.");
                 currentState = GameMapState.Idle;
                 yield break;
             }
@@ -321,8 +362,8 @@ namespace UnityClient.GUI.Scenes
             // Track last movement direction for idle pose
             int lastDx = 0, lastDy = 1;
 
-            // Move along each segment of the path (skip index 0 which is the start)
-            for (int i = 1; i < currentPath.Count; i++)
+            // Move along each segment of the path up to the last reachable tile
+            for (int i = 1; i <= lastReachableIndex; i++)
             {
                 int prevX = currentPath[i - 1].Position.PosX;
                 int prevY = currentPath[i - 1].Position.PosY;
@@ -357,17 +398,20 @@ namespace UnityClient.GUI.Scenes
             // Movement complete - idle in the last facing direction
             mapLoader.SetHeroIdleAnimation(selectedHero, lastDx, lastDy);
 
-            MapPathNode finalNode = currentPath[currentPath.Count - 1];
-            int finalX = finalNode.Position.PosX;
-            int finalY = finalNode.Position.PosY;
+            MapPathNode stopNode = currentPath[lastReachableIndex];
+            int finalX = stopNode.Position.PosX;
+            int finalY = stopNode.Position.PosY;
             mapLoader.UpdateHeroPosition(selectedHero, finalX, finalY);
 
-            print(string.Format("Hero arrived at ({0}, {1})", finalX, finalY));
+            // Update remaining movement points from the pathfinder node's actual value
+            selectedHero.RestMovePoint = stopNode.MoveRemains;
 
-            // Invalidate cached paths for this hero: it has moved so all previously
-            // computed routes from its old position are now stale.
-            // Also bump the game-state version so other heroes' caches that might
-            // reference this hero's old position are invalidated on next use.
+            bool reachedFinalDestination = (lastReachableIndex == currentPath.Count - 1);
+            print(string.Format("Hero stopped at ({0}, {1}), restMP={2}{3}",
+                finalX, finalY, selectedHero.RestMovePoint,
+                reachedFinalDestination ? " - reached destination" : " - out of movement points"));
+
+            // Invalidate cached paths for this hero
             pathFinderCache.Invalidate(selectedHero.Identifier);
             pathFinderCache.NextGameStateVersion();
 

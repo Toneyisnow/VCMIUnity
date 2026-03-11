@@ -19,7 +19,14 @@
       "Bash(xargs grep -l \"ah0\\\\|imageMapMale\\\\|imageMapFemale\")",
       "Bash(xargs grep -l \"mapObject\\\\|heroClass\")",
       "Bash(dotnet build H3Engine/H3Engine.csproj)",
-      "Bash(dotnet build H3Engine/H3Engine.csproj -c Release)"
+      "Bash(dotnet build H3Engine/H3Engine.csproj -c Release)",
+      "Bash(xargs grep -l \"arrow\\\\|Arrow\\\\|ARROW\")",
+      "Bash(xargs grep -l \"HeroMovement\\\\|hero.*move\\\\|click.*tile\" -i)",
+      "Bash(xargs grep -l \"LOD\\\\|lod\")",
+      "Bash(xargs grep -l \"HEROES_MOVEMENT_POINTS\")",
+      "Bash(xargs grep -l \"movementPointsLand\\\\|movementPointsSea\")",
+      "Bash(xargs grep -l \"valOfBonuses\")",
+      "Bash(dotnet build)"
     ]
   }
 }

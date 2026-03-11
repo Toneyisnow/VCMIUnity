@@ -188,6 +188,17 @@ namespace H3Engine.Components.MapProviders
         }
 
         /// <summary>
+        /// Debug: dump accessibility around the hero's position.
+        /// </summary>
+        public string DebugDumpAccessibility(PathfinderContext context)
+        {
+            var evaluator = new PathAccessibilityEvaluator(context.GameMap);
+            int hx = context.Hero.Position.PosX;
+            int hy = context.Hero.Position.PosY;
+            return evaluator.DumpAccessibilityAround(hx, hy, context);
+        }
+
+        /// <summary>
         /// Shortcut: returns all tiles reachable this turn for the given hero.
         /// </summary>
         public HashSet<MapPathNode> GetReachableThisTurn(PathfinderContext context)

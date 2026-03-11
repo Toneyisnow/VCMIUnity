@@ -218,5 +218,42 @@ namespace H3Engine.Components.MapProviders
 
             return MapPathNode.ENodeAction.NORMAL;
         }
+
+        /// <summary>
+        /// Debug: dump accessibility and block info for all tiles in a 5x5 area around (cx, cy).
+        /// </summary>
+        public string DumpAccessibilityAround(int cx, int cy, PathfinderContext context)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine(string.Format("[PathDebug] Accessibility around ({0},{1}):", cx, cy));
+
+            for (int dy = -2; dy <= 2; dy++)
+            {
+                for (int dx = -2; dx <= 2; dx++)
+                {
+                    int x = cx + dx;
+                    int y = cy + dy;
+                    if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) continue;
+
+                    var acc = EvaluateAccessibility(x, y, context);
+                    int key = y * mapWidth + x;
+                    string extra = "";
+
+                    var tile = gameMap.TerrainTiles[x, y];
+                    if (tile.IsBlocked) extra += " tile.IsBlocked";
+                    if (tile.IsWater) extra += " WATER";
+
+                    if (staticTileInfo.TryGetValue(key, out var objInfo))
+                    {
+                        if (objInfo.IsBlocked) extra += string.Format(" obj.BLOCKED({0})", objInfo.ObjectType);
+                        if (objInfo.IsVisitable) extra += string.Format(" obj.VISIT({0})", objInfo.ObjectType);
+                    }
+
+                    string marker = (dx == 0 && dy == 0) ? " [HERO]" : "";
+                    sb.AppendLine(string.Format("  ({0},{1}): {2}{3}{4}", x, y, acc, extra, marker));
+                }
+            }
+            return sb.ToString();
+        }
     }
 }

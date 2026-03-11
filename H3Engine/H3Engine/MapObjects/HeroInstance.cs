@@ -54,6 +54,9 @@ namespace H3Engine.MapObjects
             {
                 this.Data = data;
             }
+
+            // Initialize rest move points to full effective move points
+            RestMovePoint = -1; // -1 means "not yet initialized, use full"
         }
 
         public H3Hero Data
@@ -61,7 +64,44 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-       
+        /// <summary>
+        /// Remaining movement points for the current turn.
+        /// Reset to GetEffectiveMovePoint() at the start of each turn.
+        /// Value of -1 means uninitialized (treat as full move points).
+        /// </summary>
+        public int RestMovePoint
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Get the effective (max) move points for this hero, delegating to H3Hero.
+        /// </summary>
+        public int GetEffectiveMovePoint()
+        {
+            return Data.GetEffectiveMovePoint();
+        }
+
+        /// <summary>
+        /// Get the current remaining move points. If uninitialized, returns full effective move points.
+        /// </summary>
+        public int GetCurrentMovePoint()
+        {
+            if (RestMovePoint < 0)
+            {
+                return GetEffectiveMovePoint();
+            }
+            return RestMovePoint;
+        }
+
+        /// <summary>
+        /// Reset move points to full at the start of a new turn.
+        /// </summary>
+        public void ResetMovePointForNewTurn()
+        {
+            RestMovePoint = GetEffectiveMovePoint();
+        }
+
         public byte MoveDirection
         {
             get; set;

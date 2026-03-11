@@ -174,9 +174,15 @@ namespace UnityClient.GUI.Mapping
         }
 
         /// <summary>
+        /// Offset to convert reachable (green) arrow index to unreachable (orange) variant.
+        /// adag.def: indices 0-24 = reachable, 25-49 = unreachable (same shapes).
+        /// </summary>
+        private const int UNREACHABLE_ARROW_OFFSET = 25;
+
+        /// <summary>
         /// Display path arrows on the map for a list of tile positions.
-        /// path[0] = start (hero position), path[last] = destination.
-        /// Uses VCMI's 9x9 direction lookup table considering both enter and leave directions.
+        /// All arrows are shown in green (reachable) style. Use the MapPathNode overload
+        /// for green/orange differentiation based on turn reachability.
         /// </summary>
         public void ShowPath(List<Vector2Int> path)
         {
@@ -184,7 +190,6 @@ namespace UnityClient.GUI.Mapping
 
             if (path == null || path.Count < 2) return;
 
-            // For each tile in the path (skip the start, which is the hero's current tile)
             for (int i = 1; i < path.Count; i++)
             {
                 Vector2Int current = path[i];
@@ -193,16 +198,12 @@ namespace UnityClient.GUI.Mapping
                 Sprite arrowSprite;
                 if (isDestination)
                 {
-                    // Destination marker: index 0 = "X"
                     arrowSprite = mapTextureManager.LoadCursorSpriteByIndex(0);
                 }
                 else
                 {
-                    // Calculate enter direction (from previous tile to current)
                     Vector2Int prev = path[i - 1];
                     int enterDir = GetDirectionIndex(prev, current);
-
-                    // Calculate leave direction (from current tile to next)
                     Vector2Int next = path[i + 1];
                     int leaveDir = GetDirectionIndex(current, next);
 
@@ -219,18 +220,51 @@ namespace UnityClient.GUI.Mapping
         }
 
         /// <summary>
-        /// Display path arrows for a list of MapPathNodes (from the new pathfinder).
-        /// Converts to tile positions and delegates to the Vector2Int overload.
+        /// Display path arrows for a list of MapPathNodes.
+        /// Nodes with Turns == 0 are reachable this turn (green arrows, indices 0-24).
+        /// Nodes with Turns > 0 are unreachable this turn (orange arrows, indices 25-49).
         /// </summary>
         public void ShowPath(List<MapPathNode> path)
         {
-            if (path == null || path.Count < 2) { ClearPath(); return; }
+            ClearPath();
 
-            var tileList = new List<Vector2Int>(path.Count);
-            foreach (var node in path)
-                tileList.Add(new Vector2Int(node.Position.PosX, node.Position.PosY));
+            if (path == null || path.Count < 2) return;
 
-            ShowPath(tileList);
+            for (int i = 1; i < path.Count; i++)
+            {
+                MapPathNode currentNode = path[i];
+                Vector2Int current = new Vector2Int(currentNode.Position.PosX, currentNode.Position.PosY);
+                bool isDestination = (i == path.Count - 1);
+                bool isReachableThisTurn = (currentNode.Turns == 0);
+
+                Sprite arrowSprite;
+                if (isDestination)
+                {
+                    // Destination marker: green "X" (index 0) or orange "X" (index 25)
+                    int destIndex = isReachableThisTurn ? 0 : UNREACHABLE_ARROW_OFFSET;
+                    arrowSprite = mapTextureManager.LoadCursorSpriteByIndex(destIndex);
+                }
+                else
+                {
+                    Vector2Int prev = new Vector2Int(path[i - 1].Position.PosX, path[i - 1].Position.PosY);
+                    int enterDir = GetDirectionIndex(prev, current);
+                    Vector2Int next = new Vector2Int(path[i + 1].Position.PosX, path[i + 1].Position.PosY);
+                    int leaveDir = GetDirectionIndex(current, next);
+
+                    int arrowIndex = DirectionToArrowIndex[enterDir, leaveDir];
+                    if (!isReachableThisTurn)
+                    {
+                        arrowIndex += UNREACHABLE_ARROW_OFFSET;
+                    }
+                    arrowSprite = mapTextureManager.LoadCursorSpriteByIndex(arrowIndex);
+                }
+
+                if (arrowSprite != null)
+                {
+                    GameObject arrow = CreateSubChildObject("PathArrows", GetMapPosition(current.x, current.y), arrowSprite, SortOrder_PathArrow, "PathArrow");
+                    pathArrowObjects.Add(arrow);
+                }
+            }
         }
 
         /// <summary>
@@ -421,7 +455,8 @@ namespace UnityClient.GUI.Mapping
                     Sprite[] sprites = mapTextureManager.LoadTownSprites(template.AnimationFile);
                     CreateSubChildAnimatedObject("Town", GetMapPosition(position.PosX, position.PosY), sprites, SortOrder_Town, "Town_" + template.SubId);
                 }
-                else if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER)
+                else if (template.Type == EObjectType.HERO || template.Type == EObjectType.HERO_PLACEHOLDER
+                    || template.Type == EObjectType.RANDOM_HERO || obj is HeroInstance)
                 {
                     Sprite[] sprites = mapTextureManager.LoadHeroSprites(template.AnimationFile);
                     // Hero sprites are wider than 1 tile; with pivot (1,0) the character
@@ -440,7 +475,7 @@ namespace UnityClient.GUI.Mapping
                         walkDefFile = walkDefFile.Replace("_e.def", "_.def");
                     }
                     heroDefFileNames[obj.Identifier] = walkDefFile;
-                    Debug.Log(string.Format("[MapLoader] Hero {0}: templateDef={1}, walkDef={2}", obj.Identifier, template.AnimationFile, walkDefFile));
+                    Debug.Log(string.Format("[MapLoader] Hero {0}: templateType={1}, templateDef={2}, walkDef={3}", obj.Identifier, template.Type, template.AnimationFile, walkDefFile));
                 }
                 else
                 {
