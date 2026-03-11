@@ -73,6 +73,9 @@ namespace UnityClient.GUI.Scenes
         // Movement animation
         private const float MOVE_SPEED = 3.0f; // tiles per second
 
+        // Pause movement flag: set when user clicks during HeroMoving
+        private bool pauseMovementRequested = false;
+
         void Start()
         {
             H3DataAccess dataAccess = H3DataAccess.GetInstance();
@@ -147,9 +150,13 @@ namespace UnityClient.GUI.Scenes
                 return;
             }
 
-            // Ignore clicks during movement
+            // During movement, a click triggers pause (hero stops at next tile)
             if (currentState == GameMapState.HeroMoving)
+            {
+                pauseMovementRequested = true;
+                Debug.Log("[GameMapScene] Pause movement requested by click.");
                 return;
+            }
 
             HeroInstance heroAtTile = mapLoader.GetHeroAtTile(tileX, tileY);
             Debug.Log("[GameMapScene] HeroAtTile: " + (heroAtTile != null ? "YES id=" + heroAtTile.Identifier : "none"));
@@ -303,7 +310,7 @@ namespace UnityClient.GUI.Scenes
                 return;
 
             currentState = GameMapState.HeroMoving;
-            mapLoader.ClearPath();
+            pauseMovementRequested = false;
 
             print("Hero moving...");
 
@@ -363,6 +370,7 @@ namespace UnityClient.GUI.Scenes
             int lastDx = 0, lastDy = 1;
 
             // Move along each segment of the path up to the last reachable tile
+            int stoppedAtIndex = lastReachableIndex; // will be updated if paused
             for (int i = 1; i <= lastReachableIndex; i++)
             {
                 int prevX = currentPath[i - 1].Position.PosX;
@@ -376,6 +384,10 @@ namespace UnityClient.GUI.Scenes
                 lastDx = dx;
                 lastDy = dy;
                 mapLoader.SetHeroMovingAnimation(selectedHero, dx, dy);
+
+                // Remove the arrow on the tile we're moving towards (as hero starts overlapping it)
+                // pathArrowObjects[0] corresponds to path[1], so index i-1
+                mapLoader.RemovePathArrowAtIndex(i - 1);
 
                 Vector3 startPos = heroGO.transform.position;
                 Vector3 endPos = mapLoader.HeroTileToWorldPosition(targetX, targetY);
@@ -393,12 +405,20 @@ namespace UnityClient.GUI.Scenes
                 }
 
                 heroGO.transform.position = endPos;
+
+                // Check if pause was requested
+                if (pauseMovementRequested && i < lastReachableIndex)
+                {
+                    print(string.Format("[MoveHero] Pausing at path index {0} ({1}, {2})", i, targetX, targetY));
+                    stoppedAtIndex = i;
+                    break;
+                }
             }
 
             // Movement complete - idle in the last facing direction
             mapLoader.SetHeroIdleAnimation(selectedHero, lastDx, lastDy);
 
-            MapPathNode stopNode = currentPath[lastReachableIndex];
+            MapPathNode stopNode = currentPath[stoppedAtIndex];
             int finalX = stopNode.Position.PosX;
             int finalY = stopNode.Position.PosY;
             mapLoader.UpdateHeroPosition(selectedHero, finalX, finalY);
@@ -406,19 +426,38 @@ namespace UnityClient.GUI.Scenes
             // Update remaining movement points from the pathfinder node's actual value
             selectedHero.RestMovePoint = stopNode.MoveRemains;
 
-            bool reachedFinalDestination = (lastReachableIndex == currentPath.Count - 1);
-            print(string.Format("Hero stopped at ({0}, {1}), restMP={2}{3}",
-                finalX, finalY, selectedHero.RestMovePoint,
-                reachedFinalDestination ? " - reached destination" : " - out of movement points"));
-
             // Invalidate cached paths for this hero
             pathFinderCache.Invalidate(selectedHero.Identifier);
             pathFinderCache.NextGameStateVersion();
 
-            // Reset state
-            currentPath = null;
-            selectedHero = null;
-            currentState = GameMapState.Idle;
+            bool wasPaused = pauseMovementRequested && stoppedAtIndex < lastReachableIndex;
+            bool hasRemainingPath = stoppedAtIndex < currentPath.Count - 1;
+            pauseMovementRequested = false;
+
+            if (wasPaused || hasRemainingPath)
+            {
+                // Either paused by click or ran out of movement points with orange tiles ahead.
+                // Trim arrows and path to remaining portion, stay in DestinationSelected.
+                mapLoader.TrimPathArrowsFromStart(stoppedAtIndex);
+                currentPath = currentPath.GetRange(stoppedAtIndex, currentPath.Count - stoppedAtIndex);
+                currentState = GameMapState.DestinationSelected;
+
+                print(string.Format("Hero {0} at ({1}, {2}), restMP={3}, remaining path length={4}",
+                    wasPaused ? "paused" : "out of move points",
+                    finalX, finalY, selectedHero.RestMovePoint, currentPath.Count));
+            }
+            else
+            {
+                // Reached final destination
+                print(string.Format("Hero reached destination at ({0}, {1}), restMP={2}",
+                    finalX, finalY, selectedHero.RestMovePoint));
+
+                // Clear any remaining arrows and reset state
+                mapLoader.ClearPath();
+                currentPath = null;
+                selectedHero = null;
+                currentState = GameMapState.Idle;
+            }
         }
 
         #endregion

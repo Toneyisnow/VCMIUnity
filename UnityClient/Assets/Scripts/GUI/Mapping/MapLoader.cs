@@ -268,6 +268,33 @@ namespace UnityClient.GUI.Mapping
         }
 
         /// <summary>
+        /// Remove a single path arrow by its index in the pathArrowObjects list.
+        /// Used during movement to remove arrows one by one as the hero enters each tile.
+        /// </summary>
+        public void RemovePathArrowAtIndex(int index)
+        {
+            if (index < 0 || index >= pathArrowObjects.Count) return;
+            GameObject arrow = pathArrowObjects[index];
+            if (arrow != null) Destroy(arrow);
+            pathArrowObjects[index] = null;
+        }
+
+        /// <summary>
+        /// Remove the first 'count' arrows from the list (already destroyed ones are null).
+        /// Used after pause to keep only the remaining arrows in sync with the trimmed path.
+        /// </summary>
+        public void TrimPathArrowsFromStart(int count)
+        {
+            if (count <= 0) return;
+            int removeCount = Mathf.Min(count, pathArrowObjects.Count);
+            for (int i = 0; i < removeCount; i++)
+            {
+                if (pathArrowObjects[i] != null) Destroy(pathArrowObjects[i]);
+            }
+            pathArrowObjects.RemoveRange(0, removeCount);
+        }
+
+        /// <summary>
         /// Remove all path arrow objects from the map.
         /// </summary>
         public void ClearPath()
