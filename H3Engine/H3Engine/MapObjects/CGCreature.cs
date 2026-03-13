@@ -29,6 +29,15 @@ namespace H3Engine.MapObjects
         {
 
         }
+
+        /// <summary>
+        /// The original object type from the map file (e.g. RANDOM_MONSTER_L3),
+        /// before randomization replaces it with MONSTER.
+        /// </summary>
+        public EObjectType OriginalObjectType
+        {
+            get; set;
+        }
         
         public bool NeverFlee
         {

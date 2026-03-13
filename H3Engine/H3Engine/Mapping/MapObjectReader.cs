@@ -691,17 +691,24 @@ namespace H3Engine.Mapping
 
             // Create Creature
             CGCreature creature = new CGCreature();
+            creature.OriginalObjectType = this.ObjectTemplate.Type;
 
             if (MapHeader.Version > EMapFormat.ROE)
             {
                 creature.Identifier = reader.ReadUInt32();
                 // Quest Identifier?
             }
-            
+
             StackDescriptor stack = new StackDescriptor();
             stack.Amount = reader.ReadUInt16();
 
-            //type will be set during initialization
+            // For non-random monsters, record the creature type from the template SubId
+            if (this.ObjectTemplate.Type == EObjectType.MONSTER)
+            {
+                stack.CreatureId = (ECreatureId)this.ObjectTemplate.SubId;
+            }
+            // For random monsters, CreatureId will be set during map initialization
+
             creature.AddStack(0, stack);
 
             creature.Friendliness = reader.ReadByte();

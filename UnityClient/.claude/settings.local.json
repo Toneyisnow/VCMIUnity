@@ -26,7 +26,14 @@
       "Bash(xargs grep -l \"HEROES_MOVEMENT_POINTS\")",
       "Bash(xargs grep -l \"movementPointsLand\\\\|movementPointsSea\")",
       "Bash(xargs grep -l \"valOfBonuses\")",
-      "Bash(dotnet build)"
+      "Bash(dotnet build)",
+      "Bash(xargs grep -l \"EObjectType\\\\|ECreatureId\")",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:heroes.thelazy.net)",
+      "Bash(dotnet sln add Tools/LodDumper/LodDumper.csproj)",
+      "Bash(dotnet build Tools/LodDumper/LodDumper.csproj)",
+      "Bash(dotnet publish Tools/LodDumper/LodDumper.csproj -c Release -r win-x64 --self-contained false -o Tools/LodDumper/bin/Publish)"
     ]
   }
 }

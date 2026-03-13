@@ -18,6 +18,11 @@ namespace H3Engine.Components.Data
 
         }
 
+        public ECreatureId CreatureId
+        {
+            get; set;
+        } = ECreatureId.NONE;
+
         public H3Creature Creature
         {
             get; set;
