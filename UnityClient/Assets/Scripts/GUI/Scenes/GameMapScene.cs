@@ -11,6 +11,7 @@ using H3Engine.Mapping;
 using Assets.Scripts.Utils;
 using UnityClient.GUI.Mapping;
 using UnityClient.Components;
+using UnityClient.Components.Data;
 using UnityClient.Components.Mapping;
 using H3Engine.MapObjects;
 using H3Engine.Core;
@@ -85,8 +86,16 @@ namespace UnityClient.GUI.Scenes
             dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3bitmap.lod"));
             dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3sprite.lod"));
 
-            H3Campaign campaign = dataAccess.RetrieveCampaign("final.h3c");
-            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, 3);
+            // Load campaign from CrossSceneData (set by CampaignInfoScene)
+            // Falls back to hardcoded campaign if not set (for direct testing)
+            H3Campaign campaign = CrossSceneData.CurrentCampaign;
+            int scenarioIndex = CrossSceneData.SelectedScenarioIndex;
+            if (campaign == null)
+            {
+                campaign = dataAccess.RetrieveCampaign("final.h3c");
+                scenarioIndex = 3;
+            }
+            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, scenarioIndex);
 
             playerInterface = PlayerInterface.StartGame(map);
 

@@ -33,7 +33,10 @@
       "WebFetch(domain:heroes.thelazy.net)",
       "Bash(dotnet sln add Tools/LodDumper/LodDumper.csproj)",
       "Bash(dotnet build Tools/LodDumper/LodDumper.csproj)",
-      "Bash(dotnet publish Tools/LodDumper/LodDumper.csproj -c Release -r win-x64 --self-contained false -o Tools/LodDumper/bin/Publish)"
+      "Bash(dotnet publish Tools/LodDumper/LodDumper.csproj -c Release -r win-x64 --self-contained false -o Tools/LodDumper/bin/Publish)",
+      "Bash(where vswhere:*)",
+      "Bash('C:/Program Files \\(x86\\)/Microsoft Visual Studio/Installer/vswhere.exe' -all -products * -format json)",
+      "Bash(\"C:/Program Files \\(x86\\)/Microsoft Visual Studio/Installer/vswhere.exe\" -all -products '*' -property installationPath)"
     ]
   }
 }

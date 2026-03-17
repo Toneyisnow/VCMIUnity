@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,8 +13,13 @@ using UnityClient.GUI.Rendering;
 using UnityClient.GUI.GameControls;
 using UnityClient.Components.Data;
 
-namespace UnityClient.GUI.Scenes
+namespace UnityClient.GUI.Scenes.Menu
 {
+    /// <summary>
+    /// Campaign selection screen corresponding to CCampaignScreen in VCMI.
+    /// Displays available campaigns for the selected campaign set (SOD/ROE/AB).
+    /// Selecting a campaign navigates to CampaignInfoScene.
+    /// </summary>
     public class CampaignSelectScene : MonoBehaviour
     {
         private ECampaignVersion campaignVersion;
@@ -29,16 +34,12 @@ namespace UnityClient.GUI.Scenes
         public Vector3 iconPosition6;
         public Vector3 iconPosition7;
 
-
-        // Start is called before the first frame update
         void Start()
         {
-            this.campaignVersion = CrossSceneData.SelectedCampaign;
-            this.campaignVersion = ECampaignVersion.SOD;
+            this.campaignVersion = CrossSceneData.SelectedCampaignSet;
 
             H3DataAccess h3Engine = H3DataAccess.GetInstance();
             ImageData imageData = h3Engine.RetrieveImage("campback.PCX");
-
 
             GameObject background = GameObject.Find("Background");
             var renderer = background.GetComponent<SpriteRenderer>();
@@ -70,13 +71,6 @@ namespace UnityClient.GUI.Scenes
             }
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
-
         private void CreateCampaignIcon(Vector3 position, string imageFileName, string videoFileName, int flag)
         {
             GameObject campaignIcon = Instantiate(CampaignIconPrefab);
@@ -84,14 +78,14 @@ namespace UnityClient.GUI.Scenes
 
             CampaignIcon script = campaignIcon.GetComponent<CampaignIcon>();
             script.Initialize(imageFileName, videoFileName, flag, (f) => { this.OnSelectedCampaign(f); });
-
         }
 
         private void OnSelectedCampaign(int campaignFlag)
         {
-            print("OnSelectedCampaign: " + campaignFlag);
-            SceneManager.LoadScene("GameMapScene");
-        }
+            Debug.Log("[CampaignSelectScene] OnSelectedCampaign: " + campaignFlag);
 
+            CrossSceneData.SelectedCampaignIndex = campaignFlag;
+            SceneManager.LoadScene("CampaignInfoScene", LoadSceneMode.Single);
+        }
     }
 }
