@@ -27,7 +27,7 @@ namespace UnityClient.Components.Data
         public static int SelectedCampaignIndex { get; set; }
 
         /// <summary>
-        /// The loaded campaign object, set by CampaignInfoScene before entering GameMapScene.
+        /// The loaded campaign object, set by BonusSelectionScene before entering GameMapScene.
         /// Replaces GAME->server().si->campState in VCMI.
         /// </summary>
         public static H3Campaign CurrentCampaign { get; set; }

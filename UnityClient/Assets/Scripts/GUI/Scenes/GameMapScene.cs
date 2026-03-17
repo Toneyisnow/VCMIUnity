@@ -86,7 +86,7 @@ namespace UnityClient.GUI.Scenes
             dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3bitmap.lod"));
             dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3sprite.lod"));
 
-            // Load campaign from CrossSceneData (set by CampaignInfoScene)
+            // Load campaign from CrossSceneData (set by BonusSelectionScene)
             // Falls back to hardcoded campaign if not set (for direct testing)
             H3Campaign campaign = CrossSceneData.CurrentCampaign;
             int scenarioIndex = CrossSceneData.SelectedScenarioIndex;
