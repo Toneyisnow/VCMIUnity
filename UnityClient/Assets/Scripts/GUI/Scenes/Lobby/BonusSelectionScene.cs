@@ -10,7 +10,7 @@ using H3Engine.GUI;
 using H3Engine.Mapping;
 using UnityEngine.SceneManagement;
 using UnityClient.Components.Data;
-using UnityClient.GUI.GameControls;
+using UnityClient.GUI.Widgets;
 using UnityClient.GUI.Rendering;
 
 namespace UnityClient.GUI.Scenes.Lobby
@@ -33,9 +33,9 @@ namespace UnityClient.GUI.Scenes.Lobby
     ///   (481, 253)  "Map Description:" FONT_SMALL YELLOW
     ///   (480, 276)  mapDescription     286x112
     ///   (475, 432)  "Choose a bonus:"  FONT_SMALL WHITE
-    ///   (475+i*68, 455) bonus buttons  campaignBonusSelection.DEF
+    ///   (475+i*68, 455) bonus buttons  campaignBonusSelection.DEF + overlay icons
     ///   (724, 432)  "Difficulty"        FONT_MEDIUM WHITE
-    ///   (709, 455)  difficulty icons   GSPBUT3-7.DEF
+    ///   (709, 455)  difficulty icons   GSPBUT3-7.DEF (stacked, only selected visible)
     ///   (694, 508)  difficultyLeft     SCNRBLF.DEF
     ///   (738, 508)  difficultyRight    SCNRBRT.DEF
     ///   (475, 536)  buttonStart        CBBEGIB.DEF
@@ -56,12 +56,85 @@ namespace UnityClient.GUI.Scenes.Lobby
         private int selectedBonusIndex = -1;
         private int selectedDifficulty = 1; // 0-4, default Normal
 
-        // Bonus button highlight tracking
+        // Bonus button tracking
         private List<GameObject> bonusButtons = new List<GameObject>();
-        private List<SpriteRenderer> bonusHighlights = new List<SpriteRenderer>();
+        private List<SpriteRenderer> bonusBaseRenderers = new List<SpriteRenderer>();
+        private Sprite bonusUnselectedSprite = null;
+        private Sprite bonusSelectedSprite = null;
 
-        // Difficulty icon tracking
-        private List<SpriteRenderer> difficultyIcons = new List<SpriteRenderer>();
+        // Difficulty icon tracking: 5 sprites from GSPBUT3-7.DEF, single renderer
+        private Sprite[] difficultySprites = new Sprite[5];
+        private SpriteRenderer difficultyIconRenderer = null;
+
+        /// <summary>
+        /// DEF name to overlay frame mapping per bonus type.
+        /// Matches VCMI CBonusSelection::createBonusesIcons() bonusPics array.
+        /// </summary>
+        private static readonly string[] BonusOverlayDefs =
+        {
+            "SPELLBON.DEF",   // 0: SPELL
+            "TWCRPORT.DEF",   // 1: MONSTER
+            "",               // 2: BUILDING (uses BO*.PCX, handled specially)
+            "ARTIFBON.DEF",   // 3: ARTIFACT
+            "SPELLBON.DEF",   // 4: SPELL_SCROLL
+            "PSKILBON.DEF",   // 5: PRIMARY_SKILL
+            "SSKILBON.DEF",   // 6: SECONDARY_SKILL
+            "BORES.DEF",      // 7: RESOURCE
+            "",               // 8: HEROES_FROM_PREVIOUS_SCENARIO (portrait)
+            "",               // 9: HERO (portrait or CBONN1A3.BMP)
+        };
+
+        /// <summary>
+        /// Building ID (EBuildingId) to campaign bonus PCX image name mapping.
+        /// Uses Castle faction images as default. Faction-specific images follow the
+        /// pattern Bo[FactionCode][BuildingName].pcx (e.g., BoCsCas1 for Castle's Fort).
+        /// Source: VCMI config/factions/castle.json "structures" → "campaignBonus" fields.
+        /// </summary>
+        private static readonly Dictionary<int, string> BuildingBonusImages = new Dictionary<int, string>
+        {
+            // Mage Guilds (0-4)
+            { 0, "BoCsMag1.pcx" },  // MAGES_GUILD_1
+            { 1, "BoCsMag2.pcx" },  // MAGES_GUILD_2
+            { 2, "BoCsMag3.pcx" },  // MAGES_GUILD_3
+            { 3, "BoCsMag4.pcx" },  // MAGES_GUILD_4
+            // Castle has no Mage Guild 5
+            // Common buildings (5-16)
+            { 5, "BoCsTav1.pcx" },  // TAVERN
+            { 6, "BoCsDock.pcx" },  // SHIPYARD
+            { 7, "BoCsCas1.pcx" },  // FORT
+            { 8, "BoCsCas2.pcx" },  // CITADEL
+            { 9, "BoCsCas3.pcx" },  // CASTLE
+            { 10, "BoCsHal1.pcx" }, // VILLAGE_HALL
+            { 11, "BoCsHal2.pcx" }, // TOWN_HALL
+            { 12, "BoCsHal3.pcx" }, // CITY_HALL
+            { 13, "BoCsHal4.pcx" }, // CAPITOL
+            { 14, "BoCsMrk1.pcx" }, // MARKETPLACE
+            { 15, "BoCsMrk2.pcx" }, // RESOURCE_SILO
+            { 16, "BoCsBlak.pcx" }, // BLACKSMITH
+            // Special buildings (17-26)
+            { 17, "BoCsLite.pcx" }, // SPECIAL_1 (Lighthouse)
+            { 18, "BoCsGr1H.pcx" }, // HORDE_1
+            { 19, "BoCsGr2H.pcx" }, // HORDE_1_UPGR
+            { 21, "BoCsCv2S.pcx" }, // SPECIAL_2 (Stables)
+            { 22, "BoCsTav2.pcx" }, // SPECIAL_3 (Brotherhood)
+            { 26, "BoCsHoly.pcx" }, // GRAIL
+            // Dwellings (30-36)
+            { 30, "BoCsPik1.pcx" }, // DWELL_LVL_1 (Pikeman)
+            { 31, "BoCsCrs1.pcx" }, // DWELL_LVL_2 (Archer)
+            { 32, "BoCsGr1.pcx" },  // DWELL_LVL_3 (Griffin)
+            { 33, "BoCsSwd1.pcx" }, // DWELL_LVL_4 (Swordsman)
+            { 34, "BoCsMon1.pcx" }, // DWELL_LVL_5 (Monk)
+            { 35, "BoCsCv1.pcx" },  // DWELL_LVL_6 (Cavalier)
+            { 36, "BoCsAng1.pcx" }, // DWELL_LVL_7 (Angel)
+            // Upgraded dwellings (37-43)
+            { 37, "BoCsPik2.pcx" }, // DWELL_LVL_1_UP
+            { 38, "BoCsCrs2.pcx" }, // DWELL_LVL_2_UP
+            { 39, "BoCsGr2.pcx" },  // DWELL_LVL_3_UP
+            { 40, "BoCsSwd2.pcx" }, // DWELL_LVL_4_UP
+            { 41, "BoCsMon2.pcx" }, // DWELL_LVL_5_UP
+            { 42, "BoCsCv2.pcx" },  // DWELL_LVL_6_UP
+            { 43, "BoCsAng2.pcx" }, // DWELL_LVL_7_UP
+        };
 
         void Start()
         {
@@ -163,10 +236,9 @@ namespace UnityClient.GUI.Scenes.Lobby
         }
 
         /// <summary>
-        /// Build bonus selection buttons.
-        /// VCMI: Toggle buttons at (475 + i*68, 455) using campaignBonusSelection DEF.
-        /// Each button shows an overlay icon for the bonus type.
-        /// Simplified: show text buttons describing each bonus.
+        /// Build bonus selection buttons using campaignBonusSelection DEF as toggle base
+        /// with overlay icons from the appropriate DEF files (SPELLBON, TWCRPORT, etc.).
+        /// VCMI reference: CBonusSelection::createBonusesIcons() in CBonusSelection.cpp.
         /// </summary>
         private void BuildBonusSelection()
         {
@@ -183,47 +255,72 @@ namespace UnityClient.GUI.Scenes.Lobby
                 return;
             }
 
+            // Load campaignBonusSelection DEF for toggle button base
+            // Group 0 = unselected frames, Group 1 = selected frames
+            BundleImageDefinition toggleDef = dataAccess.RetrieveBundleImage("campaignBonusSelection.def");
+            if (toggleDef != null)
+            {
+                ImageData unselImg = toggleDef.GetImageData(0, 0);
+                bonusUnselectedSprite = Texture2DExtension.CreateSpriteFromImageData(unselImg, new Vector2(0.5f, 0.5f));
+
+                ImageData selImg = toggleDef.GetImageData(1, 0);
+                if (selImg != null)
+                    bonusSelectedSprite = Texture2DExtension.CreateSpriteFromImageData(selImg, new Vector2(0.5f, 0.5f));
+                else
+                    bonusSelectedSprite = bonusUnselectedSprite;
+            }
+
             var bonuses = scenario.TravelOptions.BonusChoices;
             for (int i = 0; i < bonuses.Count; i++)
             {
                 float px = 475 + i * 68;
                 float py = 455;
-
-                // Create a clickable bonus slot
-                string bonusText = GetBonusDescription(bonuses[i]);
                 int bonusIndex = i;
 
+                // Get toggle button dimensions for positioning
+                float btnW = 58f;
+                float btnH = 64f;
+                if (bonusUnselectedSprite != null)
+                {
+                    btnW = bonusUnselectedSprite.texture.width;
+                    btnH = bonusUnselectedSprite.texture.height;
+                }
+
+                // Create the slot object centered on the button area
                 GameObject slotObj = new GameObject("BonusSlot_" + i);
                 slotObj.transform.parent = transform;
-                slotObj.transform.position = PixelToWorld(px + 29, py + 29, -1f); // center of 58x58 slot
+                slotObj.transform.position = PixelToWorld(px + btnW / 2f, py + btnH / 2f, -1f);
                 slotObj.transform.localScale = new Vector3(scale, scale, 1);
 
-                // Background rectangle for the slot
-                SpriteRenderer bgRenderer = slotObj.AddComponent<SpriteRenderer>();
-                bgRenderer.sprite = CreateColoredSprite(58, 58, new UnityEngine.Color(0.3f, 0.3f, 0.3f, 0.8f));
-                bgRenderer.sortingOrder = 1;
+                // Base toggle button image from campaignBonusSelection DEF
+                SpriteRenderer baseRenderer = slotObj.AddComponent<SpriteRenderer>();
+                baseRenderer.sortingOrder = 1;
+                if (bonusUnselectedSprite != null)
+                {
+                    baseRenderer.sprite = bonusUnselectedSprite;
+                }
+                else
+                {
+                    // Fallback: colored rectangle if DEF not found
+                    baseRenderer.sprite = CreateColoredSprite(58, 64, new UnityEngine.Color(0.3f, 0.3f, 0.3f, 0.8f));
+                }
+                bonusBaseRenderers.Add(baseRenderer);
 
-                // Highlight overlay (shown when selected)
-                GameObject highlightObj = new GameObject("BonusHighlight_" + i);
-                highlightObj.transform.parent = slotObj.transform;
-                highlightObj.transform.localPosition = Vector3.zero;
-                SpriteRenderer hlRenderer = highlightObj.AddComponent<SpriteRenderer>();
-                hlRenderer.sprite = CreateColoredSprite(58, 58, new UnityEngine.Color(1f, 1f, 0f, 0.3f));
-                hlRenderer.sortingOrder = 2;
-                hlRenderer.enabled = false;
-                bonusHighlights.Add(hlRenderer);
+                // Overlay icon based on bonus type
+                CreateBonusOverlay(slotObj, bonuses[i], i);
 
                 // Clickable collider
                 BoxCollider2D collider = slotObj.AddComponent<BoxCollider2D>();
-                collider.size = new Vector2(58f / PPU, 58f / PPU);
+                collider.size = new Vector2(btnW / PPU, btnH / PPU);
 
                 BonusSlotClickHandler handler = slotObj.AddComponent<BonusSlotClickHandler>();
                 handler.Initialize(bonusIndex, OnBonusSelected);
 
                 bonusButtons.Add(slotObj);
 
-                // Bonus type label below the slot
-                CreateLabel("BonusLabel_" + i, px, py + 62, bonusText, 10, UnityEngine.Color.white);
+                // Bonus description label below the button (VCMI icon size is 58x64)
+                string bonusText = GetBonusDescription(bonuses[i]);
+                CreateLabel("BonusLabel_" + i, px, py + btnH + 2, bonusText, 10, UnityEngine.Color.white);
             }
 
             // Auto-select first bonus if available
@@ -234,52 +331,254 @@ namespace UnityClient.GUI.Scenes.Lobby
         }
 
         /// <summary>
-        /// Build difficulty selection.
-        /// VCMI: 5 difficulty icons GSPBUT3-7.DEF at (709, 455), with left/right arrows.
-        /// Simplified: show 5 colored rectangles with labels, left/right buttons.
+        /// Create an overlay icon on top of a bonus toggle button.
+        /// VCMI: bonusButton->setOverlay(CAnimImage(picName, picNumber)) or CPicture(picName).
+        /// </summary>
+        private void CreateBonusOverlay(GameObject parentSlot, ScenarioTravelBonus bonus, int index)
+        {
+            string overlayDefName;
+            int overlayFrame;
+            string overlayBmpName;
+            GetBonusOverlayInfo(bonus, out overlayDefName, out overlayFrame, out overlayBmpName);
+
+            Sprite overlaySprite = null;
+
+            if (!string.IsNullOrEmpty(overlayDefName) && overlayFrame >= 0)
+            {
+                // Load from DEF file with specific frame
+                BundleImageDefinition overlayDef = dataAccess.RetrieveBundleImage(overlayDefName);
+                if (overlayDef != null)
+                {
+                    ImageData overlayImg = overlayDef.GetImageData(0, overlayFrame);
+                    if (overlayImg != null)
+                    {
+                        overlaySprite = Texture2DExtension.CreateSpriteFromImageData(overlayImg, new Vector2(0.5f, 0.5f));
+                    }
+                    else
+                    {
+                        Debug.LogWarning(string.Format("[BonusSelection] Overlay frame {0}:{1} not found", overlayDefName, overlayFrame));
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[BonusSelection] Overlay DEF not found: " + overlayDefName);
+                }
+            }
+            else if (!string.IsNullOrEmpty(overlayBmpName))
+            {
+                // Load from BMP image file
+                ImageData bmpImg = dataAccess.RetrieveImage(overlayBmpName);
+                if (bmpImg != null)
+                {
+                    overlaySprite = Texture2DExtension.CreateSpriteFromImageData(bmpImg, new Vector2(0.5f, 0.5f));
+                }
+                else
+                {
+                    Debug.LogWarning("[BonusSelection] Overlay BMP not found: " + overlayBmpName);
+                }
+            }
+
+            if (overlaySprite != null)
+            {
+                GameObject overlayObj = new GameObject("BonusOverlay_" + index);
+                overlayObj.transform.parent = parentSlot.transform;
+                overlayObj.transform.localPosition = Vector3.zero;
+
+                SpriteRenderer overlayRenderer = overlayObj.AddComponent<SpriteRenderer>();
+                overlayRenderer.sprite = overlaySprite;
+                overlayRenderer.sortingOrder = 2;
+            }
+        }
+
+        /// <summary>
+        /// Determine overlay DEF name and frame number for a bonus type.
+        /// Matches VCMI CBonusSelection::createBonusesIcons() logic.
+        ///
+        /// Returns either (defName + frame) for DEF-based overlays,
+        /// or (bmpName) for single-image overlays.
+        /// </summary>
+        private void GetBonusOverlayInfo(ScenarioTravelBonus bonus, out string defName, out int frame, out string bmpName)
+        {
+            defName = null;
+            frame = -1;
+            bmpName = null;
+
+            int typeIndex = (int)bonus.Type;
+            if (typeIndex < 0 || typeIndex >= BonusOverlayDefs.Length)
+                return;
+
+            switch (bonus.Type)
+            {
+                case ScenarioTravelBonus.EBonusType.SPELL:
+                    // SPELLBON.DEF, frame = spell ID (Info2)
+                    defName = BonusOverlayDefs[typeIndex];
+                    frame = bonus.Info2;
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.MONSTER:
+                    // TWCRPORT.DEF, frame = creature type (Info2) + 2
+                    defName = BonusOverlayDefs[typeIndex];
+                    frame = bonus.Info2 + 2;
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.BUILDING:
+                    // Building uses faction-specific PCX files. Default to Castle faction images.
+                    // Info1 = building ID matching EBuildingId enum.
+                    if (BuildingBonusImages.ContainsKey(bonus.Info1))
+                    {
+                        bmpName = BuildingBonusImages[bonus.Info1];
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[BonusSelection] No building bonus image for building ID: " + bonus.Info1);
+                    }
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.ARTIFACT:
+                    // ARTIFBON.DEF, frame = artifact ID (Info2)
+                    defName = BonusOverlayDefs[typeIndex];
+                    frame = bonus.Info2;
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.SPELL_SCROLL:
+                    // SPELLBON.DEF, frame = spell ID (Info2)
+                    defName = BonusOverlayDefs[typeIndex];
+                    frame = bonus.Info2;
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.PRIMARY_SKILL:
+                    // PSKILBON.DEF, frame = index of the leading (highest) skill
+                    // Info2 is packed UInt32: 4 bytes for Attack, Defense, SpellPower, Knowledge
+                    defName = BonusOverlayDefs[typeIndex];
+                    frame = GetLeadingPrimarySkill(bonus.Info2);
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.SECONDARY_SKILL:
+                    // SSKILBON.DEF, frame = skill ID * 3 + mastery level - 1
+                    defName = BonusOverlayDefs[typeIndex];
+                    frame = bonus.Info2 * 3 + bonus.Info3 - 1;
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.RESOURCE:
+                    // BORES.DEF, frame = resource type
+                    // Special: 0xFD (253) = wood+ore -> frame 7; 0xFE (254) = rare resources -> frame 8
+                    defName = BonusOverlayDefs[typeIndex];
+                    if (bonus.Info1 == 0xFD)
+                        frame = 7;
+                    else if (bonus.Info1 == 0xFE)
+                        frame = 8;
+                    else
+                        frame = bonus.Info1;
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.HEROES_FROM_PREVIOUS_SCENARIO:
+                    // Portrait: would need hero lookup from previous scenario
+                    // Skip overlay for now
+                    break;
+
+                case ScenarioTravelBonus.EBonusType.HERO:
+                    // Info2 = hero ID; 0xFFFF = random hero -> CBONN1A3.BMP
+                    if (bonus.Info2 == 0xFFFF)
+                    {
+                        bmpName = "CBONN1A3.BMP";
+                    }
+                    // For specific heroes, would need portrait lookup
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Get the index of the highest primary skill from a packed UInt32.
+        /// Byte 0=Attack, 1=Defense, 2=SpellPower, 3=Knowledge.
+        /// </summary>
+        private int GetLeadingPrimarySkill(int packedSkills)
+        {
+            int leading = 0;
+            int maxVal = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                int val = (packedSkills >> (i * 8)) & 0xFF;
+                if (val > maxVal)
+                {
+                    maxVal = val;
+                    leading = i;
+                }
+            }
+            return leading;
+        }
+
+        /// <summary>
+        /// Build difficulty selection using GSPBUT3-7.DEF icons.
+        /// VCMI: 5 CAnimImage at (709, 455), stacked; only the selected one is enabled.
+        /// Left/right arrows at (694, 508) / (738, 508) to cycle.
         /// </summary>
         private void BuildDifficultySelection()
         {
             // Line 116: "Difficulty" label at (724, 432), TOPCENTER
             CreateLabel("LabelDifficulty", 695, 432, "Difficulty", 12, UnityEngine.Color.white);
 
-            string[] diffNames = { "Easy", "Normal", "Hard", "Expert", "Impossible" };
-            UnityEngine.Color[] diffColors = {
-                new UnityEngine.Color(0.2f, 0.8f, 0.2f), // Easy - green
-                new UnityEngine.Color(0.3f, 0.5f, 0.8f), // Normal - blue
-                new UnityEngine.Color(0.8f, 0.8f, 0.2f), // Hard - yellow
-                new UnityEngine.Color(0.8f, 0.4f, 0.1f), // Expert - orange
-                new UnityEngine.Color(0.8f, 0.1f, 0.1f), // Impossible - red
-            };
-
-            // Difficulty icons at (709, 455), each ~30px wide
+            // Load all 5 difficulty icon DEFs: GSPBUT3.DEF (Easy) through GSPBUT7.DEF (Impossible)
+            bool allLoaded = true;
             for (int i = 0; i < 5; i++)
             {
-                float px = 695 + i * 18;
-                float py = 455;
-                int diffIndex = i;
-
-                GameObject iconObj = new GameObject("DiffIcon_" + i);
-                iconObj.transform.parent = transform;
-                iconObj.transform.position = PixelToWorld(px + 8, py + 12, -1f);
-                iconObj.transform.localScale = new Vector3(scale, scale, 1);
-
-                SpriteRenderer iconRenderer = iconObj.AddComponent<SpriteRenderer>();
-                UnityEngine.Color c = diffColors[i];
-                c.a = (i == selectedDifficulty) ? 1.0f : 0.3f;
-                iconRenderer.sprite = CreateColoredSprite(16, 24, c);
-                iconRenderer.sortingOrder = 2;
-                difficultyIcons.Add(iconRenderer);
-
-                BoxCollider2D col = iconObj.AddComponent<BoxCollider2D>();
-                col.size = new Vector2(16f / PPU, 24f / PPU);
-
-                DifficultyClickHandler dh = iconObj.AddComponent<DifficultyClickHandler>();
-                dh.Initialize(diffIndex, OnDifficultySelected);
+                string defName = "GSPBUT" + (i + 3) + ".DEF";
+                BundleImageDefinition def = dataAccess.RetrieveBundleImage(defName);
+                if (def != null)
+                {
+                    ImageData img = def.GetImageData(0, 0);
+                    if (img != null)
+                    {
+                        difficultySprites[i] = Texture2DExtension.CreateSpriteFromImageData(img, new Vector2(0, 1));
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[BonusSelection] No frame in: " + defName);
+                        allLoaded = false;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[BonusSelection] Difficulty DEF not found: " + defName);
+                    allLoaded = false;
+                }
             }
 
-            // Difficulty name below icons
-            CreateLabel("DiffName", 695, 480, diffNames[selectedDifficulty], 10, UnityEngine.Color.white);
+            // Create single icon renderer at (709, 455)
+            // All 5 DEF icons share the same position; only the selected one is visible.
+            GameObject iconObj = new GameObject("DifficultyIcon");
+            iconObj.transform.parent = transform;
+            iconObj.transform.position = PixelToWorld(709, 455, -1f);
+            iconObj.transform.localScale = new Vector3(scale, scale, 1);
+
+            difficultyIconRenderer = iconObj.AddComponent<SpriteRenderer>();
+            difficultyIconRenderer.sortingOrder = 2;
+
+            if (allLoaded && difficultySprites[selectedDifficulty] != null)
+            {
+                difficultyIconRenderer.sprite = difficultySprites[selectedDifficulty];
+            }
+            else
+            {
+                // Fallback: colored rectangle
+                difficultyIconRenderer.sprite = CreateColoredSprite(32, 32, UnityEngine.Color.gray);
+            }
+
+            // Make the icon clickable to cycle difficulty
+            BoxCollider2D iconCol = iconObj.AddComponent<BoxCollider2D>();
+            if (difficultyIconRenderer.sprite != null)
+            {
+                float w = difficultyIconRenderer.sprite.texture.width;
+                float h = difficultyIconRenderer.sprite.texture.height;
+                iconCol.size = new Vector2(w / PPU, h / PPU);
+                iconCol.offset = new Vector2(w / PPU / 2f, -h / PPU / 2f);
+            }
+
+            DifficultyClickHandler dh = iconObj.AddComponent<DifficultyClickHandler>();
+            dh.Initialize(-1, OnDifficultyIconClicked); // -1 = cycle forward on click
+
+            // Difficulty name below icon
+            string[] diffNames = { "Easy", "Normal", "Hard", "Expert", "Impossible" };
+            CreateLabel("DiffName", 695, 490, diffNames[selectedDifficulty], 10, UnityEngine.Color.white);
 
             // Line 129-130: left/right buttons at (694, 508) / (738, 508)
             CreateButton("SCNRBLF.def", 694, 508, "DiffLeft", OnDifficultyLeft);
@@ -404,7 +703,7 @@ namespace UnityClient.GUI.Scenes.Lobby
         }
 
         /// <summary>
-        /// Create a simple colored rectangle sprite at runtime.
+        /// Create a simple colored rectangle sprite at runtime (fallback when DEF not found).
         /// </summary>
         private Sprite CreateColoredSprite(int width, int height, UnityEngine.Color color)
         {
@@ -425,16 +724,30 @@ namespace UnityClient.GUI.Scenes.Lobby
         private void OnBonusSelected(int index)
         {
             selectedBonusIndex = index;
-            for (int i = 0; i < bonusHighlights.Count; i++)
+
+            // Update toggle button sprites: selected uses group 1, unselected uses group 0
+            for (int i = 0; i < bonusBaseRenderers.Count; i++)
             {
-                bonusHighlights[i].enabled = (i == index);
+                if (bonusUnselectedSprite != null && bonusSelectedSprite != null)
+                {
+                    bonusBaseRenderers[i].sprite = (i == index) ? bonusSelectedSprite : bonusUnselectedSprite;
+                }
+                else
+                {
+                    // Fallback: change color alpha
+                    bonusBaseRenderers[i].color = (i == index)
+                        ? new UnityEngine.Color(1f, 1f, 0.5f, 1f)
+                        : UnityEngine.Color.white;
+                }
             }
+
             Debug.Log("[BonusSelection] Bonus selected: " + index);
         }
 
-        private void OnDifficultySelected(int index)
+        private void OnDifficultyIconClicked(int unused)
         {
-            selectedDifficulty = Mathf.Clamp(index, 0, 4);
+            // Cycle forward on direct click
+            selectedDifficulty = (selectedDifficulty + 1) % 5;
             UpdateDifficultyDisplay();
         }
 
@@ -459,11 +772,11 @@ namespace UnityClient.GUI.Scenes.Lobby
         private void UpdateDifficultyDisplay()
         {
             string[] diffNames = { "Easy", "Normal", "Hard", "Expert", "Impossible" };
-            for (int i = 0; i < difficultyIcons.Count; i++)
+
+            // Swap the difficulty icon sprite
+            if (difficultyIconRenderer != null && difficultySprites[selectedDifficulty] != null)
             {
-                UnityEngine.Color c = difficultyIcons[i].sprite.texture.GetPixel(0, 0);
-                c.a = (i == selectedDifficulty) ? 1.0f : 0.3f;
-                difficultyIcons[i].sprite = CreateColoredSprite(16, 24, c);
+                difficultyIconRenderer.sprite = difficultySprites[selectedDifficulty];
             }
 
             // Update difficulty name label

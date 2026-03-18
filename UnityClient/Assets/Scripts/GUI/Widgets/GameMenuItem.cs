@@ -7,7 +7,7 @@ using UnityEngine;
 using H3Engine.FileSystem;
 using UnityClient.GUI.Rendering;
 
-namespace UnityClient.GUI.GameControls
+namespace UnityClient.GUI.Widgets
 {
     public class GameMenuItem : MonoBehaviour
     {

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Assets.Scripts.Utils;
 using UnityClient.Components;
 using UnityClient.Components.Data;
-using UnityClient.GUI.GameControls;
+using UnityClient.GUI.Widgets;
 using UnityClient.GUI.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;

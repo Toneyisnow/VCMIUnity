@@ -8,7 +8,7 @@ using UnityEngine.Video;
 using System.IO;
 using UnityClient.GUI.Rendering;
 
-namespace UnityClient.GUI.GameControls
+namespace UnityClient.GUI.Widgets
 {
     public class CampaignIcon : MonoBehaviour
     {
