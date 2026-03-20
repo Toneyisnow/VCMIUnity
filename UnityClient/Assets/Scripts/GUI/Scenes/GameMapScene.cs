@@ -15,7 +15,11 @@ using UnityClient.Components.Data;
 using UnityClient.Components.Mapping;
 using H3Engine.MapObjects;
 using H3Engine.Core;
+using H3Engine.Common;
+using H3Engine.GUI;
+using H3Engine.FileSystem;
 using H3Engine.Components.MapProviders;
+using UnityClient.GUI.Rendering;
 
 namespace UnityClient.GUI.Scenes
 {
@@ -77,7 +81,28 @@ namespace UnityClient.GUI.Scenes
         // Pause movement flag: set when user clicks during HeroMoving
         private bool pauseMovementRequested = false;
 
+        // Loading overlay state
+        private bool isInitializing = true;
+        private LoadProgress renderProgress = null;
+        private GameObject loadingOverlay = null;
+        private List<GameObject> progressBlocks = new List<GameObject>();
+        private int lastVisibleBlocks = 0;
+        private TextMesh loadingStatusText = null;
+
+        private const float SCREEN_W = 800f;
+        private const float SCREEN_H = 600f;
+        private const float PPU = 100f;
+        private const int PROGRESS_BLOCK_COUNT = 20;
+        private const float PROGRESS_BLOCK_SIZE = 18f;
+        private const float PROGRESS_BAR_X = 395f;
+        private const float PROGRESS_BAR_Y = 548f;
+
         void Start()
+        {
+            StartCoroutine(InitializeCoroutine());
+        }
+
+        private IEnumerator InitializeCoroutine()
         {
             H3DataAccess dataAccess = H3DataAccess.GetInstance();
 
@@ -86,16 +111,24 @@ namespace UnityClient.GUI.Scenes
             dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3bitmap.lod"));
             dataAccess.LoadArchiveFile(H3DataUtil.GetGameDataFilePath("H3sprite.lod"));
 
-            // Load campaign from CrossSceneData (set by BonusSelectionScene)
-            // Falls back to hardcoded campaign if not set (for direct testing)
-            H3Campaign campaign = CrossSceneData.CurrentCampaign;
-            int scenarioIndex = CrossSceneData.SelectedScenarioIndex;
-            if (campaign == null)
+            // Use pre-loaded map from loading screen if available, otherwise load here
+            H3Map map = CrossSceneData.LoadedMap;
+            if (map != null)
             {
-                campaign = dataAccess.RetrieveCampaign("final.h3c");
-                scenarioIndex = 3;
+                CrossSceneData.LoadedMap = null; // Consume and clear
             }
-            H3Map map = H3CampaignLoader.LoadScenarioMap(campaign, scenarioIndex);
+            else
+            {
+                // Fallback: load campaign directly (for direct testing or if loading screen was skipped)
+                H3Campaign campaign = CrossSceneData.CurrentCampaign;
+                int scenarioIndex = CrossSceneData.SelectedScenarioIndex;
+                if (campaign == null)
+                {
+                    campaign = dataAccess.RetrieveCampaign("final.h3c");
+                    scenarioIndex = 3;
+                }
+                map = H3CampaignLoader.LoadScenarioMap(campaign, scenarioIndex);
+            }
 
             playerInterface = PlayerInterface.StartGame(map);
 
@@ -106,7 +139,16 @@ namespace UnityClient.GUI.Scenes
             GameObject gameMapUI = GameObject.Find("GameMap");
             mapLoader = gameMapUI.GetComponent<MapLoader>();
             mapLoader.Initialize(gameMap);
-            mapLoader.RenderMap();
+
+            // Show loading overlay and render map with progress
+            ShowLoadingOverlay(dataAccess);
+            renderProgress = new LoadProgress();
+            yield return null; // Let overlay render one frame
+
+            yield return StartCoroutine(mapLoader.RenderMapCoroutine(renderProgress));
+
+            DestroyLoadingOverlay();
+            isInitializing = false;
 
             // Initialize pathfinder (cache + Dijkstra engine)
             pathFinderCache = new PathfinderCache();
@@ -138,6 +180,17 @@ namespace UnityClient.GUI.Scenes
 
         void Update()
         {
+            // Update loading progress bar during initialization
+            if (isInitializing)
+            {
+                if (renderProgress != null)
+                {
+                    UpdateProgressBar(renderProgress.Progress);
+                    UpdateLoadingStatus(renderProgress.StatusMessage);
+                }
+                return;
+            }
+
             if (mapCamera == null || !mapCamera.WasClick)
                 return;
 
@@ -466,6 +519,140 @@ namespace UnityClient.GUI.Scenes
                 currentPath = null;
                 selectedHero = null;
                 currentState = GameMapState.Idle;
+            }
+        }
+
+        #endregion
+
+        #region Loading Overlay
+
+        private Vector3 PixelToWorld(float px, float py, float z = 0f)
+        {
+            Camera cam = Camera.main;
+            float viewHeight = cam.orthographicSize * 2f;
+            float scale = viewHeight / (SCREEN_H / PPU);
+            float halfW = SCREEN_W / PPU * scale / 2f;
+            float halfH = SCREEN_H / PPU * scale / 2f;
+            return new Vector3(px / PPU * scale - halfW, halfH - py / PPU * scale, z);
+        }
+
+        private void ShowLoadingOverlay(H3DataAccess dataAccess)
+        {
+            Camera cam = Camera.main;
+            float viewHeight = cam.orthographicSize * 2f;
+            float scale = viewHeight / (SCREEN_H / PPU);
+
+            loadingOverlay = new GameObject("LoadingOverlay");
+            loadingOverlay.transform.parent = transform;
+
+            // Background: "loadbar" PCX from H3 game data
+            ImageData bgImage = dataAccess.RetrieveImage("loadbar.pcx");
+            if (bgImage != null)
+            {
+                GameObject bgObj = new GameObject("LoadingBG");
+                bgObj.transform.parent = loadingOverlay.transform;
+                bgObj.transform.position = PixelToWorld(0, 0, -5f);
+                bgObj.transform.localScale = new Vector3(scale, scale, 1);
+
+                SpriteRenderer bgRenderer = bgObj.AddComponent<SpriteRenderer>();
+                bgRenderer.sprite = Texture2DExtension.CreateSpriteFromImageData(bgImage, new Vector2(0, 1));
+                bgRenderer.sortingOrder = 50;
+            }
+            else
+            {
+                // Fallback: solid dark background
+                GameObject bgObj = new GameObject("LoadingBG");
+                bgObj.transform.parent = loadingOverlay.transform;
+                bgObj.transform.position = new Vector3(0, 0, -5f);
+
+                SpriteRenderer bgRenderer = bgObj.AddComponent<SpriteRenderer>();
+                Texture2D bgTex = new Texture2D(1, 1);
+                bgTex.SetPixel(0, 0, new UnityEngine.Color(0, 0, 0, 0.85f));
+                bgTex.Apply();
+                bgRenderer.sprite = Sprite.Create(bgTex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+                bgRenderer.sortingOrder = 50;
+                float viewWidth = viewHeight * cam.aspect;
+                bgObj.transform.localScale = new Vector3(viewWidth, viewHeight, 1);
+            }
+
+            // Progress blocks: "loadprog" DEF
+            progressBlocks.Clear();
+            lastVisibleBlocks = 0;
+
+            BundleImageDefinition loadProgDef = dataAccess.RetrieveBundleImage("loadprog.def");
+            if (loadProgDef != null)
+            {
+                for (int i = 0; i < PROGRESS_BLOCK_COUNT; i++)
+                {
+                    ImageData blockImage = loadProgDef.GetImageData(0, i);
+                    if (blockImage == null) continue;
+
+                    GameObject blockObj = new GameObject("ProgressBlock_" + i);
+                    blockObj.transform.parent = loadingOverlay.transform;
+                    blockObj.transform.position = PixelToWorld(
+                        PROGRESS_BAR_X + i * PROGRESS_BLOCK_SIZE,
+                        PROGRESS_BAR_Y, -6f);
+                    blockObj.transform.localScale = new Vector3(scale, scale, 1);
+
+                    SpriteRenderer blockRenderer = blockObj.AddComponent<SpriteRenderer>();
+                    blockRenderer.sprite = Texture2DExtension.CreateSpriteFromImageData(blockImage, new Vector2(0, 1));
+                    blockRenderer.sortingOrder = 52;
+
+                    blockObj.SetActive(false);
+                    progressBlocks.Add(blockObj);
+                }
+            }
+
+            // Status text
+            GameObject statusObj = new GameObject("LoadingStatus");
+            statusObj.transform.parent = loadingOverlay.transform;
+            statusObj.transform.position = PixelToWorld(400, 580, -6f);
+
+            loadingStatusText = statusObj.AddComponent<TextMesh>();
+            loadingStatusText.text = "";
+            loadingStatusText.fontSize = 18;
+            loadingStatusText.characterSize = 0.08f * scale;
+            loadingStatusText.color = UnityEngine.Color.white;
+            loadingStatusText.anchor = TextAnchor.MiddleCenter;
+            loadingStatusText.alignment = TextAlignment.Center;
+            loadingStatusText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            statusObj.GetComponent<MeshRenderer>().sortingOrder = 53;
+        }
+
+        private void UpdateProgressBar(float progress)
+        {
+            if (progressBlocks.Count == 0) return;
+
+            int visibleCount = Mathf.FloorToInt(progress * progressBlocks.Count);
+            visibleCount = Mathf.Clamp(visibleCount, 0, progressBlocks.Count);
+
+            if (visibleCount != lastVisibleBlocks)
+            {
+                for (int i = lastVisibleBlocks; i < visibleCount; i++)
+                {
+                    progressBlocks[i].SetActive(true);
+                }
+                lastVisibleBlocks = visibleCount;
+            }
+        }
+
+        private void UpdateLoadingStatus(string message)
+        {
+            if (loadingStatusText != null && !string.IsNullOrEmpty(message))
+            {
+                loadingStatusText.text = message;
+            }
+        }
+
+        private void DestroyLoadingOverlay()
+        {
+            if (loadingOverlay != null)
+            {
+                Destroy(loadingOverlay);
+                loadingOverlay = null;
+                progressBlocks.Clear();
+                lastVisibleBlocks = 0;
+                loadingStatusText = null;
             }
         }
 

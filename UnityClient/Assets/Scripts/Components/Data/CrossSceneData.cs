@@ -4,6 +4,7 @@ using UnityEngine;
 
 using H3Engine.Common;
 using H3Engine.Campaign;
+using H3Engine.Mapping;
 
 namespace UnityClient.Components.Data
 {
@@ -37,6 +38,12 @@ namespace UnityClient.Components.Data
         /// Corresponds to GAME->server().campaignMap in VCMI.
         /// </summary>
         public static int SelectedScenarioIndex { get; set; }
+
+        /// <summary>
+        /// Pre-loaded map data from the loading screen, so GameMapScene can skip re-loading.
+        /// Set by BonusSelectionScene's loading coroutine, consumed and cleared by GameMapScene.
+        /// </summary>
+        public static H3Map LoadedMap { get; set; }
 
         /// <summary>
         /// Legacy property kept for backward compatibility.

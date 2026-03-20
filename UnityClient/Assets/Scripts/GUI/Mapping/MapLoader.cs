@@ -128,6 +128,81 @@ namespace UnityClient.GUI.Mapping
 
         }
 
+        /// <summary>
+        /// Coroutine version of RenderMap that yields between phases and reports progress.
+        /// Provides smooth progress bar updates during the heavy rendering pipeline.
+        /// </summary>
+        public IEnumerator RenderMapCoroutine(LoadProgress progress)
+        {
+            int mapHeight = gameMap.Height;
+
+            // Calculate total steps: preload steps + render terrain rows + render road rows
+            // + render river rows + render objects + render edge
+            int preloadSteps = mapTextureManager.GetPreloadStepCount();
+            int renderSteps = mapHeight * 3 + 2; // terrain + road + river rows + objects + edge
+            progress.SetupSteps(preloadSteps + renderSteps);
+
+            // Phase 1: Preload textures (with per-column yields)
+            yield return mapTextureManager.PreloadTexturesCoroutine(progress);
+
+            // Phase 2: Render terrain (per-row yield)
+            progress.SetStatus("Rendering terrain...");
+            for (int yy = 0; yy < mapHeight; yy++)
+            {
+                for (int xx = 0; xx < gameMap.Width; xx++)
+                {
+                    TerrainTile tile = gameMap.TerrainTiles[xx, yy];
+                    Sprite sprite = mapTextureManager.LoadTerrainSprite(tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
+                    GameObject gametile = CreateSubChildObject("Terrain", GetMapPosition(xx, yy), sprite, SortOrder_Terrain);
+                    MapTile mapTileComponent = gametile.AddComponent<MapTile>();
+                    mapTileComponent.Initialize(xx, yy);
+                }
+                progress.Step();
+                yield return null;
+            }
+
+            // Phase 3: Render road (per-row yield)
+            progress.SetStatus("Rendering roads...");
+            for (int yy = 0; yy < mapHeight; yy++)
+            {
+                for (int xx = 0; xx < gameMap.Width; xx++)
+                {
+                    TerrainTile tile = gameMap.TerrainTiles[xx, yy];
+                    Sprite sprite = mapTextureManager.LoadRoadSprite(tile.RoadType, tile.RoadDir, tile.RoadRotation);
+                    CreateSubChildObject("Road", GetMapPosition(xx, yy), sprite, SortOrder_Road);
+                }
+                progress.Step();
+                yield return null;
+            }
+
+            // Phase 4: Render river (per-row yield)
+            progress.SetStatus("Rendering rivers...");
+            for (int yy = 0; yy < mapHeight; yy++)
+            {
+                for (int xx = 0; xx < gameMap.Width; xx++)
+                {
+                    TerrainTile tile = gameMap.TerrainTiles[xx, yy];
+                    Sprite sprite = mapTextureManager.LoadRiverSprite(tile.RiverType, tile.RiverDir, tile.RiverRotation);
+                    CreateSubChildObject("River", GetMapPosition(xx, yy), sprite, SortOrder_River);
+                }
+                progress.Step();
+                yield return null;
+            }
+
+            // Phase 5: Render map objects
+            progress.SetStatus("Rendering map objects...");
+            RenderMapObjects();
+            progress.Step();
+            yield return null;
+
+            // Phase 6: Render edge
+            progress.SetStatus("Rendering map edges...");
+            RenderEdge();
+            progress.Step();
+
+            progress.Finish();
+        }
+
         // Start is called before the first frame update
         void Start()
         {

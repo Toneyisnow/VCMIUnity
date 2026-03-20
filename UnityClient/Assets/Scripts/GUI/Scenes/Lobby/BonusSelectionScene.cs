@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 using H3Engine.DataAccess;
@@ -65,6 +66,22 @@ namespace UnityClient.GUI.Scenes.Lobby
         // Difficulty icon tracking: 5 sprites from GSPBUT3-7.DEF, single renderer
         private Sprite[] difficultySprites = new Sprite[5];
         private SpriteRenderer difficultyIconRenderer = null;
+
+        // Loading overlay state
+        private bool isLoading = false;
+        private LoadProgress loadProgress = null;
+        private H3Map loadedMap = null;
+        private Exception loadException = null;
+        private GameObject loadingOverlay = null;
+        private TextMesh loadingStatusText = null;
+
+        // Progress bar blocks (from loadprog.def, matching VCMI's CLoadingScreen)
+        private const int PROGRESS_BLOCK_COUNT = 20;
+        private const float PROGRESS_BLOCK_SIZE = 18f; // pixels
+        private const float PROGRESS_BAR_X = 395f;     // pixels from left
+        private const float PROGRESS_BAR_Y = 548f;     // pixels from top
+        private List<GameObject> progressBlocks = new List<GameObject>();
+        private int lastVisibleBlocks = 0;
 
         /// <summary>
         /// DEF name to overlay frame mapping per bonus type.
@@ -796,20 +813,77 @@ namespace UnityClient.GUI.Scenes.Lobby
 
         private void OnStartClicked()
         {
+            if (isLoading) return;
+
             if (campaign == null || selectedScenarioIndex < 0 || selectedScenarioIndex >= campaign.Scenarios.Count)
             {
                 Debug.LogError("[BonusSelection] Invalid scenario index: " + selectedScenarioIndex);
                 return;
             }
 
-            CrossSceneData.CurrentCampaign = campaign;
-            CrossSceneData.SelectedScenarioIndex = selectedScenarioIndex;
-
             Debug.Log(string.Format("[BonusSelection] Starting scenario {0}: {1}, bonus={2}, difficulty={3}",
                 selectedScenarioIndex, campaign.Scenarios[selectedScenarioIndex].MapName,
                 selectedBonusIndex, selectedDifficulty));
 
-            SceneManager.LoadScene("GameMapScene", LoadSceneMode.Single);
+            // Show loading overlay and start background map loading
+            isLoading = true;
+            loadProgress = new LoadProgress();
+            loadedMap = null;
+            loadException = null;
+
+            ShowLoadingOverlay();
+
+            // Capture values for the background thread
+            H3Campaign campaignRef = campaign;
+            int scenarioIdx = selectedScenarioIndex;
+
+            Thread loadThread = new Thread(() =>
+            {
+                try
+                {
+                    loadedMap = H3CampaignLoader.LoadScenarioMap(campaignRef, scenarioIdx, loadProgress);
+                }
+                catch (Exception ex)
+                {
+                    loadException = ex;
+                }
+            });
+            loadThread.IsBackground = true;
+            loadThread.Start();
+        }
+
+        void Update()
+        {
+            if (!isLoading) return;
+
+            // Check for loading error
+            if (loadException != null)
+            {
+                Debug.LogError("[BonusSelection] Map loading failed: " + loadException.Message);
+                isLoading = false;
+                DestroyLoadingOverlay();
+                return;
+            }
+
+            // Update progress bar
+            if (loadProgress != null)
+            {
+                float progress = loadProgress.Progress;
+                UpdateProgressBar(progress);
+                UpdateLoadingStatus(loadProgress.StatusMessage);
+            }
+
+            // Check if loading is complete
+            if (loadedMap != null)
+            {
+                isLoading = false;
+
+                CrossSceneData.CurrentCampaign = campaign;
+                CrossSceneData.SelectedScenarioIndex = selectedScenarioIndex;
+                CrossSceneData.LoadedMap = loadedMap;
+
+                SceneManager.LoadScene("GameMapScene", LoadSceneMode.Single);
+            }
         }
 
         private void OnBackClicked()
@@ -820,6 +894,136 @@ namespace UnityClient.GUI.Scenes.Lobby
         private void OnVideoClicked()
         {
             Debug.Log("[BonusSelection] Video button clicked (not implemented)");
+        }
+
+        #endregion
+
+        #region Loading Overlay
+
+        private void ShowLoadingOverlay()
+        {
+            loadingOverlay = new GameObject("LoadingOverlay");
+            loadingOverlay.transform.parent = transform;
+
+            // Background: "loadbar" PCX from H3 game data (800x600 loading screen)
+            ImageData bgImage = dataAccess.RetrieveImage("loadbar.pcx");
+            if (bgImage != null)
+            {
+                GameObject bgObj = new GameObject("LoadingBG");
+                bgObj.transform.parent = loadingOverlay.transform;
+                bgObj.transform.position = PixelToWorld(0, 0, -5f);
+                bgObj.transform.localScale = new Vector3(scale, scale, 1);
+
+                SpriteRenderer bgRenderer = bgObj.AddComponent<SpriteRenderer>();
+                bgRenderer.sprite = Texture2DExtension.CreateSpriteFromImageData(bgImage, new Vector2(0, 1));
+                bgRenderer.sortingOrder = 50;
+            }
+            else
+            {
+                // Fallback: solid dark background if loadbar.pcx not found
+                Debug.LogWarning("[BonusSelection] loadbar.pcx not found, using dark background");
+                GameObject bgObj = new GameObject("LoadingBG");
+                bgObj.transform.parent = loadingOverlay.transform;
+                bgObj.transform.position = new Vector3(0, 0, -5f);
+
+                SpriteRenderer bgRenderer = bgObj.AddComponent<SpriteRenderer>();
+                Texture2D bgTex = new Texture2D(1, 1);
+                bgTex.SetPixel(0, 0, new UnityEngine.Color(0, 0, 0, 0.85f));
+                bgTex.Apply();
+                bgRenderer.sprite = Sprite.Create(bgTex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+                bgRenderer.sortingOrder = 50;
+
+                Camera cam = Camera.main;
+                float viewHeight = cam.orthographicSize * 2f;
+                float viewWidth = viewHeight * cam.aspect;
+                bgObj.transform.localScale = new Vector3(viewWidth, viewHeight, 1);
+            }
+
+            // Progress blocks: "loadprog" DEF from H3 game data
+            // VCMI: 20 blocks, each 18px wide, at (395, 548)
+            progressBlocks.Clear();
+            lastVisibleBlocks = 0;
+
+            BundleImageDefinition loadProgDef = dataAccess.RetrieveBundleImage("loadprog.def");
+            if (loadProgDef != null)
+            {
+                for (int i = 0; i < PROGRESS_BLOCK_COUNT; i++)
+                {
+                    ImageData blockImage = loadProgDef.GetImageData(0, i);
+                    if (blockImage == null) continue;
+
+                    GameObject blockObj = new GameObject("ProgressBlock_" + i);
+                    blockObj.transform.parent = loadingOverlay.transform;
+                    blockObj.transform.position = PixelToWorld(
+                        PROGRESS_BAR_X + i * PROGRESS_BLOCK_SIZE,
+                        PROGRESS_BAR_Y, -6f);
+                    blockObj.transform.localScale = new Vector3(scale, scale, 1);
+
+                    SpriteRenderer blockRenderer = blockObj.AddComponent<SpriteRenderer>();
+                    blockRenderer.sprite = Texture2DExtension.CreateSpriteFromImageData(blockImage, new Vector2(0, 1));
+                    blockRenderer.sortingOrder = 52;
+
+                    blockObj.SetActive(false); // Start hidden, reveal as progress advances
+                    progressBlocks.Add(blockObj);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BonusSelection] loadprog.def not found, progress bar will not show");
+            }
+
+            // Status text (shows current loading phase)
+            GameObject statusObj = new GameObject("LoadingStatus");
+            statusObj.transform.parent = loadingOverlay.transform;
+            statusObj.transform.position = PixelToWorld(400, 580, -6f);
+
+            loadingStatusText = statusObj.AddComponent<TextMesh>();
+            loadingStatusText.text = "";
+            loadingStatusText.fontSize = 18;
+            loadingStatusText.characterSize = 0.08f * scale;
+            loadingStatusText.color = UnityEngine.Color.white;
+            loadingStatusText.anchor = TextAnchor.MiddleCenter;
+            loadingStatusText.alignment = TextAlignment.Center;
+            loadingStatusText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            statusObj.GetComponent<MeshRenderer>().sortingOrder = 53;
+        }
+
+        private void UpdateProgressBar(float progress)
+        {
+            if (progressBlocks.Count == 0) return;
+
+            int visibleCount = Mathf.FloorToInt(progress * progressBlocks.Count);
+            visibleCount = Mathf.Clamp(visibleCount, 0, progressBlocks.Count);
+
+            // Only update if changed
+            if (visibleCount != lastVisibleBlocks)
+            {
+                for (int i = lastVisibleBlocks; i < visibleCount; i++)
+                {
+                    progressBlocks[i].SetActive(true);
+                }
+                lastVisibleBlocks = visibleCount;
+            }
+        }
+
+        private void UpdateLoadingStatus(string message)
+        {
+            if (loadingStatusText != null && !string.IsNullOrEmpty(message))
+            {
+                loadingStatusText.text = message;
+            }
+        }
+
+        private void DestroyLoadingOverlay()
+        {
+            if (loadingOverlay != null)
+            {
+                Destroy(loadingOverlay);
+                loadingOverlay = null;
+                progressBlocks.Clear();
+                lastVisibleBlocks = 0;
+                loadingStatusText = null;
+            }
         }
 
         #endregion

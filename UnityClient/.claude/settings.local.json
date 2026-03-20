@@ -38,7 +38,11 @@
       "Bash('C:/Program Files \\(x86\\)/Microsoft Visual Studio/Installer/vswhere.exe' -all -products * -format json)",
       "Bash(\"C:/Program Files \\(x86\\)/Microsoft Visual Studio/Installer/vswhere.exe\" -all -products '*' -property installationPath)",
       "Bash(xargs grep:*)",
-      "Bash(find /d/SourceCode/Git/vcmi/vcmi -name *bonus* -o -name *Bonus*)"
+      "Bash(find /d/SourceCode/Git/vcmi/vcmi -name *bonus* -o -name *Bonus*)",
+      "Bash(grep -r \"loadbar\\\\|loadprog\" d:/SourceCode/Git/vcmi/vcmi --include=*.def --include=*.h3m -i)",
+      "Bash(find d:/SourceCode/Git/vcmi/vcmi/config -type f \\\\\\(-name *.def -o -name *.pcx -o -name *.bmp \\\\\\))",
+      "Bash(find d:/SourceCode/Git/vcmi/vcmi -type f -name *CAnimImage* -o -name *MiscWidgets*)",
+      "Bash(find \"d:/SourceCode/Git/vcmi/vcmi/client\" -name \"*.h\" -exec grep -l \"CAnimImage\" {})"
     ]
   }
 }

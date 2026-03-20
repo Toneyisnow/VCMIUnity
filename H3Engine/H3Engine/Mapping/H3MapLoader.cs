@@ -48,32 +48,55 @@ namespace H3Engine.Mapping
 
         public H3Map LoadMap()
         {
+            return LoadMap(null);
+        }
+
+        /// <summary>
+        /// Load the map with optional progress reporting.
+        /// </summary>
+        public H3Map LoadMap(LoadProgress progress)
+        {
             mapObject = new H3Map();
+
+            // Total steps: header(1) + playerInfo(1) + victoryLoss(1) + team(1) + heroes(1) + disposed(1) + artifacts(1) + spells(1) + rumors(1) + predefined(1) + terrain(1) + templates(1) + objects(1) + events(1) + consolidate(1) = 15
+            if (progress != null)
+            {
+                progress.SetupSteps(15);
+                progress.SetStatus("Reading map header...");
+            }
 
             using (MemoryStream streamData = new MemoryStream(mapData))
             {
                 using (BinaryReader reader = new BinaryReader(streamData, Encoding.UTF8))
                 {
                     ReadHeader(reader);
+                    progress?.Step(); // 1
 
                     ReadPlayerInfo(reader);
+                    progress?.Step(); // 2
 
                     ReadVictoryLossConditions(reader);
+                    progress?.Step(); // 3
 
                     // 1 byte + N * 1
                     ReadTeamInfo(reader);
+                    progress?.Step(); // 4
 
                     // 20 byte mask + placeholdercount + placeholder
                     ReadAllowedHeroes(reader);
-                    
-                    // 417 
+                    progress?.Step(); // 5
+
+                    // 417
                     ReadDisposedHeroes(reader);
+                    progress?.Step(); // 6
 
                     // 18 bytes
                     ReadAllowedArtifacts(reader);
+                    progress?.Step(); // 7
 
                     // 13 bytes
                     ReadAllowedSpellsAbilities(reader);
+                    progress?.Step(); // 8
 
                     if (this.mapObject.Header.Version == EMapFormat.HOTA)
                     {
@@ -82,23 +105,39 @@ namespace H3Engine.Mapping
                     }
 
                     ReadRumors(reader);
+                    progress?.Step(); // 9
 
                     ReadPredefinedHeroes(reader);
+                    progress?.Step(); // 10
+
+                    if (progress != null) progress.SetStatus("Reading terrain...");
 
                     //// reader.Seek(646, SeekOrigin.Begin);
 
                     ReadTerrain(reader);
+                    progress?.Step(); // 11
+
+                    if (progress != null) progress.SetStatus("Reading object templates...");
 
                     ReadObjectTemplates(reader);
+                    progress?.Step(); // 12
+
+                    if (progress != null) progress.SetStatus("Reading objects...");
 
                     ReadObjects(reader);
+                    progress?.Step(); // 13
 
                     ReadEvents(reader);
+                    progress?.Step(); // 14
+
+                    if (progress != null) progress.SetStatus("Finalizing map data...");
 
                     ConsolidateAndAdjustData();
+                    progress?.Step(); // 15
                 }
             }
 
+            progress?.Finish();
             return mapObject;
         }
         

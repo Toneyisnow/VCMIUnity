@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -65,8 +66,106 @@ namespace UnityClient.GUI.Rendering
             lastTime = DateTime.Now;
 
             PreloadCursorTextures();
+        }
 
+        /// <summary>
+        /// Coroutine version of PreloadTextures that yields per-column and reports progress.
+        /// Caller is responsible for setting up LoadProgress total steps before calling.
+        /// Steps consumed: mapWidth * 3 (terrain/road/river columns) + 3 (pack) + 3 (edge/objects/cursor).
+        /// </summary>
+        public IEnumerator PreloadTexturesCoroutine(LoadProgress progress)
+        {
+            int mapWidth = (int)h3Map.Header.Width;
+            int mapHeight = (int)h3Map.Header.Height;
 
+            // --- Terrain ---
+            progress.SetStatus("Loading terrain textures...");
+            terrainTextureSheet = new TextureSheet();
+            for (int xx = 0; xx < mapWidth; xx++)
+            {
+                for (int yy = 0; yy < mapHeight; yy++)
+                {
+                    TerrainTile tile = h3Map.TerrainTiles[0, xx, yy];
+                    ImageData imageData = h3dataAccess.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
+                    Texture2D texture = Texture2DExtension.LoadFromData(imageData, tile.TerrainRotation);
+                    string textureKey = string.Format(@"{0}{1}{2}", tile.TerrainType, tile.TerrainView, tile.TerrainRotation);
+                    terrainTextureSheet.AddImageData(textureKey, texture);
+                }
+                progress.Step();
+                yield return null;
+            }
+            terrainTextureSheet.PackTextures();
+            progress.Step();
+            yield return null;
+
+            // --- Road ---
+            progress.SetStatus("Loading road textures...");
+            roadTextureSheet = new TextureSheet();
+            for (int xx = 0; xx < mapWidth; xx++)
+            {
+                for (int yy = 0; yy < mapHeight; yy++)
+                {
+                    TerrainTile tile = h3Map.TerrainTiles[0, xx, yy];
+                    if (tile.RoadType == ERoadType.NO_ROAD) continue;
+                    ImageData imageData = h3dataAccess.RetrieveRoadImage(tile.RoadType, tile.RoadDir);
+                    Texture2D texture = Texture2DExtension.LoadFromData(imageData, tile.RoadRotation);
+                    string textureKey = string.Format(@"{0}{1}{2}", tile.RoadType, tile.RoadDir, tile.RoadRotation);
+                    roadTextureSheet.AddImageData(textureKey, texture);
+                }
+                progress.Step();
+                yield return null;
+            }
+            roadTextureSheet.PackTextures();
+            progress.Step();
+            yield return null;
+
+            // --- River ---
+            progress.SetStatus("Loading river textures...");
+            riverTextureSheet = new TextureSheet();
+            for (int xx = 0; xx < mapWidth; xx++)
+            {
+                for (int yy = 0; yy < mapHeight; yy++)
+                {
+                    TerrainTile tile = h3Map.TerrainTiles[0, xx, yy];
+                    if (tile.RiverType == ERiverType.NO_RIVER) continue;
+                    ImageData imageData = h3dataAccess.RetrieveRiverImage(tile.RiverType, tile.RiverDir);
+                    Texture2D texture = Texture2DExtension.LoadFromData(imageData, tile.RiverRotation);
+                    string textureKey = string.Format(@"{0}{1}{2}", tile.RiverType, tile.RiverDir, tile.RiverRotation);
+                    riverTextureSheet.AddImageData(textureKey, texture);
+                }
+                progress.Step();
+                yield return null;
+            }
+            riverTextureSheet.PackTextures();
+            progress.Step();
+            yield return null;
+
+            // --- Edge (small, no per-item yield needed) ---
+            progress.SetStatus("Loading edge textures...");
+            PreloadEdgeTextures();
+            progress.Step();
+            yield return null;
+
+            // --- Map Objects ---
+            progress.SetStatus("Loading object textures...");
+            PreloadMapObjectTextures();
+            progress.Step();
+            yield return null;
+
+            // --- Cursor ---
+            PreloadCursorTextures();
+            progress.Step();
+            yield return null;
+        }
+
+        /// <summary>
+        /// Returns the number of progress steps consumed by PreloadTexturesCoroutine.
+        /// </summary>
+        public int GetPreloadStepCount()
+        {
+            int mapWidth = (int)h3Map.Header.Width;
+            // terrain columns + pack + road columns + pack + river columns + pack + edge + objects + cursor
+            return mapWidth * 3 + 3 + 3;
         }
 
         public Sprite LoadTerrainSprite(ETerrainType terrainType, byte terrainIndex, byte rotation)

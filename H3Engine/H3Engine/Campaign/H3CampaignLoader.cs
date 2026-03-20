@@ -61,6 +61,11 @@ namespace H3Engine.Campaign
 
         public static H3Map LoadScenarioMap(H3Campaign campaign, int scenarioIndex)
         {
+            return LoadScenarioMap(campaign, scenarioIndex, null);
+        }
+
+        public static H3Map LoadScenarioMap(H3Campaign campaign, int scenarioIndex, LoadProgress progress)
+        {
             if (campaign == null)
             {
                 throw new ArgumentNullException("campaign is null.");
@@ -74,7 +79,11 @@ namespace H3Engine.Campaign
             if (campaign.Scenarios[scenarioIndex].MapData == null && campaign.CampaignMapBytes[scenarioIndex] != null)
             {
                 H3MapLoader h3MapLoader = new H3MapLoader(campaign.CampaignMapBytes[scenarioIndex]);
-                campaign.Scenarios[scenarioIndex].MapData = h3MapLoader.LoadMap();
+                campaign.Scenarios[scenarioIndex].MapData = h3MapLoader.LoadMap(progress);
+            }
+            else
+            {
+                progress?.Finish();
             }
 
             return campaign.Scenarios[scenarioIndex].MapData;
