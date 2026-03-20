@@ -42,7 +42,8 @@
       "Bash(grep -r \"loadbar\\\\|loadprog\" d:/SourceCode/Git/vcmi/vcmi --include=*.def --include=*.h3m -i)",
       "Bash(find d:/SourceCode/Git/vcmi/vcmi/config -type f \\\\\\(-name *.def -o -name *.pcx -o -name *.bmp \\\\\\))",
       "Bash(find d:/SourceCode/Git/vcmi/vcmi -type f -name *CAnimImage* -o -name *MiscWidgets*)",
-      "Bash(find \"d:/SourceCode/Git/vcmi/vcmi/client\" -name \"*.h\" -exec grep -l \"CAnimImage\" {})"
+      "Bash(find \"d:/SourceCode/Git/vcmi/vcmi/client\" -name \"*.h\" -exec grep -l \"CAnimImage\" {})",
+      "Bash(dotnet build:*)"
     ]
   }
 }

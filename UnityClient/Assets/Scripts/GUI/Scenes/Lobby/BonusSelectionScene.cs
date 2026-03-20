@@ -155,10 +155,10 @@ namespace UnityClient.GUI.Scenes.Lobby
 
         void Start()
         {
-            Camera cam = Camera.main;
-            float viewHeight = cam.orthographicSize * 2f;
-            scale = viewHeight / (SCREEN_H / PPU);
-            Debug.Log(string.Format("[BonusSelection] Camera ortho={0}, scale={1}", cam.orthographicSize, scale));
+            // Use scale=1 so H3 pixel coords map directly to world units at PPU=100,
+            // consistent with MainMenuScene's native sprite rendering.
+            scale = 1.0f;
+            Debug.Log(string.Format("[BonusSelection] scale={0}", scale));
 
             ECampaignVersion campaignVersion = CrossSceneData.SelectedCampaignSet;
             int campaignIndex = CrossSceneData.SelectedCampaignIndex;
@@ -903,7 +903,7 @@ namespace UnityClient.GUI.Scenes.Lobby
         private void ShowLoadingOverlay()
         {
             loadingOverlay = new GameObject("LoadingOverlay");
-            loadingOverlay.transform.parent = transform;
+            // Do not parent to scene transform — PixelToWorld computes world-space positions.
 
             // Background: "loadbar" PCX from H3 game data (800x600 loading screen)
             ImageData bgImage = dataAccess.RetrieveImage("loadbar.pcx");

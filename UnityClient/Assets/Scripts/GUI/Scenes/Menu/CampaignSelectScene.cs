@@ -28,7 +28,7 @@ namespace UnityClient.GUI.Scenes.Menu
         // Background dimensions in pixels (campback.PCX)
         private const float BG_WIDTH_PX = 800f;
         private const float BG_HEIGHT_PX = 600f;
-        private const float BG_SCALE = 1.6f;
+        private const float BG_SCALE = 1.0f;
         private const float PPU = 100f;
 
         private List<GameObject> campaignIcons = new List<GameObject>();
