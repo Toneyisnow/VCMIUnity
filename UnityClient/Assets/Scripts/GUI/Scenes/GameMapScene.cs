@@ -99,6 +99,9 @@ namespace UnityClient.GUI.Scenes
 
         void Start()
         {
+            // Set camera so that 1 asset pixel = 1 screen pixel at default zoom
+            Camera.main.orthographicSize = Screen.height / (2f * PPU);
+
             StartCoroutine(InitializeCoroutine());
         }
 
