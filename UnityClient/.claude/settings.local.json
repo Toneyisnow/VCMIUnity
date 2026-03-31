@@ -43,7 +43,15 @@
       "Bash(find d:/SourceCode/Git/vcmi/vcmi/config -type f \\\\\\(-name *.def -o -name *.pcx -o -name *.bmp \\\\\\))",
       "Bash(find d:/SourceCode/Git/vcmi/vcmi -type f -name *CAnimImage* -o -name *MiscWidgets*)",
       "Bash(find \"d:/SourceCode/Git/vcmi/vcmi/client\" -name \"*.h\" -exec grep -l \"CAnimImage\" {})",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient -name *.tmpreset -o -name 'LiberationSans SDF*' -o -name TMP_*)",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets -name *.fontsettings -o -name *SDF* -o -name *.tmpro)",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Library/PackageCache/com.unity.ugui@bb329a87fcdc -name LiberationSans*)",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient -name Unity.TextMeshPro* -o -name TMPro*)",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Library -name Unity.TextMeshPro.dll -not -path */Editor*)",
+      "Bash(mv \"Assets/Scripts/AdventureMapCoordinate.cs.meta\" \"Assets/Scripts/GUI/Mapping/AdventureMapCoordinate.cs.meta\")",
+      "Bash(mv \"Assets/Scripts/AnimatedMapArtifact.cs.meta\" \"Assets/Scripts/GUI/Mapping/AnimatedMapArtifact.cs.meta\")",
+      "Bash(mv \"Assets/Scripts/AnimatedObject.cs.meta\" \"Assets/Scripts/GUI/Mapping/AnimatedObject.cs.meta\")"
     ]
   }
 }

@@ -269,9 +269,9 @@ public class SampleTest : MonoBehaviour
         GameMap gameMap = GameMap.LoadFromH3Map(map, 2);
 
         Transform gameMapGO = transform.Find("GameMap");
-        MapLoader mapLoader = gameMapGO.gameObject.GetComponent<MapLoader>();
-        mapLoader.Initialize(gameMap);
-        mapLoader.RenderMap();
+        MapComponent mapComponent = gameMapGO.gameObject.GetComponent<MapComponent>();
+        mapComponent.Initialize(gameMap);
+        mapComponent.RenderMap();
         
 
     }

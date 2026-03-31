@@ -49,7 +49,8 @@ namespace UnityClient.GUI.Scenes
 
         private MenuControl menuControl = null;
 
-        private MapLoader mapLoader = null;
+        private MapComponent mapComponent = null;
+        private MovePathResolver movePathResolver = null;
 
         private MapCamera mapCamera = null;
 
@@ -140,15 +141,16 @@ namespace UnityClient.GUI.Scenes
             GameMap gameMap = playerInterface.GameData.MapAtLevel(0);
 
             GameObject gameMapUI = GameObject.Find("GameMap");
-            mapLoader = gameMapUI.GetComponent<MapLoader>();
-            mapLoader.Initialize(gameMap);
+            mapComponent = gameMapUI.GetComponent<MapComponent>();
+            mapComponent.Initialize(gameMap);
+            movePathResolver = mapComponent.PathResolver;
 
             // Show loading overlay and render map with progress
             ShowLoadingOverlay(dataAccess);
             renderProgress = new LoadProgress();
             yield return null; // Let overlay render one frame
 
-            yield return StartCoroutine(mapLoader.RenderMapCoroutine(renderProgress));
+            yield return StartCoroutine(mapComponent.RenderMapCoroutine(renderProgress));
 
             DestroyLoadingOverlay();
             isInitializing = false;
@@ -208,7 +210,7 @@ namespace UnityClient.GUI.Scenes
                 worldPos.x, worldPos.y, tileX, tileY, currentState));
 
             // Bounds check
-            GameMap gameMap = mapLoader.GameMap;
+            GameMap gameMap = mapComponent.GameMap;
             if (tileX < 0 || tileX >= gameMap.Width || tileY < 0 || tileY >= gameMap.Height)
             {
                 Debug.Log("[GameMapScene] Click out of bounds, ignored.");
@@ -223,7 +225,7 @@ namespace UnityClient.GUI.Scenes
                 return;
             }
 
-            HeroInstance heroAtTile = mapLoader.GetHeroAtTile(tileX, tileY);
+            HeroInstance heroAtTile = mapComponent.GetHeroAtTile(tileX, tileY);
             Debug.Log("[GameMapScene] HeroAtTile: " + (heroAtTile != null ? "YES id=" + heroAtTile.Identifier : "none"));
 
             switch (currentState)
@@ -314,7 +316,7 @@ namespace UnityClient.GUI.Scenes
 
         private void SelectHero(HeroInstance hero)
         {
-            mapLoader.ClearPath();
+            movePathResolver.ClearPath();
             currentPath = null;
 
             selectedHero = hero;
@@ -325,7 +327,7 @@ namespace UnityClient.GUI.Scenes
 
         private void DeselectHero()
         {
-            mapLoader.ClearPath();
+            movePathResolver.ClearPath();
             currentPath = null;
             selectedHero = null;
             currentState = GameMapState.Idle;
@@ -345,7 +347,7 @@ namespace UnityClient.GUI.Scenes
                 selectedHero,
                 maxMP,
                 currentMP,
-                mapLoader.GameMap,
+                mapComponent.GameMap,
                 pathFinderCache.CurrentGameStateVersion);
 
             // Debug: dump accessibility around hero's position
@@ -363,7 +365,7 @@ namespace UnityClient.GUI.Scenes
             currentState = GameMapState.DestinationSelected;
 
             // Display path arrows on map (green for reachable, orange for unreachable this turn)
-            mapLoader.ShowPath(currentPath);
+            movePathResolver.ShowPath(currentPath);
 
             print(string.Format("Destination selected at ({0}, {1}), path length: {2}, maxMP: {3}, currentMP: {4}",
                 tileX, tileY, path.Count, maxMP, currentMP));
@@ -409,7 +411,7 @@ namespace UnityClient.GUI.Scenes
 
         private IEnumerator MoveHeroAlongPath()
         {
-            GameObject heroGO = mapLoader.GetHeroGameObject(selectedHero);
+            GameObject heroGO = mapComponent.GetHeroGameObject(selectedHero);
             if (heroGO == null)
             {
                 print("[MoveHero] heroGO is null, aborting.");
@@ -448,14 +450,14 @@ namespace UnityClient.GUI.Scenes
                 int dy = Mathf.Clamp(targetY - prevY, -1, 1);
                 lastDx = dx;
                 lastDy = dy;
-                mapLoader.SetHeroMovingAnimation(selectedHero, dx, dy);
+                movePathResolver.SetHeroMovingAnimation(selectedHero, dx, dy);
 
                 // Remove the arrow on the tile we're moving towards (as hero starts overlapping it)
                 // pathArrowObjects[0] corresponds to path[1], so index i-1
-                mapLoader.RemovePathArrowAtIndex(i - 1);
+                movePathResolver.RemovePathArrowAtIndex(i - 1);
 
                 Vector3 startPos = heroGO.transform.position;
-                Vector3 endPos = mapLoader.HeroTileToWorldPosition(targetX, targetY);
+                Vector3 endPos = movePathResolver.HeroTileToWorldPosition(targetX, targetY);
 
                 float distance = Vector3.Distance(startPos, endPos);
                 float duration = distance / (MOVE_SPEED * 0.32f);
@@ -481,12 +483,12 @@ namespace UnityClient.GUI.Scenes
             }
 
             // Movement complete - idle in the last facing direction
-            mapLoader.SetHeroIdleAnimation(selectedHero, lastDx, lastDy);
+            movePathResolver.SetHeroIdleAnimation(selectedHero, lastDx, lastDy);
 
             MapPathNode stopNode = currentPath[stoppedAtIndex];
             int finalX = stopNode.Position.PosX;
             int finalY = stopNode.Position.PosY;
-            mapLoader.UpdateHeroPosition(selectedHero, finalX, finalY);
+            mapComponent.UpdateHeroPosition(selectedHero, finalX, finalY);
 
             // Update remaining movement points from the pathfinder node's actual value
             selectedHero.RestMovePoint = stopNode.MoveRemains;
@@ -503,7 +505,7 @@ namespace UnityClient.GUI.Scenes
             {
                 // Either paused by click or ran out of movement points with orange tiles ahead.
                 // Trim arrows and path to remaining portion, stay in DestinationSelected.
-                mapLoader.TrimPathArrowsFromStart(stoppedAtIndex);
+                movePathResolver.TrimPathArrowsFromStart(stoppedAtIndex);
                 currentPath = currentPath.GetRange(stoppedAtIndex, currentPath.Count - stoppedAtIndex);
                 currentState = GameMapState.DestinationSelected;
 
@@ -518,7 +520,7 @@ namespace UnityClient.GUI.Scenes
                     finalX, finalY, selectedHero.RestMovePoint));
 
                 // Clear any remaining arrows and reset state
-                mapLoader.ClearPath();
+                movePathResolver.ClearPath();
                 currentPath = null;
                 selectedHero = null;
                 currentState = GameMapState.Idle;

@@ -97,9 +97,9 @@ namespace H3Engine.FileSystem
                 }
             }
 
-            return Encoding.ASCII.GetString(result);
+            return Encoding.GetEncoding(1252).GetString(result);
         }
-        
+
 
         public static string ReadStringToEnd(this BinaryReader reader)
         {
@@ -139,9 +139,9 @@ namespace H3Engine.FileSystem
             byte[] result = new byte[length];
             Buffer.BlockCopy(str, (isQuoted ? 1 : 0), result, 0, length);
 
-            return Encoding.ASCII.GetString(result);
+            return Encoding.GetEncoding(1252).GetString(result);
         }
-        
+
 
     }
 }

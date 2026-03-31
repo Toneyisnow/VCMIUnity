@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using TMPro;
 
 using H3Engine.DataAccess;
 using H3Engine.Common;
@@ -66,6 +67,7 @@ namespace UnityClient.GUI.Scenes.Lobby
         // Difficulty icon tracking: 5 sprites from GSPBUT3-7.DEF, single renderer
         private Sprite[] difficultySprites = new Sprite[5];
         private SpriteRenderer difficultyIconRenderer = null;
+
 
         // Loading overlay state
         private bool isLoading = false;
@@ -609,7 +611,11 @@ namespace UnityClient.GUI.Scenes.Lobby
         private string GetCurrentScenarioName()
         {
             if (selectedScenarioIndex < campaign.Scenarios.Count)
-                return campaign.Scenarios[selectedScenarioIndex].MapName ?? "Scenario";
+            {
+                string mapName = campaign.Scenarios[selectedScenarioIndex].MapName ?? "Scenario";
+                // MapName stores the .h3m filename; strip the extension for display
+                return System.IO.Path.GetFileNameWithoutExtension(mapName);
+            }
             return "Scenario";
         }
 
@@ -707,15 +713,25 @@ namespace UnityClient.GUI.Scenes.Lobby
             go.transform.parent = transform;
             go.transform.position = PixelToWorld(px, py, -0.5f);
 
-            TextMesh textMesh = go.AddComponent<TextMesh>();
-            textMesh.text = text;
-            textMesh.fontSize = fontSize;
-            textMesh.characterSize = 0.1f * scale;
-            textMesh.color = color;
-            textMesh.anchor = TextAnchor.UpperLeft;
-            textMesh.alignment = TextAlignment.Left;
+            TextMeshPro tmp = go.AddComponent<TextMeshPro>();
+            TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts/fangzheng_black_gb18030_yolan SDF");
+            if (font != null)
+                tmp.font = font;
+            else
+                Debug.LogWarning("[BonusSelection] Chinese font not found at Resources/Fonts/fangzheng_black_gb18030_yolan SDF");
 
-            textMesh.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            tmp.text = text;
+            // TMP fontSize in world units at PPU=100
+            tmp.fontSize = fontSize * 0.1f * scale;
+            tmp.color = color;
+            tmp.alignment = TextAlignmentOptions.TopLeft;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            // Width = 286px right panel, height = 200px (large enough to never clip)
+            // Pivot top-left so position matches PixelToWorld top-left origin
+            tmp.rectTransform.pivot = new Vector2(0f, 1f);
+            tmp.rectTransform.sizeDelta = new Vector2(286f / PPU * scale, 2000f / PPU * scale);
+            tmp.overflowMode = TextOverflowModes.Truncate;
+
             go.GetComponent<MeshRenderer>().sortingOrder = 3;
         }
 
