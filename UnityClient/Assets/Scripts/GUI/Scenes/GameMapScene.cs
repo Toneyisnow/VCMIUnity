@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using H3Engine.DataAccess;
-using H3Engine.Components.Data;
+using H3Engine.Engine;
 
 using H3Engine;
 using System.IO;
@@ -18,7 +18,7 @@ using H3Engine.Core;
 using H3Engine.Common;
 using H3Engine.GUI;
 using H3Engine.FileSystem;
-using H3Engine.Components.MapProviders;
+using H3Engine.Engine.PathFinder;
 using UnityClient.GUI.Rendering;
 
 namespace UnityClient.GUI.Scenes
@@ -53,6 +53,10 @@ namespace UnityClient.GUI.Scenes
         private MovePathResolver movePathResolver = null;
 
         private MapCamera mapCamera = null;
+
+        // Adventure map UI overlay
+        private MapWidget    mapWidget    = null;
+        private MapInterface mapInterface = null;
 
         // --- Pathfinder (replaces SimplePathFinder) ---
         private PathfinderCache pathFinderCache = null;
@@ -154,6 +158,11 @@ namespace UnityClient.GUI.Scenes
 
             DestroyLoadingOverlay();
             isInitializing = false;
+
+            // Initialize adventure map UI overlay
+            mapWidget = gameMapUI.AddComponent<MapWidget>();
+            mapWidget.Initialize(dataAccess, mapComponent);
+            mapInterface = new MapInterface(mapWidget);
 
             // Initialize pathfinder (cache + Dijkstra engine)
             pathFinderCache = new PathfinderCache();
@@ -322,6 +331,8 @@ namespace UnityClient.GUI.Scenes
             selectedHero = hero;
             currentState = GameMapState.HeroSelected;
 
+            mapInterface?.OnHeroSelected(hero);
+
             print(string.Format("Hero selected at ({0}, {1})", hero.Position.PosX, hero.Position.PosY));
         }
 
@@ -331,6 +342,8 @@ namespace UnityClient.GUI.Scenes
             currentPath = null;
             selectedHero = null;
             currentState = GameMapState.Idle;
+
+            mapInterface?.OnHeroDeselected();
 
             print("Hero deselected");
         }

@@ -1,6 +1,6 @@
-﻿using H3Engine.Components.Data;
-using H3Engine.Components.MapProviders;
-using H3Engine.Components.Protocols;
+﻿using H3Engine.Engine;
+using H3Engine.Engine.PathFinder;
+using H3Engine.Core.Protocols;
 using H3Engine.Mapping;
 using System;
 using System.Collections.Generic;

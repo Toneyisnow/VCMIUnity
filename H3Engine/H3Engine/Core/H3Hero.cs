@@ -1,42 +1,15 @@
-﻿using H3Engine.Common;
-using H3Engine.Components;
-using H3Engine.Components.Data;
+using H3Engine.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace H3Engine.Core
 {
-
-    public class HeroSpecialty
-    {
-        public HeroSpecialty()
-        {
-
-        }
-
-        public ESpecialtyType Type
-        {
-            get; set;
-        }
-
-        public int SubType
-        {
-            get; set;
-        }
-
-    }
+    // HeroClass   → moved to Core/Hero/HeroClass.cs
+    // HeroSpecialty → moved to Core/Hero/HeroType.cs
 
 
     public class H3HeroId
     {
-        public H3HeroId()
-        {
-
-        }
-
         public int Id
         {
             get; set;
@@ -47,48 +20,19 @@ namespace H3Engine.Core
             get; set;
         }
     }
-    
-
-    public class HeroClass
-    {
-        public enum EClassAffinity
-        {
-            MIGHT,
-            MAGIC
-        };
-        
-        public EEthnicity Ethnicity
-        {
-            get; set;
-        }
-
-        public string Identifier
-        {
-            get; set;
-        }
-
-        public string Name
-        {
-            get; set;
-        }
 
 
-    }
-
-
+    /// <summary>
+    /// Runtime state of a single hero instance loaded from an h3m map or game save.
+    /// Static type data (name, biography, initial army, specialty template, …) lives in
+    /// <see cref="HeroType"/>; this class holds the mutable per-instance values.
+    /// Corresponds to VCMI's CGHeroInstance data fields.
+    /// </summary>
     public class H3Hero
     {
-
         public static H3Hero InitializeFromTemplate(int templateId)
         {
-
             return null;
-        }
-
-
-        public H3Hero()
-        {
-
         }
 
         public string Identifier
@@ -111,11 +55,14 @@ namespace H3Engine.Core
             get; set;
         }
 
-        public byte Sex
+        /// <summary>
+        /// Instance gender.  EHeroGender.DEFAULT means "use hero type's gender".
+        /// Corresponds to CGHeroInstance::gender in VCMI.
+        /// </summary>
+        public EHeroGender Gender
         {
             get; set;
-        }
-    
+        } = EHeroGender.DEFAULT;
 
         public long Experience
         {
@@ -146,7 +93,7 @@ namespace H3Engine.Core
         }
 
         /// <summary>
-        /// Key: Skill Id Value: Level of Skill - (1 - basic, 2 - adv., 3 - expert)
+        /// Key: Skill Id  Value: Level of Skill (1 = basic, 2 = adv., 3 = expert)
         /// </summary>
         public List<AbilitySkill> SecondarySkills
         {
@@ -162,7 +109,7 @@ namespace H3Engine.Core
         {
             get; set;
         }
-        
+
         public HeroSpecialty Specialty
         {
             get; set;
@@ -174,7 +121,7 @@ namespace H3Engine.Core
         }
 
         /// <summary>
-        /// Base movement points per turn. Default 1500 (foot heroes).
+        /// Base movement points per turn.  Default 1500 (foot heroes).
         /// In H3 this depends on the slowest creature speed in army:
         ///   Speed 0-4: 1500, Speed 5: 1560, Speed 6: 1630, Speed 7: 1700,
         ///   Speed 8: 1760, Speed 9: 1830, Speed 10: 1900, Speed 11+: 2000
@@ -188,7 +135,7 @@ namespace H3Engine.Core
         private static readonly int[] MovePointsBySpeed = {
             1500, 1500, 1500, 1500, 1500,  // speed 0-4
             1560, 1630, 1700, 1760, 1830,  // speed 5-9
-            1900, 2000                       // speed 10-11+
+            1900, 2000                      // speed 10-11+
         };
 
         /// <summary>
@@ -242,12 +189,11 @@ namespace H3Engine.Core
                 }
             }
 
-            // Step 3: TODO - Apply artifact bonuses (e.g., Boots of Speed +600 flat)
+            // Step 3: TODO - Apply artifact bonuses (e.g. Boots of Speed +600 flat)
             // Step 4: TODO - Apply hero specialty bonuses
 
             int effectivePoints = baseMovePoints * (100 + logisticsPercent) / 100;
             return effectivePoints;
         }
-
     }
 }

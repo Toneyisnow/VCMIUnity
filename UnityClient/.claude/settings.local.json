@@ -51,7 +51,14 @@
       "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Library -name Unity.TextMeshPro.dll -not -path */Editor*)",
       "Bash(mv \"Assets/Scripts/AdventureMapCoordinate.cs.meta\" \"Assets/Scripts/GUI/Mapping/AdventureMapCoordinate.cs.meta\")",
       "Bash(mv \"Assets/Scripts/AnimatedMapArtifact.cs.meta\" \"Assets/Scripts/GUI/Mapping/AnimatedMapArtifact.cs.meta\")",
-      "Bash(mv \"Assets/Scripts/AnimatedObject.cs.meta\" \"Assets/Scripts/GUI/Mapping/AnimatedObject.cs.meta\")"
+      "Bash(mv \"Assets/Scripts/AnimatedObject.cs.meta\" \"Assets/Scripts/GUI/Mapping/AnimatedObject.cs.meta\")",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Resources -type f \\\\\\(-name *.json -o -name *.txt \\\\\\))",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient -type f -name *.json)",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Scripts/Components -type f -name *.cs)",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/H3Engine -type f -name *ResourceLoader* -o -name *DataAccess*)",
+      "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Prefabs -type f -name *.prefab)",
+      "Bash(mkdir -p \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Resources/config/widgets\")",
+      "Bash(cp \"d:/SourceCode/Git/vcmi/vcmi/config/widgets/adventureMap.json\" \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Resources/config/widgets/adventureMap.json\")"
     ]
   }
 }

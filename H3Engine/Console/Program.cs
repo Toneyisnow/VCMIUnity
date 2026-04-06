@@ -13,10 +13,10 @@ using H3Engine.GUI;
 using H3Engine.MapObjects;
 using H3Engine.Mapping;
 using H3Engine.Utils;
-using H3Engine.Components.MapProviders;
+using H3Engine.Engine.PathFinder;
 using H3Console.Utils;
 using H3Engine.DataAccess;
-using H3Engine.Components.Data;
+using H3Engine.Engine;
 
 namespace H3Console
 {

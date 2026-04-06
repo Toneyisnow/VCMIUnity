@@ -1,4 +1,4 @@
-using H3Engine.Components.MapProviders;
+using H3Engine.Engine.PathFinder;
 using H3Engine.GUI;
 using H3Engine.MapObjects;
 using System.Collections.Generic;

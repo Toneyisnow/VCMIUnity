@@ -15,7 +15,7 @@ using UnityEngine.U2D;
 using H3Engine.Common;
 using UnityClient.GUI.Rendering;
 using UnityClient.GUI.Mapping;
-using H3Engine.Components.Data;
+using H3Engine.Engine;
 
 public class SampleTest : MonoBehaviour
 {

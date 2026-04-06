@@ -1,6 +1,4 @@
 ﻿using H3Engine.Common;
-using H3Engine.Components;
-using H3Engine.Components.Data;
 using H3Engine.Core;
 using H3Engine.FileSystem;
 using H3Engine.MapObjects;
@@ -392,7 +390,7 @@ namespace H3Engine.Mapping
                 ArtifactSet artifactSet = hero.Data.Artifacts;
 
                 EArtifactId artifactId = (EArtifactId)aid;
-                H3Artifact artifact = new H3Artifact(artifactId);
+                ArtifactType artifact = new ArtifactType { Id = artifactId };
 
                 if (artifact.IsBig() && slotIndex > 19)
                 {
@@ -615,17 +613,13 @@ namespace H3Engine.Mapping
                 {
                     hero.Data.Biography = reader.ReadStringWithLength();
                 }
-                hero.Data.Sex = reader.ReadByte();
 
-                // Remove trash
-                if (hero.Data.Sex != 0xFF)
-                {
-                    hero.Data.Sex &= 1;
-                }
+                byte sex = reader.ReadByte();
+                hero.Data.Gender = sex == 0xFF ? EHeroGender.DEFAULT : (EHeroGender)(sex & 1);
             }
             else
             {
-                hero.Data.Sex = 0xFF;
+                hero.Data.Gender = EHeroGender.DEFAULT;
             }
 
             // Spells
@@ -1409,20 +1403,20 @@ namespace H3Engine.Mapping
     {
         public override CGObject ReadObject(BinaryReader reader, int objectId, MapPosition objectPosition)
         {
-            CGHeroPlaceHolder heroPlaceHolder = new CGHeroPlaceHolder();
+            HeroPlaceholder heroPlaceHolder = new HeroPlaceholder();
 
             heroPlaceHolder.SetOwner((EPlayerColor)reader.ReadByte());
 
             int heroTypeId = reader.ReadByte();
-            heroPlaceHolder.SubId = heroTypeId;
-
             if (heroTypeId == 0xff)
             {
-                heroPlaceHolder.Power = reader.ReadByte();
+                heroPlaceHolder.HeroTypeId = null;
+                heroPlaceHolder.PowerRank = reader.ReadByte();
             }
             else
             {
-                heroPlaceHolder.Power = 0;
+                heroPlaceHolder.HeroTypeId = heroTypeId;
+                heroPlaceHolder.PowerRank = null;
             }
 
             return heroPlaceHolder;

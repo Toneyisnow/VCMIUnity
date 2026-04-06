@@ -1,5 +1,4 @@
 ﻿using H3Engine.Common;
-using H3Engine.Components;
 using H3Engine.Core;
 using H3Engine.FileSystem;
 using H3Engine.MapObjects;
@@ -669,7 +668,7 @@ namespace H3Engine.Mapping
 
                     byte sex = reader.ReadByte();
                     logger.LogTrace("sex: " + sex);
-                    hero.Data.Sex = sex;
+                    hero.Data.Gender = sex == 0xFF ? EHeroGender.DEFAULT : (EHeroGender)(sex & 1);
 
                     // Spells
                     bool hasCustomSpells = reader.ReadBoolean();
