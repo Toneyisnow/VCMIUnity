@@ -8,6 +8,7 @@ using H3Engine;
 using H3Engine.Campaign;
 using H3Engine.Common;
 using H3Engine.Core;
+using H3Engine.Core.Constants;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
 using H3Engine.MapObjects;
@@ -284,9 +285,9 @@ namespace H3Console
                     // ImageData tileImage = engine.RetrieveTerrainImage((H3Engine.Common.ETerrainType)tile.TerrainType, tile.TerrainView);
                     // StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\tile-{0}-{1}.png", yy, xx), tileImage.GetPNGData(tile.TerrainRotation));
 
-                    if (tile.RoadType != H3Engine.Common.ERoadType.NO_ROAD)
+                    if (tile.RoadType != ERoadType.NO_ROAD)
                     {
-                        ImageData roadImage = engine.RetrieveRoadImage((H3Engine.Common.ERoadType)tile.RoadType, tile.RoadDir);
+                        ImageData roadImage = engine.RetrieveRoadImage((ERoadType)tile.RoadType, tile.RoadDir);
                         if (roadImage != null)
                         {
                             //// StreamHelper.WriteBytesToFile(string.Format(@"D:\PlayGround\Heroes3\ab_map\road-{0}-{1}.png", yy, xx), roadImage.GetPNGData(tile.RoadRotation));

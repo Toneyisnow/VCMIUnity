@@ -1,10 +1,11 @@
-// Corresponds to VCMI lib/mapObjects/army/CArmedInstance.h
+﻿// Corresponds to VCMI lib/mapObjects/army/CArmedInstance.h
 // Merged with the existing H3Engine ArmedInstance: Message and AddStack() kept,
 // GuardArmy renamed to Army (GuardArmy kept as compatibility alias).
 
 using H3Engine.Core;
 using System;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.MapObjects
 {
@@ -13,8 +14,7 @@ namespace H3Engine.MapObjects
     /// Corresponds to VCMI's CArmedInstance (CGObjectInstance + CCreatureSet).
     ///
     /// Subclasses: <see cref="HeroInstance"/>, <see cref="TownInstance"/>,
-    /// <see cref="CGCreature"/>, <see cref="CGPandoraBox"/>, …
-    /// </summary>
+    /// <see cref="CGCreature"/>, <see cref="CGPandoraBox"/>, 鈥?    /// </summary>
     public class ArmedInstance : CGObject
     {
         public ArmedInstance()
@@ -22,7 +22,7 @@ namespace H3Engine.MapObjects
             Army = new CreatureSet();
         }
 
-        // ── Army ─────────────────────────────────────────────────────────────
+        // 鈹€鈹€ Army 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// The army this object owns (up to 7 creature stacks).
@@ -47,14 +47,14 @@ namespace H3Engine.MapObjects
         /// <summary>
         /// Optional message shown to the visiting hero before the battle begins
         /// (used by guarded objects such as Pandora's Box and roaming creatures).
-        /// No direct equivalent in CArmedInstance – stored here for convenience.
+        /// No direct equivalent in CArmedInstance 鈥?stored here for convenience.
         /// </summary>
         public string Message
         {
             get; set;
         }
 
-        // ── Battle state ─────────────────────────────────────────────────────
+        // 鈹€鈹€ Battle state 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// ID of the current battle this object is engaged in.
@@ -69,7 +69,7 @@ namespace H3Engine.MapObjects
         /// <summary>Returns true if this object is currently in a battle.</summary>
         public bool IsInBattle => BattleId >= 0;
 
-        // ── Army helpers ─────────────────────────────────────────────────────
+        // 鈹€鈹€ Army helpers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Adds a creature stack to the army at the specified slot index.
@@ -87,3 +87,5 @@ namespace H3Engine.MapObjects
         public int StacksCount => Army.Stacks?.Count ?? 0;
     }
 }
+
+

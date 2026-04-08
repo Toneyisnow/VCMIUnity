@@ -1,9 +1,10 @@
-// Migrated from VCMI lib/entities/artifact/CArtifact.h
-// Static artifact type definition – loaded once from config, never mutated during gameplay.
+﻿// Migrated from VCMI lib/entities/artifact/CArtifact.h
+// Static artifact type definition 鈥?loaded once from config, never mutated during gameplay.
 // Runtime state (which hero equips which copy) lives in ArtifactInstance / ArtifactSet.
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -17,7 +18,7 @@ namespace H3Engine.Core
     /// </summary>
     public class ArtifactType
     {
-        // ── Identity ──────────────────────────────────────────────────────────
+        // 鈹€鈹€ Identity 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         public EArtifactId Id
         {
@@ -48,7 +49,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Visuals ───────────────────────────────────────────────────────────
+        // 鈹€鈹€ Visuals 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>Index into the artifact icon sprite sheet.</summary>
         public int IconIndex
@@ -71,7 +72,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Economy ───────────────────────────────────────────────────────────
+        // 鈹€鈹€ Economy 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>Gold cost to buy at a marketplace.</summary>
         public int Price
@@ -79,7 +80,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Classification ───────────────────────────────────────────────────
+        // 鈹€鈹€ Classification 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Rarity class (SPECIAL / TREASURE / MINOR / MAJOR / RELIC).
@@ -98,7 +99,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Slot placement ───────────────────────────────────────────────────
+        // 鈹€鈹€ Slot placement 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Allowed equipment slots per bearer type.
@@ -111,7 +112,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── War machine ──────────────────────────────────────────────────────
+        // 鈹€鈹€ War machine 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Creature that acts as this artifact in battle (Ballista, First Aid Tent, etc.).
@@ -122,7 +123,7 @@ namespace H3Engine.Core
             get; set;
         } = ECreatureId.NONE;
 
-        // ── Combined artifact ────────────────────────────────────────────────
+        // 鈹€鈹€ Combined artifact 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Component artifact IDs that must all be equipped to assemble this combined artifact.
@@ -144,7 +145,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Spell scroll ─────────────────────────────────────────────────────
+        // 鈹€鈹€ Spell scroll 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Spell stored in this scroll.  Only meaningful when <see cref="IsScroll"/> is true.
@@ -155,7 +156,7 @@ namespace H3Engine.Core
             get; set;
         } = ESpellId.NONE;
 
-        // ── Charged artifact ─────────────────────────────────────────────────
+        // 鈹€鈹€ Charged artifact 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Starting charges for charged artifacts (e.g. Tomes of X Magic).
@@ -175,7 +176,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Computed helpers ─────────────────────────────────────────────────
+        // 鈹€鈹€ Computed helpers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Returns true for MAJOR and RELIC class artifacts.
@@ -219,3 +220,5 @@ namespace H3Engine.Core
         }
     }
 }
+
+

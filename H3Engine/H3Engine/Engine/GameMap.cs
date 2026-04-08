@@ -1,4 +1,4 @@
-// Moved from H3Engine.Components.Data.GameMap → H3Engine.Engine
+﻿// Moved from H3Engine.Components.Data.GameMap 鈫?H3Engine.Engine
 
 using H3Engine.Common;
 using H3Engine.Core;
@@ -7,6 +7,7 @@ using H3Engine.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Engine
 {
@@ -202,3 +203,6 @@ namespace H3Engine.Engine
         }
     }
 }
+
+
+

@@ -1,13 +1,14 @@
-// Migrated from VCMI lib/entities/artifact/ArtSlotInfo.h
+﻿// Migrated from VCMI lib/entities/artifact/ArtSlotInfo.h
 // Describes a single equipment slot: which artifact occupies it and whether it is locked.
 
 using H3Engine.Common;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
     /// <summary>
     /// State of one artifact equipment slot on a bearer (hero, creature, commander).
-    /// A slot is "locked" when it belongs to a combined artifact – the constituent
+    /// A slot is "locked" when it belongs to a combined artifact 鈥?the constituent
     /// artifact occupies one slot while every other required slot is locked and points
     /// back to the combined artifact's primary slot.
     ///
@@ -46,3 +47,6 @@ namespace H3Engine.Core
         public bool IsEmpty => ArtifactId == EArtifactId.NONE && !Locked;
     }
 }
+
+
+

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using H3Engine.Engine;
 using H3Engine.Engine.PathFinder;
@@ -6,6 +6,7 @@ using H3Engine.Core.Protocols;
 using H3Engine.Core.Queries;
 using H3Engine.FileSystem;
 using H3Engine.Mapping;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Engine
 {
@@ -117,3 +118,5 @@ namespace H3Engine.Engine
     }
 
 }
+
+

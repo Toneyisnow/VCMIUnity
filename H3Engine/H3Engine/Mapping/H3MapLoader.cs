@@ -1,4 +1,4 @@
-﻿using H3Engine.Common;
+using H3Engine.Common;
 using H3Engine.Core;
 using H3Engine.FileSystem;
 using H3Engine.MapObjects;
@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Mapping
 {
@@ -191,7 +192,7 @@ namespace H3Engine.Mapping
 
         private void ReadPlayerInfo(BinaryReader reader)
         {
-            for (int i = 0; i < GameConstants.PLAYER_LIMIT_T; i++)
+            for (int i = 0; i < NumericConstants.PLAYER_LIMIT_T; i++)
             {
                 PlayerInfo playerInfo = new PlayerInfo();
 
@@ -245,7 +246,7 @@ namespace H3Engine.Mapping
                 int allowedFactionsMask = reader.ReadByte();
                 logger.LogTrace("allowedFactionsMask:" + allowedFactionsMask);
 
-                int totalFactionCount = GameConstants.F_NUMBER;
+                int totalFactionCount = NumericConstants.F_NUMBER;
                 if (mapObject.Header.Version != EMapFormat.ROE)
                     allowedFactionsMask += reader.ReadByte() << 8;
                 else
@@ -460,14 +461,14 @@ namespace H3Engine.Mapping
             logger.LogTrace("How Many Teams: " + howManyTeams);
             if (howManyTeams > 0)
             {
-                for (int i = 0; i < GameConstants.PLAYER_LIMIT_T; i++)
+                for (int i = 0; i < NumericConstants.PLAYER_LIMIT_T; i++)
                 {
                     int team = reader.ReadByte();
                 }
             }
             else
             {
-                for (int i = 0; i < GameConstants.PLAYER_LIMIT_T; i++)
+                for (int i = 0; i < NumericConstants.PLAYER_LIMIT_T; i++)
                 {
 
                 }
@@ -490,7 +491,7 @@ namespace H3Engine.Mapping
             }
 
             HashSet<int> allowedHeroSet = new HashSet<int>();
-            reader.ReadBitMask(allowedHeroSet, byteCount, GameConstants.HEROES_QUANTITY, false);
+            reader.ReadBitMask(allowedHeroSet, byteCount, NumericConstants.HEROES_QUANTITY, false);
 
             // in HOTA, there seems 3 bytes unknown
             if (mapObject.Header.Version == EMapFormat.HOTA)
@@ -552,7 +553,7 @@ namespace H3Engine.Mapping
                 int bytes = (mapObject.Header.Version == EMapFormat.AB ? 17 : 18);
 
                 HashSet<int> allowedList = new HashSet<int>();
-                reader.ReadBitMask(allowedList, bytes, GameConstants.ARTIFACTS_QUANTITY);
+                reader.ReadBitMask(allowedList, bytes, NumericConstants.ARTIFACTS_QUANTITY);
             }
 
             if (mapObject.Header.Version == EMapFormat.ROE || mapObject.Header.Version == EMapFormat.AB)
@@ -570,13 +571,13 @@ namespace H3Engine.Mapping
 
                 // Reading allowed spells (9 bytes)
                 const int spell_bytes = 9;
-                reader.ReadBitMask(allowedSpells, spell_bytes, GameConstants.SPELLS_QUANTITY);
+                reader.ReadBitMask(allowedSpells, spell_bytes, NumericConstants.SPELLS_QUANTITY);
                 logger.LogTrace("allowedSpells: " + JsonConvert.SerializeObject(allowedSpells));
 
 
                 // Allowed hero's abilities (4 bytes)
                 const int skill_bytes = 4;
-                reader.ReadBitMask(allowedSkills, skill_bytes, GameConstants.SKILL_QUANTITY);
+                reader.ReadBitMask(allowedSkills, skill_bytes, NumericConstants.SKILL_QUANTITY);
                 logger.LogTrace("allowedSkills: " + JsonConvert.SerializeObject(allowedSkills));
             }
         }
@@ -608,7 +609,7 @@ namespace H3Engine.Mapping
                 || mapObject.Header.Version == EMapFormat.HOTA)
             {
 
-                int heroCount = GameConstants.HEROES_QUANTITY;
+                int heroCount = NumericConstants.HEROES_QUANTITY;
                 if (this.mapObject.Header.Version == EMapFormat.HOTA)
                 {
                     heroCount += 19;
@@ -675,7 +676,7 @@ namespace H3Engine.Mapping
                     if (hasCustomSpells)
                     {
                         HashSet<int> spells = new HashSet<int>();
-                        reader.ReadBitMask(spells, 9, GameConstants.SPELLS_QUANTITY, false);
+                        reader.ReadBitMask(spells, 9, NumericConstants.SPELLS_QUANTITY, false);
                         logger.LogTrace("Spells: " + JsonConvert.SerializeObject(spells));
 
                         hero.Data.Spells = new List<ESpellId>();
@@ -691,7 +692,7 @@ namespace H3Engine.Mapping
                         logger.LogTrace("Has Custom Primary Skills.");
 
                         hero.Data.PrimarySkills = new List<int>();
-                        for (int xx = 0; xx < GameConstants.PRIMARY_SKILLS; xx++)
+                        for (int xx = 0; xx < NumericConstants.PRIMARY_SKILLS; xx++)
                         {
                             int value = reader.ReadByte();
                             logger.LogTrace("Primary Skills: " + value);
@@ -951,3 +952,5 @@ namespace H3Engine.Mapping
         }
     }
 }
+
+

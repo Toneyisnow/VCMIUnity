@@ -1,12 +1,13 @@
-// Moved from H3Engine.Components.Data.ResourceSet → H3Engine.Core
+﻿// Moved from H3Engine.Components.Data.ResourceSet 鈫?H3Engine.Core
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
     /// <summary>
-    /// A set of resource amounts (gold, wood, ore, …).
+    /// A set of resource amounts (gold, wood, ore, 鈥?.
     /// Corresponds to VCMI's TResources (array of resource counts).
     /// </summary>
     public class ResourceSet
@@ -28,3 +29,5 @@ namespace H3Engine.Core
         }
     }
 }
+
+

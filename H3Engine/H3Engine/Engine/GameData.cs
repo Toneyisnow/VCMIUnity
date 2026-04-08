@@ -1,13 +1,14 @@
-// Moved from H3Engine.Components.Data.GameData → H3Engine.Engine
+﻿// Moved from H3Engine.Components.Data.GameData 鈫?H3Engine.Engine
 
 using H3Engine.Mapping;
 using System;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Engine
 {
     /// <summary>
     /// Top-level game state container: holds one or two level maps and
-    /// global per-game data (players, events, …).
+    /// global per-game data (players, events, 鈥?.
     /// </summary>
     public class GameData
     {
@@ -45,3 +46,5 @@ namespace H3Engine.Engine
         }
     }
 }
+
+

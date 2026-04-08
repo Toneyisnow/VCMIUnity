@@ -1,9 +1,10 @@
-// Corresponds to VCMI lib/mapObjects/CGHeroInstance.h
+﻿// Corresponds to VCMI lib/mapObjects/CGHeroInstance.h
 // Merged with existing H3Engine HeroInstance: all prior fields kept,
 // new fields from CGHeroInstance added at the instance layer.
 
 using H3Engine.Core;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.MapObjects
 {
@@ -42,18 +43,18 @@ namespace H3Engine.MapObjects
     ///   CArmedInstance, CArtifactSet, spells::Caster, AFactionMember,
     ///   IBoatGenerator, ICreatureUpgrader, IOwnableObject.
     ///
-    /// Static type data (name, biography, specialty, initial army, …) lives in
-    /// <see cref="H3Hero.Data"/> → <see cref="HeroType"/>.
+    /// Static type data (name, biography, specialty, initial army, 鈥? lives in
+    /// <see cref="H3Hero.Data"/> 鈫?<see cref="HeroType"/>.
     /// </summary>
     public class HeroInstance : ArmedInstance
     {
         public HeroInstance(H3Hero data = null)
         {
             Data = data ?? new H3Hero();
-            RestMovePoint = -1; // uninitialized – treat as full movement
+            RestMovePoint = -1; // uninitialized 鈥?treat as full movement
         }
 
-        // ── Data container ────────────────────────────────────────────────────
+        // 鈹€鈹€ Data container 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Hero instance data loaded from the map / game save.
@@ -65,7 +66,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── Movement ─────────────────────────────────────────────────────────
+        // 鈹€鈹€ Movement 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Remaining movement points for the current turn.
@@ -99,7 +100,7 @@ namespace H3Engine.MapObjects
         /// <summary>Resets movement to full at the start of a new turn.</summary>
         public void ResetMovePointForNewTurn() => RestMovePoint = GetEffectiveMovePoint();
 
-        // ── Mana ─────────────────────────────────────────────────────────────
+        // 鈹€鈹€ Mana 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Current spell points (mana).
@@ -114,7 +115,7 @@ namespace H3Engine.MapObjects
         /// <summary>Returns true if mana has been initialised.</summary>
         public bool IsManaInitialized => Mana >= 0;
 
-        // ── Town / garrison ───────────────────────────────────────────────────
+        // 鈹€鈹€ Town / garrison 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// True when this hero is stationed in a town garrison rather than
@@ -145,7 +146,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── Boat ─────────────────────────────────────────────────────────────
+        // 鈹€鈹€ Boat 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Object ID of the boat this hero is currently sailing on.
@@ -160,7 +161,7 @@ namespace H3Engine.MapObjects
         /// <summary>Returns true if the hero is currently aboard a boat.</summary>
         public bool InBoat => BoardedBoatId >= 0;
 
-        // ── Battle formation ──────────────────────────────────────────────────
+        // 鈹€鈹€ Battle formation 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// When true the hero's army uses the tactic formation phase at battle start.
@@ -171,7 +172,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── Portrait override ─────────────────────────────────────────────────
+        // 鈹€鈹€ Portrait override 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// If >= 0, overrides the hero's portrait with the portrait from the
@@ -183,7 +184,7 @@ namespace H3Engine.MapObjects
             get; set;
         } = -1;
 
-        // ── Commander ────────────────────────────────────────────────────────
+        // 鈹€鈹€ Commander 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Optional commander creature attached to this hero.
@@ -196,7 +197,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── Patrol ────────────────────────────────────────────────────────────
+        // 鈹€鈹€ Patrol 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Patrol settings for this hero (position, radius, active flag).
@@ -208,3 +209,5 @@ namespace H3Engine.MapObjects
         }
     }
 }
+
+

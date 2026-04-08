@@ -1,6 +1,7 @@
-// Migrated from VCMI lib/entities/artifact/EArtifactClass.h
+﻿// Migrated from VCMI lib/entities/artifact/EArtifactClass.h
 
 using System;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -19,3 +20,5 @@ namespace H3Engine.Core
         ART_RELIC    = 16,
     }
 }
+
+

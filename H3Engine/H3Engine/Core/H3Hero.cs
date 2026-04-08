@@ -1,11 +1,12 @@
-using H3Engine.Common;
+﻿using H3Engine.Common;
+using H3Engine.Core.Constants;
 using System;
 using System.Collections.Generic;
 
 namespace H3Engine.Core
 {
-    // HeroClass   → moved to Core/Hero/HeroClass.cs
-    // HeroSpecialty → moved to Core/Hero/HeroType.cs
+    // HeroClass   鈫?moved to Core/Hero/HeroClass.cs
+    // HeroSpecialty 鈫?moved to Core/Hero/HeroType.cs
 
 
     public class H3HeroId
@@ -24,7 +25,7 @@ namespace H3Engine.Core
 
     /// <summary>
     /// Runtime state of a single hero instance loaded from an h3m map or game save.
-    /// Static type data (name, biography, initial army, specialty template, …) lives in
+    /// Static type data (name, biography, initial army, specialty template, 鈥? lives in
     /// <see cref="HeroType"/>; this class holds the mutable per-instance values.
     /// Corresponds to VCMI's CGHeroInstance data fields.
     /// </summary>
@@ -197,3 +198,5 @@ namespace H3Engine.Core
         }
     }
 }
+
+

@@ -1,4 +1,5 @@
-using H3Engine.Common;
+﻿using H3Engine.Common;
+using H3Engine.Core.Constants;
 using H3Engine.Engine;
 using H3Engine.MapObjects;
 using System;
@@ -68,14 +69,14 @@ namespace H3Engine.Engine.PathFinder
         /// BlockMask / VisitMask to populate staticTileInfo.
         ///
         /// Mask layout (same as VCMI / MapBlockManager):
-        ///   index i → column = i % 8 left of anchor, row = i / 8 above anchor
+        ///   index i 鈫?column = i % 8 left of anchor, row = i / 8 above anchor
         ///   so tile = (obj.PosX - i%8,  obj.PosY - i/8)
         /// </summary>
         private void BuildStaticTileInfo()
         {
             foreach (var obj in gameMap.Objects)
             {
-                // Heroes are dynamic — handled separately in EvaluateAccessibility
+                // Heroes are dynamic 鈥?handled separately in EvaluateAccessibility
                 if (obj.ObjectType == EObjectType.HERO ||
                     obj.ObjectType == EObjectType.HERO_PLACEHOLDER ||
                     obj.ObjectType == EObjectType.RANDOM_HERO)
@@ -138,14 +139,14 @@ namespace H3Engine.Engine.PathFinder
         /// <paramref name="context"/>.
         ///
         /// Evaluation order (mirrors VCMI PathfinderUtil::evaluateAccessibility):
-        ///  1. Out of bounds                  → BLOCKED
-        ///  2. Water / Rock terrain           → BLOCKED  (land hero)
-        ///  3. Terrain IsBlocked flag         → BLOCKED  (if not also visitable)
-        ///  4. Ally hero on tile              → BLOCKED
-        ///  5. Enemy hero on tile             → VISITABLE (BATTLE action)
-        ///  6. Static object: blocked         → BLOCKED
-        ///  7. Static object: visitable       → VISITABLE (VISIT / BATTLE action)
-        ///  8. Otherwise                      → ACCESSIBLE
+        ///  1. Out of bounds                  鈫?BLOCKED
+        ///  2. Water / Rock terrain           鈫?BLOCKED  (land hero)
+        ///  3. Terrain IsBlocked flag         鈫?BLOCKED  (if not also visitable)
+        ///  4. Ally hero on tile              鈫?BLOCKED
+        ///  5. Enemy hero on tile             鈫?VISITABLE (BATTLE action)
+        ///  6. Static object: blocked         鈫?BLOCKED
+        ///  7. Static object: visitable       鈫?VISITABLE (VISIT / BATTLE action)
+        ///  8. Otherwise                      鈫?ACCESSIBLE
         /// </summary>
         public MapPathNode.ENodeAccessibility EvaluateAccessibility(int x, int y, PathfinderContext context)
         {
@@ -202,7 +203,7 @@ namespace H3Engine.Engine.PathFinder
         {
             int key = y * mapWidth + x;
 
-            // Dynamic: enemy hero → BATTLE
+            // Dynamic: enemy hero 鈫?BATTLE
             foreach (var hero in gameMap.Heroes)
             {
                 if (hero == context.Hero) continue;
@@ -257,3 +258,5 @@ namespace H3Engine.Engine.PathFinder
         }
     }
 }
+
+

@@ -1,4 +1,5 @@
-using H3Engine.Common;
+﻿using H3Engine.Common;
+using H3Engine.Core.Constants;
 using H3Engine.Engine;
 using H3Engine.Core;
 using H3Engine.MapObjects;
@@ -77,7 +78,7 @@ namespace H3Engine.Engine.PathFinder
         /// <summary>
         /// Returns the movement-point cost for a hero stepping onto <paramref name="destTile"/>.
         /// Roads on the destination tile override the terrain cost.
-        /// Diagonal movement costs √2 ≈ 1.414× more (rounded to nearest integer).
+        /// Diagonal movement costs 鈭? 鈮?1.414脳 more (rounded to nearest integer).
         /// </summary>
         private static int CalculateMoveCost(TerrainTile destTile, bool isDiagonal)
         {
@@ -85,7 +86,7 @@ namespace H3Engine.Engine.PathFinder
                 ? RoadMoveCost(destTile.RoadType)
                 : TerrainMoveCost(destTile.TerrainType);
 
-            // Diagonal: multiply by 141/100  (≈ √2)
+            // Diagonal: multiply by 141/100  (鈮?鈭?)
             return isDiagonal ? cost * 141 / 100 : cost;
         }
 
@@ -222,7 +223,7 @@ namespace H3Engine.Engine.PathFinder
         ///        b. Compute movement cost, updating turn counter if points exhausted.
         ///        c. If the new cost improves the neighbour, update and re-enqueue.
         ///   4. VISITABLE nodes (interactive objects, enemies) are updated but NOT
-        ///      expanded further — movement stops there.
+        ///      expanded further 鈥?movement stops there.
         /// </summary>
         private PathsInfo CalculatePaths(PathfinderContext context)
         {
@@ -259,7 +260,7 @@ namespace H3Engine.Engine.PathFinder
 
                 current.Locked = true;
 
-                // VISITABLE nodes are path endpoints — do not expand from them
+                // VISITABLE nodes are path endpoints 鈥?do not expand from them
                 if (current.Accessibility == MapPathNode.ENodeAccessibility.VISITABLE ||
                     current.Accessibility == MapPathNode.ENodeAccessibility.BLOCKVISIT)
                     continue;
@@ -284,7 +285,7 @@ namespace H3Engine.Engine.PathFinder
                     int moveCost = CalculateMoveCost(destTile, IsDiag[d]);
 
                     // Advance movement-point budget, rolling over to the next turn
-                    // if required (unlimited turns — the game can cap this externally).
+                    // if required (unlimited turns 鈥?the game can cap this externally).
                     int newMoveRemains = current.MoveRemains - moveCost;
                     int newTurns       = current.Turns;
 
@@ -295,7 +296,7 @@ namespace H3Engine.Engine.PathFinder
                         newMoveRemains = context.MaxMovePoints - moveCost;
 
                         if (newMoveRemains < 0)
-                            continue; // single tile costs more than a full turn — unreachable
+                            continue; // single tile costs more than a full turn 鈥?unreachable
                     }
 
                     // Path cost = turns + (points spent this turn) / maxPoints
@@ -321,3 +322,5 @@ namespace H3Engine.Engine.PathFinder
         }
     }
 }
+
+

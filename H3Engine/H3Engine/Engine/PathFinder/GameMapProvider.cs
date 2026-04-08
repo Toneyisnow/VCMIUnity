@@ -1,8 +1,9 @@
-using H3Engine.Engine;
+﻿using H3Engine.Engine;
 using H3Engine.Core;
 using H3Engine.MapObjects;
 using System;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Engine.PathFinder
 {
@@ -99,3 +100,5 @@ namespace H3Engine.Engine.PathFinder
         }
     }
 }
+
+

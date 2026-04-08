@@ -1,4 +1,4 @@
-// Migrated from VCMI lib/mapObjects/CGHeroInstance.h (CGHeroPlaceholder)
+﻿// Migrated from VCMI lib/mapObjects/CGHeroInstance.h (CGHeroPlaceholder)
 // Represents a placeholder slot on the map that will be filled by a real hero
 // at game start (either by power rank or by explicit hero type).
 
@@ -8,14 +8,14 @@ namespace H3Engine.MapObjects
     /// A placeholder object on the adventure map that resolves to a real hero
     /// when the map is started.  Two resolution modes:
     /// <list type="bullet">
-    ///   <item>By power rank – the player's hero with the matching power rank fills the slot.</item>
-    ///   <item>By type – a specific hero type is placed here.</item>
+    ///   <item>By power rank 鈥?the player's hero with the matching power rank fills the slot.</item>
+    ///   <item>By type 鈥?a specific hero type is placed here.</item>
     /// </list>
     /// Corresponds to VCMI's CGHeroPlaceholder class.
     /// </summary>
     public class HeroPlaceholder : CGObject
     {
-        // ── Resolution mode: by power rank ────────────────────────────────────
+        // 鈹€鈹€ Resolution mode: by power rank 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Power rank of the hero that should fill this placeholder.
@@ -28,7 +28,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── Resolution mode: by hero type ─────────────────────────────────────
+        // 鈹€鈹€ Resolution mode: by hero type 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// The specific hero type ID to place here.
@@ -40,7 +40,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── Helpers ───────────────────────────────────────────────────────────
+        // 鈹€鈹€ Helpers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>True if this placeholder is resolved by power rank.</summary>
         public bool IsByPowerRank => PowerRank.HasValue;
@@ -49,3 +49,4 @@ namespace H3Engine.MapObjects
         public bool IsByHeroType => HeroTypeId.HasValue;
     }
 }
+

@@ -1,4 +1,5 @@
-using H3Engine.Common;
+﻿using H3Engine.Common;
+using H3Engine.Core.Constants;
 using H3Engine.Engine;
 using H3Engine.MapObjects;
 
@@ -13,12 +14,12 @@ namespace H3Engine.Engine.PathFinder
         /// <summary>The hero for whom paths are being calculated.</summary>
         public HeroInstance Hero { get; }
 
-        /// <summary>Owner of the hero — used to distinguish allies from enemies.</summary>
+        /// <summary>Owner of the hero 鈥?used to distinguish allies from enemies.</summary>
         public EPlayerColor PlayerColor { get; }
 
         /// <summary>
         /// Maximum movement points available per turn for this hero.
-        /// Typically 1500–3000 depending on hero stats and army speed.
+        /// Typically 1500鈥?000 depending on hero stats and army speed.
         /// </summary>
         public int MaxMovePoints { get; }
 
@@ -55,3 +56,5 @@ namespace H3Engine.Engine.PathFinder
         }
     }
 }
+
+

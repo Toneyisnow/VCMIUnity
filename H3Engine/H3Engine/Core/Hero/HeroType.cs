@@ -1,9 +1,10 @@
-// Migrated from VCMI lib/entities/hero/CHero.h
+﻿// Migrated from VCMI lib/entities/hero/CHero.h
 // Represents the static hero type definition (template / blueprint).
 // HeroSpecialty and InitialArmyStack moved here from H3Hero.cs.
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -47,7 +48,7 @@ namespace H3Engine.Core
     }
 
     /// <summary>
-    /// Static hero type definition – loaded once from config/h3m data and never mutated
+    /// Static hero type definition 鈥?loaded once from config/h3m data and never mutated
     /// during gameplay.  Corresponds to VCMI's CHero class.
     ///
     /// Runtime hero state (experience, skills, army, etc.) lives in H3Hero / HeroInstance.
@@ -93,7 +94,7 @@ namespace H3Engine.Core
         } = EHeroGender.MALE;
 
         /// <summary>
-        /// Reference to this hero's class (e.g. Knight, Ranger, Warlock…).
+        /// Reference to this hero's class (e.g. Knight, Ranger, Warlock鈥?.
         /// </summary>
         public HeroClass HeroClass
         {
@@ -138,7 +139,7 @@ namespace H3Engine.Core
         }
 
         /// <summary>
-        /// Campaign-only hero – will not appear in random maps or taverns unless placed explicitly.
+        /// Campaign-only hero 鈥?will not appear in random maps or taverns unless placed explicitly.
         /// Corresponds to CHero::special.
         /// </summary>
         public bool IsSpecial
@@ -164,3 +165,6 @@ namespace H3Engine.Core
         }
     }
 }
+
+
+

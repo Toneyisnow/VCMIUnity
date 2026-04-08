@@ -1,4 +1,4 @@
-// Migrated from VCMI lib/entities/artifact/ArtBearer.h
+﻿// Migrated from VCMI lib/entities/artifact/ArtBearer.h
 // Identifies which entity type can equip an artifact.
 
 namespace H3Engine.Core
@@ -16,3 +16,4 @@ namespace H3Engine.Core
         ALTAR     = 3,
     }
 }
+

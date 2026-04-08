@@ -1,8 +1,9 @@
-// Moved from H3Engine.Components.Data.CreatureSet → H3Engine.Core
+﻿// Moved from H3Engine.Components.Data.CreatureSet 鈫?H3Engine.Core
 // (VCMI: lib/mapObjects/army/CCreatureSet.h)
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -50,3 +51,5 @@ namespace H3Engine.Core
         }
     }
 }
+
+

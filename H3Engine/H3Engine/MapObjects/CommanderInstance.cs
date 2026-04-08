@@ -1,4 +1,4 @@
-// Migrated from VCMI lib/mapObjects/army/CCommanderInstance.h
+﻿// Migrated from VCMI lib/mapObjects/army/CCommanderInstance.h
 // A commander is a special named creature attached to a hero that can
 // gain experience and secondary skills independently.
 //
@@ -9,6 +9,7 @@
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.MapObjects
 {
@@ -22,7 +23,7 @@ namespace H3Engine.MapObjects
     /// </summary>
     public class CommanderInstance
     {
-        // ── Identity ──────────────────────────────────────────────────────────
+        // 鈹€鈹€ Identity 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// The creature type that determines this commander's base stats.
@@ -42,7 +43,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── State ─────────────────────────────────────────────────────────────
+        // 鈹€鈹€ State 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// True while the commander is alive; false after being killed in battle.
@@ -71,7 +72,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── Skills ────────────────────────────────────────────────────────────
+        // 鈹€鈹€ Skills 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Secondary skill levels for this commander, indexed by skill slot.
@@ -92,7 +93,7 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
-        // ── Stack quantity ────────────────────────────────────────────────────
+        // 鈹€鈹€ Stack quantity 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Number of creatures in this stack (commanders always have 1).
@@ -104,3 +105,6 @@ namespace H3Engine.MapObjects
         } = 1;
     }
 }
+
+
+

@@ -1,9 +1,10 @@
-// Migrated from VCMI lib/entities/building/CBuilding.h
+﻿// Migrated from VCMI lib/entities/building/CBuilding.h
 // Static definition of a single town building (costs, requirements, production, bonuses).
 // Runtime "which buildings are constructed" lives in TownInstance.Buildings.
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -22,7 +23,7 @@ namespace H3Engine.Core
         /// </summary>
         public enum EBuildMode
         {
-            /// <summary>Normal building – player must pay and click Build.</summary>
+            /// <summary>Normal building 鈥?player must pay and click Build.</summary>
             NORMAL  = 0,
             /// <summary>Appears automatically when all requirements are present.</summary>
             AUTO    = 1,
@@ -125,7 +126,7 @@ namespace H3Engine.Core
         // --- Combat / Fortification ---
 
         /// <summary>
-        /// War machine artifact provided by this building (e.g. Ballista Yard → Ballista).
+        /// War machine artifact provided by this building (e.g. Ballista Yard 鈫?Ballista).
         /// NONE if not applicable.
         /// </summary>
         public EArtifactId WarMachine
@@ -160,3 +161,5 @@ namespace H3Engine.Core
         } = EBuildMode.NORMAL;
     }
 }
+
+

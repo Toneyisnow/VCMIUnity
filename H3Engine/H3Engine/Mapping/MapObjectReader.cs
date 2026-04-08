@@ -1,4 +1,5 @@
-﻿using H3Engine.Common;
+using H3Engine.Common;
+using H3Engine.Core.Constants;
 using H3Engine.Core;
 using H3Engine.FileSystem;
 using H3Engine.MapObjects;
@@ -476,7 +477,7 @@ namespace H3Engine.Mapping
             hero.Data.Spells.Add(ESpellId.PRESET);
 
             HashSet<int> result = new HashSet<int>();
-            reader.ReadBitMask(result, 9, GameConstants.SPELLS_QUANTITY, false);
+            reader.ReadBitMask(result, 9, NumericConstants.SPELLS_QUANTITY, false);
             
             foreach (int sp in result)
             {
@@ -653,7 +654,7 @@ namespace H3Engine.Mapping
                 if (hasCustomPrimSkills)
                 {
                     hero.Data.PrimarySkills = new List<int>();
-                    for (int xx = 0; xx < GameConstants.PRIMARY_SKILLS; ++xx)
+                    for (int xx = 0; xx < NumericConstants.PRIMARY_SKILLS; ++xx)
                     {
                         hero.Data.PrimarySkills.Add(reader.ReadByte());
                     }
@@ -886,7 +887,7 @@ namespace H3Engine.Mapping
                     byte c = reader.ReadByte();
                     for (int yy = 0; yy < 8; ++yy)
                     {
-                        if (i * 8 + yy < GameConstants.SKILL_QUANTITY)
+                        if (i * 8 + yy < NumericConstants.SKILL_QUANTITY)
                         {
                             if (c == (c | 1 << yy))
                             {
@@ -898,14 +899,14 @@ namespace H3Engine.Mapping
                 // enable new (modded) skills
                 if (witchHut.AllowedAbilities.Count != 1)
                 {
-                    //// for (int skillID = GameConstants.SKILL_QUANTITY; skillID < VLC->skillh->size(); ++skillID)
+                    //// for (int skillID = NumericConstants.SKILL_QUANTITY; skillID < VLC->skillh->size(); ++skillID)
                     ////     wh->allowedAbilities.push_back(skillID);
                 }
             }
             else
             {
                 // RoE map
-                for (int skillID = 0; skillID < GameConstants.SKILL_QUANTITY; ++skillID)
+                for (int skillID = 0; skillID < NumericConstants.SKILL_QUANTITY; ++skillID)
                     witchHut.AllowedAbilities.Add(skillID);
             }
 
@@ -1062,7 +1063,7 @@ namespace H3Engine.Mapping
                     byte c = reader.ReadByte();
                     for (int yy = 0; yy < 8; ++yy)
                     {
-                        if (i * 8 + yy < GameConstants.SPELLS_QUANTITY)
+                        if (i * 8 + yy < NumericConstants.SPELLS_QUANTITY)
                         {
                             if (c == (c | 1 << yy)) //add obligatory spell even if it's banned on a map (?)
                             {
@@ -1079,7 +1080,7 @@ namespace H3Engine.Mapping
                 for (int yy = 0; yy < 8; ++yy)
                 {
                     int spellid = i * 8 + yy;
-                    if (spellid < GameConstants.SPELLS_QUANTITY)
+                    if (spellid < NumericConstants.SPELLS_QUANTITY)
                     {
                         if (c != (c | 1 << yy)) //add random spell only if it's allowed on entire map
                         {
@@ -1349,7 +1350,7 @@ namespace H3Engine.Mapping
                         castleInfo.AllowedFactions.Add(val);
                     }
 
-                    for (int i = 0; i < (GameConstants.F_NUMBER - MASK_SIZE); i++)
+                    for (int i = 0; i < (NumericConstants.F_NUMBER - MASK_SIZE); i++)
                     {
                         bool val = ((mask[1] & (1 << i)) > 0);
                         castleInfo.AllowedFactions.Add(val);
@@ -1468,3 +1469,5 @@ namespace H3Engine.Mapping
 
 
 }
+
+

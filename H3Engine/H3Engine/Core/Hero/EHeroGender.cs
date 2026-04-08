@@ -1,4 +1,4 @@
-// Migrated from VCMI lib/entities/hero/EHeroGender.h
+﻿// Migrated from VCMI lib/entities/hero/EHeroGender.h
 
 namespace H3Engine.Core
 {
@@ -9,3 +9,4 @@ namespace H3Engine.Core
         FEMALE  =  1,
     }
 }
+

@@ -1,9 +1,10 @@
-using H3Engine.Core;
+﻿using H3Engine.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Engine.PathFinder
 {
@@ -75,7 +76,7 @@ namespace H3Engine.Engine.PathFinder
         }
 
         /// <summary>
-        /// Total path cost in "turns + remaining fraction" — used as priority queue key.
+        /// Total path cost in "turns + remaining fraction" 鈥?used as priority queue key.
         /// Computed as: Turns + (maxMovePoints - MoveRemains) / maxMovePoints
         /// </summary>
         public float Cost
@@ -117,3 +118,5 @@ namespace H3Engine.Engine.PathFinder
         }
     }
 }
+
+

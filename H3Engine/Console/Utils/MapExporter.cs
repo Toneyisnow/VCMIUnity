@@ -1,4 +1,5 @@
 ﻿using H3Engine.Common;
+using H3Engine.Core.Constants;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
 using H3Engine.MapObjects;
@@ -74,13 +75,13 @@ namespace H3Console.Utils
                     ImageData imageData = h3Engine.RetrieveTerrainImage(tile.TerrainType, tile.TerrainView);
                     DrawOnCanvas(imageData, xx, yy, tile.TerrainRotation);
 
-                    if (tile.RoadType != H3Engine.Common.ERoadType.NO_ROAD)
+                    if (tile.RoadType != ERoadType.NO_ROAD)
                     {
                         ImageData imageDataRoad = h3Engine.RetrieveRoadImage(tile.RoadType, tile.RoadDir);
                         DrawOnCanvas(imageDataRoad, xx, yy, tile.RoadRotation);
                     }
 
-                    if (tile.RiverType != H3Engine.Common.ERiverType.NO_RIVER)
+                    if (tile.RiverType != ERiverType.NO_RIVER)
                     {
                         ImageData imageDataRiver = h3Engine.RetrieveRiverImage(tile.RiverType, tile.RiverDir);
                         DrawOnCanvas(imageDataRiver, xx, yy, tile.RiverRotation);

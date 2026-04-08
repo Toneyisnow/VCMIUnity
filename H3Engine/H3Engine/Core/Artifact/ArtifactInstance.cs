@@ -1,8 +1,9 @@
-// Migrated from VCMI lib/entities/artifact/CArtifactInstance.h
+﻿// Migrated from VCMI lib/entities/artifact/CArtifactInstance.h
 // Represents one runtime copy of an artifact (as opposed to its static type definition).
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -43,7 +44,7 @@ namespace H3Engine.Core
     /// </summary>
     public class ArtifactInstance
     {
-        // ── Identity ──────────────────────────────────────────────────────────
+        // 鈹€鈹€ Identity 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Unique instance ID within the game state.
@@ -63,7 +64,7 @@ namespace H3Engine.Core
             get; set;
         } = EArtifactId.NONE;
 
-        // ── Charged artifact (CCombinedArtifactInstance) ─────────────────────
+        // 鈹€鈹€ Charged artifact (CCombinedArtifactInstance) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Remaining charges for charged artifacts (Tomes, etc.).
@@ -75,7 +76,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Scroll artifact ───────────────────────────────────────────────────
+        // 鈹€鈹€ Scroll artifact 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// The spell stored in a spell scroll instance.
@@ -87,7 +88,7 @@ namespace H3Engine.Core
             get; set;
         } = ESpellId.NONE;
 
-        // ── Combined artifact (CCombinedArtifactInstance) ────────────────────
+        // 鈹€鈹€ Combined artifact (CCombinedArtifactInstance) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>
         /// Which constituent parts make up this combined artifact instance,
@@ -100,7 +101,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Computed helpers ─────────────────────────────────────────────────
+        // 鈹€鈹€ Computed helpers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         /// <summary>Returns true if this instance is a combined artifact (has assembled parts).</summary>
         public bool IsCombined()
@@ -121,3 +122,5 @@ namespace H3Engine.Core
         }
     }
 }
+
+

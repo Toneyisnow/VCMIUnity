@@ -1,18 +1,18 @@
-// Migrated from VCMI lib/entities/faction/CTown.h
+﻿// Migrated from VCMI lib/entities/faction/CTown.h
 // Static town template: buildings dictionary, creatures by tier, fortification base,
 // graphics/audio client data.
-// NOTE: CTown comments state that ClientInfo "should be moved from lib to client" –
-// mirrored here as TownClientInfo but marked accordingly.
+// NOTE: CTown comments state that ClientInfo "should be moved from lib to client" 鈥?// mirrored here as TownClientInfo but marked accordingly.
 
 using H3Engine.Common;
 using H3Engine.Core;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
     /// <summary>
     /// A visible structure on the town screen that corresponds to (or overlays) a building.
-    /// Client-side only – carries no gameplay logic.
+    /// Client-side only 鈥?carries no gameplay logic.
     /// Corresponds to VCMI's CStructure struct inside CTown.
     /// </summary>
     public class TownStructure
@@ -91,7 +91,7 @@ namespace H3Engine.Core
 
     /// <summary>
     /// Client-only presentation data for a town type.
-    /// Mirrors CTown::ClientInfo in VCMI – should be consumed by the Unity UI layer only.
+    /// Mirrors CTown::ClientInfo in VCMI 鈥?should be consumed by the Unity UI layer only.
     /// </summary>
     public class TownClientInfo
     {
@@ -316,3 +316,6 @@ namespace H3Engine.Core
         }
     }
 }
+
+
+

@@ -1,8 +1,9 @@
-// Migrated from VCMI lib/entities/building/TownFortifications.h
+﻿// Migrated from VCMI lib/entities/building/TownFortifications.h
 // Describes the fortification stats contributed by a fort/citadel/castle building.
 // Used both on CBuilding (per-building contribution) and CTown / TownType (aggregate state).
 
 using H3Engine.Common;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -93,3 +94,6 @@ namespace H3Engine.Core
         }
     }
 }
+
+
+

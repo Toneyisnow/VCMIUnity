@@ -1,8 +1,9 @@
-// Migrated from VCMI lib/entities/hero/CHeroClass.h
+﻿// Migrated from VCMI lib/entities/hero/CHeroClass.h
 // Replaces the partial HeroClass definition previously in H3Hero.cs
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -113,3 +114,5 @@ namespace H3Engine.Core
         }
     }
 }
+
+

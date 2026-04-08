@@ -1,6 +1,7 @@
-using H3Engine.MapObjects;
+﻿using H3Engine.MapObjects;
 using System;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Engine.PathFinder
 {
@@ -83,3 +84,5 @@ namespace H3Engine.Engine.PathFinder
         public void InvalidateAll() => cache.Clear();
     }
 }
+
+

@@ -1,8 +1,9 @@
-// Migrated from VCMI lib/entities/faction/CFaction.h
+﻿// Migrated from VCMI lib/entities/faction/CFaction.h
 // Static definition of a faction (alignment, terrain, boat type, puzzle map).
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -175,3 +176,6 @@ namespace H3Engine.Core
         }
     }
 }
+
+
+

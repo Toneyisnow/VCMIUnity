@@ -1,6 +1,7 @@
 ﻿using H3Engine.Core;
 using System;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.MapObjects
 {
@@ -210,3 +211,5 @@ namespace H3Engine.MapObjects
 
 
 }
+
+

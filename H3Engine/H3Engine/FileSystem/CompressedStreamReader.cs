@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.FileSystem
 {
@@ -215,3 +216,5 @@ namespace H3Engine.FileSystem
         public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
     }
 }
+
+

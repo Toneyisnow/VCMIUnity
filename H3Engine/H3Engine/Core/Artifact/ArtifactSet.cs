@@ -1,8 +1,9 @@
-// Moved from H3Engine.Components.Data.ArtifactSet → H3Engine.Core
+﻿// Moved from H3Engine.Components.Data.ArtifactSet 鈫?H3Engine.Core
 // (VCMI: lib/entities/artifact/CArtifactSet.h)
 
 using H3Engine.Common;
 using System.Collections.Generic;
+using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
@@ -21,7 +22,7 @@ namespace H3Engine.Core
         }
 
         /// <summary>
-        /// Worn equipment slots keyed by position (HEAD … MISC5).
+        /// Worn equipment slots keyed by position (HEAD 鈥?MISC5).
         /// Corresponds to CArtifactSet::artifactsWorn.
         /// </summary>
         public Dictionary<EArtifactPosition, ArtSlotInfo> ArtifactsWorn
@@ -47,7 +48,7 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // ── Queries ───────────────────────────────────────────────────────────
+        // 鈹€鈹€ Queries 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         public ArtSlotInfo GetSlot(EArtifactPosition pos)
         {
@@ -86,7 +87,7 @@ namespace H3Engine.Core
             return false;
         }
 
-        // ── Mutations ─────────────────────────────────────────────────────────
+        // 鈹€鈹€ Mutations 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
         public void PutAt(EArtifactId artId, EArtifactPosition pos, int instanceId = -1)
         {
@@ -128,3 +129,5 @@ namespace H3Engine.Core
         }
     }
 }
+
+
