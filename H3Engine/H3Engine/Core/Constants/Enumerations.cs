@@ -471,16 +471,32 @@ namespace H3Engine.Core.Constants
         BOOTS_OF_HASTE = 151, BOW_OF_SEEKING = 152, DRAGON_EYE_RING = 153
     }
 
-    /// <summary>Artifact position slots.</summary>
+    /// <summary>Artifact position slots. Corresponds to VCMI ArtifactPosition.</summary>
     public enum EArtifactPosition : sbyte
     {
         FIRST_AVAILABLE = -2, PRE_FIRST = -1,
+
+        // Hero worn slots (0–18)
         HEAD = 0, SHOULDERS = 1, NECK = 2, RIGHT_HAND = 3, LEFT_HAND = 4, TORSO = 5,
         RIGHT_RING = 6, LEFT_RING = 7, FEET = 8,
         MISC1 = 9, MISC2 = 10, MISC3 = 11, MISC4 = 12,
         MACH1 = 13, MACH2 = 14, MACH3 = 15, MACH4 = 16,
         SPELLBOOK = 17, MISC5 = 18,
-        AFTER_LAST = 19
+
+        AFTER_LAST = 19,
+
+        // Backpack and transition (represented in ArtifactSet as List / separate field)
+        BACKPACK_START  = 19,   // first virtual backpack index (same as AFTER_LAST)
+        TRANSITION_POS  = 19,   // drag-and-drop holding slot (same as AFTER_LAST)
+
+        // Commander worn slots (0–8 in the commander context; distinct bearer)
+        COMMANDER1 = 20, COMMANDER2 = 21, COMMANDER3 = 22, COMMANDER4 = 23,
+        COMMANDER5 = 24, COMMANDER6 = 25, COMMANDER7 = 26, COMMANDER8 = 27,
+        COMMANDER9 = 28,
+
+        // Creature and Altar bearer slots
+        CREATURE_SLOT = 29,
+        ALTAR         = 30,
     }
 
     /// <summary>Secondary skills.</summary>

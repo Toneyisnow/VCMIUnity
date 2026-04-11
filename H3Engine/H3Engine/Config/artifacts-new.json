@@ -1,0 +1,631 @@
+{
+	"_comment": "H3Engine artifact definitions. Bonus data sourced from VCMI config/artifacts.json. 'slot' field added for H3Engine slot assignment. RING expands to both ring slots; MISC expands to MISC1-MISC5.",
+
+	"spellBook":             { "index":0,  "class":"SPECIAL",  "slot":"SPELLBOOK" },
+	"spellScroll":           { "index":1,  "class":"SPECIAL",  "slot":"MISC" },
+	"grail":                 { "index":2,  "class":"SPECIAL",  "slot":"MISC" },
+	"catapult":              { "index":3,  "class":"SPECIAL",  "slot":"MACH4",  "warMachine":"catapult" },
+	"ballista":              { "index":4,  "class":"SPECIAL",  "slot":"MACH1",  "warMachine":"ballista" },
+	"ammoCart":              { "index":5,  "class":"SPECIAL",  "slot":"MACH2",  "warMachine":"ammoCart" },
+	"firstAidTent":          { "index":6,  "class":"SPECIAL",  "slot":"MACH3",  "warMachine":"firstAidTent" },
+
+	"centaurAxe": {
+		"index":7, "class":"TREASURE", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"attack": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack", "val":2, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"blackshardOfTheDeadKnight": {
+		"index":8, "class":"TREASURE", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"attack": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack", "val":3, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"greaterGnollsFlail": {
+		"index":9, "class":"MINOR", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"attack": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack", "val":4, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"ogresClubOfHavoc": {
+		"index":10, "class":"MINOR", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"attack": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack", "val":5, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"swordOfHellfire": {
+		"index":11, "class":"MAJOR", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"attack": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack", "val":6, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"titansGladius": {
+		"index":12, "class":"RELIC", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"attack":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",  "val":12, "valueType":"BASE_NUMBER" },
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":-3, "valueType":"BASE_NUMBER" }
+		}
+	},
+
+	"shieldOfTheDwarvenLords": {
+		"index":13, "class":"TREASURE", "slot":"LEFT_HAND",
+		"bonuses": {
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":2, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"shieldOfTheYawningDead": {
+		"index":14, "class":"TREASURE", "slot":"LEFT_HAND",
+		"bonuses": {
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":3, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"bucklerOfTheGnollKing": {
+		"index":15, "class":"MINOR", "slot":"LEFT_HAND",
+		"bonuses": {
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":4, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"targOfTheRampagingOgre": {
+		"index":16, "class":"MINOR", "slot":"LEFT_HAND",
+		"bonuses": {
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":5, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"shieldOfTheDamned": {
+		"index":17, "class":"MAJOR", "slot":"LEFT_HAND",
+		"bonuses": {
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":6, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"sentinelsShield": {
+		"index":18, "class":"RELIC", "slot":"LEFT_HAND",
+		"bonuses": {
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":12, "valueType":"BASE_NUMBER" },
+			"attack":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",  "val":-3, "valueType":"BASE_NUMBER" }
+		}
+	},
+
+	"helmOfTheAlabasterUnicorn": {
+		"index":19, "class":"TREASURE", "slot":"HEAD",
+		"bonuses": {
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":1, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"skullHelmet": {
+		"index":20, "class":"TREASURE", "slot":"HEAD",
+		"bonuses": {
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":2, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"helmOfChaos": {
+		"index":21, "class":"MINOR", "slot":"HEAD",
+		"bonuses": {
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":3, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"crownOfTheSupremeMagi": {
+		"index":22, "class":"MINOR", "slot":"HEAD",
+		"bonuses": {
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":4, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"hellstormHelmet": {
+		"index":23, "class":"MAJOR", "slot":"HEAD",
+		"bonuses": {
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":5, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"thunderHelmet": {
+		"index":24, "class":"RELIC", "slot":"HEAD",
+		"bonuses": {
+			"knowledge":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge",   "val":10, "valueType":"BASE_NUMBER" },
+			"spellpower":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower",  "val":-2, "valueType":"BASE_NUMBER" }
+		}
+	},
+
+	"breastplateOfPetrifiedWood": {
+		"index":25, "class":"TREASURE", "slot":"TORSO",
+		"bonuses": {
+			"spellpower": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower", "val":1, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"ribCage": {
+		"index":26, "class":"TREASURE", "slot":"TORSO",
+		"bonuses": {
+			"spellpower": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower", "val":2, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"scalesOfTheGreaterBasilisk": {
+		"index":27, "class":"MINOR", "slot":"TORSO",
+		"bonuses": {
+			"spellpower": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower", "val":3, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"tunicOfTheCyclopsKing": {
+		"index":28, "class":"MINOR", "slot":"TORSO",
+		"bonuses": {
+			"spellpower": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower", "val":4, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"breastplateOfBrimstone": {
+		"index":29, "class":"MAJOR", "slot":"TORSO",
+		"bonuses": {
+			"spellpower": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower", "val":5, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"titansCuirass": {
+		"index":30, "class":"RELIC", "slot":"TORSO",
+		"bonuses": {
+			"spellpower":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower",  "val":10, "valueType":"BASE_NUMBER" },
+			"knowledge":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge",   "val":-2, "valueType":"BASE_NUMBER" }
+		}
+	},
+
+	"armorOfWonder": {
+		"index":31, "class":"TREASURE", "slot":"TORSO",
+		"bonuses": {
+			"attack":    { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",    "val":1, "valueType":"BASE_NUMBER" },
+			"defence":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence",   "val":1, "valueType":"BASE_NUMBER" },
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":1, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":1, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"sandalsOfTheSaint": {
+		"index":32, "class":"TREASURE", "slot":"FEET",
+		"bonuses": {
+			"attack":    { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",    "val":2, "valueType":"BASE_NUMBER" },
+			"defence":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence",   "val":2, "valueType":"BASE_NUMBER" },
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":2, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":2, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"celestialNecklaceOfBliss": {
+		"index":33, "class":"MINOR", "slot":"NECK",
+		"bonuses": {
+			"attack":    { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",    "val":3, "valueType":"BASE_NUMBER" },
+			"defence":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence",   "val":3, "valueType":"BASE_NUMBER" },
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":3, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":3, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"lionsShieldOfCourage": {
+		"index":34, "class":"MINOR", "slot":"LEFT_HAND",
+		"bonuses": {
+			"attack":    { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",    "val":4, "valueType":"BASE_NUMBER" },
+			"defence":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence",   "val":4, "valueType":"BASE_NUMBER" },
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":4, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":4, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"swordOfJudgement": {
+		"index":35, "class":"MAJOR", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"attack":    { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",    "val":5, "valueType":"BASE_NUMBER" },
+			"defence":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence",   "val":5, "valueType":"BASE_NUMBER" },
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":5, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":5, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"helmOfHeavenlyEnlightenment": {
+		"index":36, "class":"RELIC", "slot":"HEAD",
+		"bonuses": {
+			"attack":    { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",    "val":6, "valueType":"BASE_NUMBER" },
+			"defence":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence",   "val":6, "valueType":"BASE_NUMBER" },
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":6, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":6, "valueType":"BASE_NUMBER" }
+		}
+	},
+
+	"quietEyeOfTheDragon": {
+		"index":37, "class":"TREASURE", "slot":"MISC",
+		"instanceBonuses": {
+			"attack":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",  "val":1, "valueType":"BASE_NUMBER" },
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":1, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"redDragonFlameTongue": {
+		"index":38, "class":"TREASURE", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"attack":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",  "val":2, "valueType":"BASE_NUMBER" },
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":2, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"dragonScaleShield": {
+		"index":39, "class":"MINOR", "slot":"LEFT_HAND",
+		"bonuses": {
+			"attack":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",  "val":3, "valueType":"BASE_NUMBER" },
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":3, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"dragonScaleArmor": {
+		"index":40, "class":"MINOR", "slot":"TORSO",
+		"bonuses": {
+			"attack":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",  "val":4, "valueType":"BASE_NUMBER" },
+			"defence": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":4, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"dragonboneGreaves": {
+		"index":41, "class":"TREASURE", "slot":"FEET",
+		"bonuses": {
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":1, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":1, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"dragonWingTabard": {
+		"index":42, "class":"TREASURE", "slot":"SHOULDERS",
+		"bonuses": {
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":2, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":2, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"necklaceOfDragonteeth": {
+		"index":43, "class":"MINOR", "slot":"NECK",
+		"bonuses": {
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":3, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":3, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"crownOfDragontooth": {
+		"index":44, "class":"MINOR", "slot":"HEAD",
+		"bonuses": {
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":4, "valueType":"BASE_NUMBER" },
+			"knowledge": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":4, "valueType":"BASE_NUMBER" }
+		}
+	},
+
+	"stillEyeOfTheDragon": {
+		"index":45, "class":"MINOR", "slot":"MISC",
+		"bonuses": {
+			"morale": { "type":"MORALE", "val":1, "valueType":"ADDITIVE_VALUE" },
+			"luck":   { "type":"LUCK",   "val":1, "valueType":"ADDITIVE_VALUE" }
+		}
+	},
+	"cloverOfFortune":  { "index":46, "class":"TREASURE", "slot":"MISC", "bonuses": { "luck": { "type":"LUCK", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"cardsOfProphecy":  { "index":47, "class":"TREASURE", "slot":"MISC", "bonuses": { "luck": { "type":"LUCK", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"ladybirdOfLuck":   { "index":48, "class":"TREASURE", "slot":"MISC", "bonuses": { "luck": { "type":"LUCK", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"badgeOfCourage":   { "index":49, "class":"TREASURE", "slot":"MISC", "bonuses": { "morale": { "type":"MORALE", "val":1, "valueType":"ADDITIVE_VALUE" }, "mindImmunity": { "type":"MIND_IMMUNITY", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"crestOfValor":     { "index":50, "class":"TREASURE", "slot":"MISC", "bonuses": { "morale": { "type":"MORALE", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"glyphOfGallantry": { "index":51, "class":"TREASURE", "slot":"MISC", "bonuses": { "morale": { "type":"MORALE", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"speculum":         { "index":52, "class":"TREASURE", "slot":"MISC", "bonuses": { "sight": { "type":"SIGHT_RANGE", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"spyglass":         { "index":53, "class":"TREASURE", "slot":"MISC", "bonuses": { "sight": { "type":"SIGHT_RANGE", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+
+	"amuletOfTheUndertaker": {
+		"index":54, "class":"TREASURE", "slot":"NECK",
+		"bonuses": { "necromancy": { "type":"UNDEAD_RAISE_PERCENTAGE", "val":5, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"vampiresCowl": {
+		"index":55, "class":"MINOR", "slot":"HEAD",
+		"bonuses": { "necromancy": { "type":"UNDEAD_RAISE_PERCENTAGE", "val":10, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"deadMansBoots": {
+		"index":56, "class":"MINOR", "slot":"FEET",
+		"bonuses": { "necromancy": { "type":"UNDEAD_RAISE_PERCENTAGE", "val":15, "valueType":"ADDITIVE_VALUE" } }
+	},
+
+	"garnitureOfInterference": { "index":57, "class":"TREASURE", "slot":"NECK",      "bonuses": { "resistance": { "type":"MAGIC_RESISTANCE", "val":5,  "valueType":"ADDITIVE_VALUE" } } },
+	"surcoatOfCounterpoise":   { "index":58, "class":"MINOR",    "slot":"SHOULDERS", "bonuses": { "resistance": { "type":"MAGIC_RESISTANCE", "val":10, "valueType":"ADDITIVE_VALUE" } } },
+	"bootsOfPolarity":         { "index":59, "class":"MINOR",    "slot":"FEET",      "bonuses": { "resistance": { "type":"MAGIC_RESISTANCE", "val":15, "valueType":"ADDITIVE_VALUE" } } },
+
+	"bowOfElvenCherrywood": {
+		"index":60, "class":"TREASURE", "slot":"RIGHT_HAND",
+		"bonuses": { "archery": { "type":"PERCENTAGE_DAMAGE_BOOST", "subtype":"damageTypeRanged", "val":5, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"bowstringOfTheUnicornsMane": {
+		"index":61, "class":"MINOR", "slot":"SHOULDERS",
+		"bonuses": { "archery": { "type":"PERCENTAGE_DAMAGE_BOOST", "subtype":"damageTypeRanged", "val":10, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"angelFeatherArrows": {
+		"index":62, "class":"MINOR", "slot":"MISC",
+		"bonuses": { "archery": { "type":"PERCENTAGE_DAMAGE_BOOST", "subtype":"damageTypeRanged", "val":15, "valueType":"ADDITIVE_VALUE" } }
+	},
+
+	"birdOfPerception": { "index":63, "class":"TREASURE", "slot":"MISC", "bonuses": { "eagleEye": { "type":"LEARN_BATTLE_SPELL_CHANCE", "val":5,  "valueType":"ADDITIVE_VALUE" } } },
+	"stoicWatchman":    { "index":64, "class":"MINOR",    "slot":"MISC", "bonuses": { "eagleEye": { "type":"LEARN_BATTLE_SPELL_CHANCE", "val":10, "valueType":"ADDITIVE_VALUE" } } },
+	"emblemOfCognizance":{ "index":65, "class":"MINOR",   "slot":"MISC", "bonuses": { "eagleEye": { "type":"LEARN_BATTLE_SPELL_CHANCE", "val":15, "valueType":"ADDITIVE_VALUE" } } },
+
+	"statesmansMedal":  { "index":66, "class":"TREASURE", "slot":"NECK",      "bonuses": { "diplomacy": { "type":"SURRENDER_DISCOUNT", "val":10, "valueType":"ADDITIVE_VALUE" } } },
+	"diplomatsRing":    { "index":67, "class":"TREASURE", "slot":"RING",      "bonuses": { "diplomacy": { "type":"SURRENDER_DISCOUNT", "val":10, "valueType":"ADDITIVE_VALUE" } } },
+	"ambassadorsSash":  { "index":68, "class":"MINOR",    "slot":"SHOULDERS", "bonuses": { "diplomacy": { "type":"SURRENDER_DISCOUNT", "val":10, "valueType":"ADDITIVE_VALUE" } } },
+
+	"ringOfTheWayfarer": {
+		"index":69, "class":"TREASURE", "slot":"RING",
+		"bonuses": { "speed": { "type":"STACKS_SPEED", "val":1, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"equestriansGloves": {
+		"index":70, "class":"TREASURE", "slot":"MISC",
+		"bonuses": { "movement": { "type":"MOVEMENT", "subtype":"heroMovementLand", "val":300, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"necklaceOfOceanGuidance": {
+		"index":71, "class":"MINOR", "slot":"NECK", "onlyOnWaterMap":true,
+		"bonuses": { "movement": { "type":"MOVEMENT", "subtype":"heroMovementSea", "val":1000, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"angelWings": {
+		"index":72, "class":"RELIC", "slot":"SHOULDERS",
+		"bonuses": { "fly": { "type":"FLYING_MOVEMENT", "val":0, "valueType":"INDEPENDENT_MIN" } }
+	},
+
+	"charmOfMana":    { "index":73, "class":"TREASURE", "slot":"MISC", "bonuses": { "mana": { "type":"MANA_REGENERATION", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"talismanOfMana": { "index":74, "class":"MINOR",    "slot":"NECK", "bonuses": { "mana": { "type":"MANA_REGENERATION", "val":2, "valueType":"ADDITIVE_VALUE" } } },
+	"mysticOrbOfMana":{ "index":75, "class":"MINOR",    "slot":"MISC", "bonuses": { "mana": { "type":"MANA_REGENERATION", "val":3, "valueType":"ADDITIVE_VALUE" } } },
+
+	"collarOfConjuring": { "index":76, "class":"TREASURE", "slot":"NECK",      "bonuses": { "duration": { "type":"SPELL_DURATION", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"ringOfConjuring":   { "index":77, "class":"MINOR",    "slot":"RING",      "bonuses": { "duration": { "type":"SPELL_DURATION", "val":2, "valueType":"ADDITIVE_VALUE" } } },
+	"capeOfConjuring":   { "index":78, "class":"MINOR",    "slot":"SHOULDERS", "bonuses": { "duration": { "type":"SPELL_DURATION", "val":3, "valueType":"ADDITIVE_VALUE" } } },
+
+	"orbOfTheFirmament":  { "index":79, "class":"MAJOR", "slot":"MISC", "bonuses": { "spellDmg": { "type":"SPELL_DAMAGE", "subtype":"spellSchool.air",   "val":50, "valueType":"ADDITIVE_VALUE" } } },
+	"orbOfSilt":          { "index":80, "class":"MAJOR", "slot":"MISC", "bonuses": { "spellDmg": { "type":"SPELL_DAMAGE", "subtype":"spellSchool.earth", "val":50, "valueType":"ADDITIVE_VALUE" } } },
+	"orbOfTempestuousFire":{ "index":81, "class":"MAJOR", "slot":"MISC", "bonuses": { "spellDmg": { "type":"SPELL_DAMAGE", "subtype":"spellSchool.fire",  "val":50, "valueType":"ADDITIVE_VALUE" } } },
+	"orbOfDrivingRain":   { "index":82, "class":"MAJOR", "slot":"MISC", "bonuses": { "spellDmg": { "type":"SPELL_DAMAGE", "subtype":"spellSchool.water", "val":50, "valueType":"ADDITIVE_VALUE" } } },
+
+	"recantersCloak": {
+		"index":83, "class":"MAJOR", "slot":"SHOULDERS",
+		"bonuses": { "blockMagic": { "type":"BLOCK_MAGIC_ABOVE", "val":2, "valueType":"INDEPENDENT_MIN" } }
+	},
+	"spiritOfOppression": {
+		"index":84, "class":"MAJOR", "slot":"MISC",
+		"bonuses": { "moraleBlock": { "type":"MORALE", "val":0, "valueType":"INDEPENDENT_MIN", "propagator":"BATTLE_WIDE" } }
+	},
+	"hourglassOfTheEvilHour": {
+		"index":85, "class":"MAJOR", "slot":"MISC",
+		"bonuses": { "luckBlock": { "type":"LUCK", "val":0, "valueType":"INDEPENDENT_MIN", "propagator":"BATTLE_WIDE" } }
+	},
+
+	"tomeOfFireMagic":  { "index":86, "class":"RELIC", "slot":"MISC", "bonuses": { "fire":  { "type":"SPELLS_OF_SCHOOL", "subtype":"spellSchool.fire",  "val":3, "valueType":"ADDITIVE_VALUE" } } },
+	"tomeOfAirMagic":   { "index":87, "class":"RELIC", "slot":"MISC", "bonuses": { "air":   { "type":"SPELLS_OF_SCHOOL", "subtype":"spellSchool.air",   "val":3, "valueType":"ADDITIVE_VALUE" } } },
+	"tomeOfWaterMagic": { "index":88, "class":"RELIC", "slot":"MISC", "bonuses": { "water": { "type":"SPELLS_OF_SCHOOL", "subtype":"spellSchool.water", "val":3, "valueType":"ADDITIVE_VALUE" } } },
+	"tomeOfEarthMagic": { "index":89, "class":"RELIC", "slot":"MISC", "bonuses": { "earth": { "type":"SPELLS_OF_SCHOOL", "subtype":"spellSchool.earth", "val":3, "valueType":"ADDITIVE_VALUE" } } },
+
+	"bootsOfLevitation": {
+		"index":90, "class":"RELIC", "slot":"FEET", "onlyOnWaterMap":true,
+		"bonuses": { "waterWalking": { "type":"WATER_WALKING", "val":0, "valueType":"INDEPENDENT_MIN" } }
+	},
+	"goldenBow": {
+		"index":91, "class":"RELIC", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"noDistPenalty": { "type":"NO_DISTANCE_PENALTY", "val":1, "valueType":"ADDITIVE_VALUE" },
+			"noWallPenalty":  { "type":"NO_WALL_PENALTY",     "val":1, "valueType":"ADDITIVE_VALUE" }
+		}
+	},
+	"sphereOfPermanence": {
+		"index":92, "class":"RELIC", "slot":"MISC",
+		"bonuses": {
+			"noDispel":        { "type":"SPELL_IMMUNITY", "subtype":"spell.dispel",        "val":1, "valueType":"ADDITIVE_VALUE" },
+			"noDispelHelpful": { "type":"SPELL_IMMUNITY", "subtype":"spell.dispelHelpful", "val":1, "valueType":"ADDITIVE_VALUE" }
+		}
+	},
+	"orbOfVulnerability": {
+		"index":93, "class":"RELIC", "slot":"MISC",
+		"bonuses": {
+			"noImmunities":  { "type":"NEGATE_ALL_NATURAL_IMMUNITIES", "val":1, "valueType":"ADDITIVE_VALUE", "propagator":"BATTLE_WIDE" },
+			"noResistance":  { "type":"MAGIC_RESISTANCE",              "val":0, "valueType":"INDEPENDENT_MIN","propagator":"BATTLE_WIDE" }
+		}
+	},
+
+	"ringOfVitality":  { "index":94, "class":"TREASURE", "slot":"RING",  "bonuses": { "health": { "type":"CREATURE_HP", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"ringOfLife":      { "index":95, "class":"TREASURE", "slot":"RING",  "bonuses": { "health": { "type":"CREATURE_HP", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"vialOfLifeblood": { "index":96, "class":"MINOR",    "slot":"MISC",  "bonuses": { "health": { "type":"CREATURE_HP", "val":2, "valueType":"ADDITIVE_VALUE" } } },
+	"necklaceOfSwiftness": { "index":97, "class":"MINOR", "slot":"NECK", "bonuses": { "speed": { "type":"STACKS_SPEED", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+
+	"bootsOfSpeed": {
+		"index":98, "class":"MAJOR", "slot":"FEET",
+		"bonuses": { "movement": { "type":"MOVEMENT", "subtype":"heroMovementLand", "val":600, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"capeOfVelocity": {
+		"index":99, "class":"MINOR", "slot":"SHOULDERS",
+		"bonuses": { "speed": { "type":"STACKS_SPEED", "val":2, "valueType":"ADDITIVE_VALUE" } }
+	},
+
+	"pendantOfDispassion": { "index":100, "class":"TREASURE", "slot":"NECK", "bonuses": { "immunity": { "type":"SPELL_IMMUNITY", "subtype":"spell.berserk",     "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"pendantOfSecondSight":{ "index":101, "class":"TREASURE", "slot":"NECK", "bonuses": { "immunity": { "type":"SPELL_IMMUNITY", "subtype":"spell.blind",       "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"pendantOfHoliness":   { "index":102, "class":"TREASURE", "slot":"NECK", "bonuses": { "immunity": { "type":"SPELL_IMMUNITY", "subtype":"spell.curse",       "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"pendantOfLife":       { "index":103, "class":"TREASURE", "slot":"NECK", "bonuses": { "immunity": { "type":"SPELL_IMMUNITY", "subtype":"spell.deathRipple", "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"pendantOfDeath":      { "index":104, "class":"TREASURE", "slot":"NECK", "bonuses": { "immunity": { "type":"SPELL_IMMUNITY", "subtype":"spell.destroyUndead","val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"pendantOfFreeWill":   { "index":105, "class":"TREASURE", "slot":"NECK", "bonuses": { "immunity": { "type":"SPELL_IMMUNITY", "subtype":"spell.hypnotize",   "val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"pendantOfNegativity": {
+		"index":106, "class":"MINOR", "slot":"NECK",
+		"bonuses": {
+			"lightningBolt":   { "type":"SPELL_IMMUNITY", "subtype":"spell.lightningBolt",  "val":1, "valueType":"ADDITIVE_VALUE" },
+			"chainLightning":  { "type":"SPELL_IMMUNITY", "subtype":"spell.chainLightning", "val":1, "valueType":"ADDITIVE_VALUE" }
+		}
+	},
+	"pendantOfTotalRecall":{ "index":107, "class":"MINOR", "slot":"NECK", "bonuses": { "immunity": { "type":"SPELL_IMMUNITY", "subtype":"spell.forgetfulness","val":1, "valueType":"ADDITIVE_VALUE" } } },
+	"pendantOfCourage": {
+		"index":108, "class":"RELIC", "slot":"NECK",
+		"bonuses": {
+			"morale": { "type":"MORALE", "val":3, "valueType":"ADDITIVE_VALUE" },
+			"luck":   { "type":"LUCK",   "val":3, "valueType":"ADDITIVE_VALUE" }
+		}
+	},
+
+	"everflowingCrystalCloak": {
+		"index":109, "class":"MAJOR", "slot":"SHOULDERS",
+		"instanceBonuses": { "crystal": { "type":"GENERATE_RESOURCE", "subtype":"resource.crystal", "val":1, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+	"ringOfInfiniteGems": {
+		"index":110, "class":"MAJOR", "slot":"RING",
+		"instanceBonuses": { "gems": { "type":"GENERATE_RESOURCE", "subtype":"resource.gems", "val":1, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+	"everpouringVialOfMercury": {
+		"index":111, "class":"MAJOR", "slot":"MISC",
+		"instanceBonuses": { "mercury": { "type":"GENERATE_RESOURCE", "subtype":"resource.mercury", "val":1, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+	"inexhaustibleCartOfOre": {
+		"index":112, "class":"MAJOR", "slot":"MISC",
+		"instanceBonuses": { "ore": { "type":"GENERATE_RESOURCE", "subtype":"resource.ore", "val":1, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+	"eversmokingRingOfSulfur": {
+		"index":113, "class":"MAJOR", "slot":"RING",
+		"instanceBonuses": { "sulfur": { "type":"GENERATE_RESOURCE", "subtype":"resource.sulfur", "val":1, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+	"inexhaustibleCartOfLumber": {
+		"index":114, "class":"MAJOR", "slot":"MISC",
+		"instanceBonuses": { "wood": { "type":"GENERATE_RESOURCE", "subtype":"resource.wood", "val":1, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+	"endlessSackOfGold": {
+		"index":115, "class":"RELIC", "slot":"MISC",
+		"instanceBonuses": { "gold": { "type":"GENERATE_RESOURCE", "subtype":"resource.gold", "val":1000, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+	"endlessBagOfGold": {
+		"index":116, "class":"RELIC", "slot":"MISC",
+		"instanceBonuses": { "gold": { "type":"GENERATE_RESOURCE", "subtype":"resource.gold", "val":750, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+	"endlessPurseOfGold": {
+		"index":117, "class":"RELIC", "slot":"MISC",
+		"instanceBonuses": { "gold": { "type":"GENERATE_RESOURCE", "subtype":"resource.gold", "val":500, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" } }
+	},
+
+	"legsOfLegion": {
+		"index":118, "class":"SPECIAL", "slot":"FEET",
+		"instanceBonuses": { "growth": { "type":"CREATURE_GROWTH", "subtype":"creatureLevel2", "val":5, "valueType":"ADDITIVE_VALUE", "propagator":"TOWN_AND_VISITOR" } }
+	},
+	"loinsOfLegion": {
+		"index":119, "class":"SPECIAL", "slot":"TORSO",
+		"instanceBonuses": { "growth": { "type":"CREATURE_GROWTH", "subtype":"creatureLevel3", "val":4, "valueType":"ADDITIVE_VALUE", "propagator":"TOWN_AND_VISITOR" } }
+	},
+	"torsoOfLegion": {
+		"index":120, "class":"SPECIAL", "slot":"TORSO",
+		"instanceBonuses": { "growth": { "type":"CREATURE_GROWTH", "subtype":"creatureLevel4", "val":3, "valueType":"ADDITIVE_VALUE", "propagator":"TOWN_AND_VISITOR" } }
+	},
+	"armsOfLegion": {
+		"index":121, "class":"SPECIAL", "slot":"SHOULDERS",
+		"instanceBonuses": { "growth": { "type":"CREATURE_GROWTH", "subtype":"creatureLevel5", "val":2, "valueType":"ADDITIVE_VALUE", "propagator":"TOWN_AND_VISITOR" } }
+	},
+	"headOfLegion": {
+		"index":122, "class":"SPECIAL", "slot":"HEAD",
+		"instanceBonuses": { "growth": { "type":"CREATURE_GROWTH", "subtype":"creatureLevel6", "val":1, "valueType":"ADDITIVE_VALUE", "propagator":"TOWN_AND_VISITOR" } }
+	},
+
+	"seaCaptainsHat": {
+		"index":123, "class":"RELIC", "slot":"HEAD", "onlyOnWaterMap":true,
+		"bonuses": {
+			"whirlpool":  { "type":"WHIRLPOOL_PROTECTION", "val":1, "valueType":"ADDITIVE_VALUE" },
+			"movement":   { "type":"MOVEMENT", "subtype":"heroMovementSea", "val":500, "valueType":"ADDITIVE_VALUE" },
+			"summonBoat": { "type":"SPELLCASTER", "subtype":"spell.summonBoat",  "val":3, "valueType":"INDEPENDENT_MAX" },
+			"scuttleBoat":{ "type":"SPELLCASTER", "subtype":"spell.scuttleBoat", "val":3, "valueType":"INDEPENDENT_MAX" }
+		}
+	},
+	"spellbindersHat": {
+		"index":124, "class":"RELIC", "slot":"HEAD",
+		"bonuses": { "spells": { "type":"SPELLS_OF_LEVEL", "subtype":"spellLevel5", "val":3, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"shacklesOfWar": {
+		"index":125, "class":"RELIC", "slot":"MISC",
+		"bonuses": { "noFleeing": { "type":"BATTLE_NO_FLEEING", "val":1, "valueType":"ADDITIVE_VALUE", "propagator":"BATTLE_WIDE" } }
+	},
+	"orbOfInhibition": {
+		"index":126, "class":"RELIC", "slot":"MISC",
+		"bonuses": { "blockMagic": { "type":"BLOCK_ALL_MAGIC", "val":1, "valueType":"ADDITIVE_VALUE", "propagator":"BATTLE_WIDE" } }
+	},
+	"vialOfDragonBlood": {
+		"index":127, "class":"SPECIAL", "slot":"MISC",
+		"bonuses": {
+			"dragonAtk": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",  "val":5, "valueType":"BASE_NUMBER" },
+			"dragonDef": { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence", "val":5, "valueType":"BASE_NUMBER" }
+		}
+	},
+
+	"armageddonsBlade": {
+		"index":128, "class":"SPECIAL", "slot":"RIGHT_HAND",
+		"bonuses": {
+			"spell":    { "type":"SPELLCASTER",   "subtype":"spell.armageddon",  "val":3, "valueType":"INDEPENDENT_MAX" },
+			"immunity": { "type":"SPELL_IMMUNITY", "subtype":"spell.armageddon", "val":1, "valueType":"ADDITIVE_VALUE" },
+			"attack":   { "type":"PRIMARY_SKILL",  "subtype":"primarySkill.attack",    "val":3, "valueType":"BASE_NUMBER" },
+			"defence":  { "type":"PRIMARY_SKILL",  "subtype":"primarySkill.defence",   "val":3, "valueType":"BASE_NUMBER" },
+			"spellpower":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.spellpower","val":3, "valueType":"BASE_NUMBER" },
+			"knowledge":{ "type":"PRIMARY_SKILL",  "subtype":"primarySkill.knowledge", "val":6, "valueType":"BASE_NUMBER" }
+		}
+	},
+
+	"angelicAlliance": {
+		"index":129, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["armorOfWonder","sandalsOfTheSaint","celestialNecklaceOfBliss","lionsShieldOfCourage","swordOfJudgement","helmOfHeavenlyEnlightenment"],
+		"bonuses": { "alignment": { "type":"NONEVIL_ALIGNMENT_MIX", "val":1, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"cloakOfTheUndeadKing": {
+		"index":130, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["amuletOfTheUndertaker","vampiresCowl","deadMansBoots"],
+		"bonuses": {
+			"skeleton":    { "type":"IMPROVED_NECROMANCY", "subtype":"creature.skeleton",   "val":1, "valueType":"ADDITIVE_VALUE" },
+			"walkingDead": { "type":"IMPROVED_NECROMANCY", "subtype":"creature.walkingDead","val":1, "valueType":"ADDITIVE_VALUE" },
+			"wight":       { "type":"IMPROVED_NECROMANCY", "subtype":"creature.wight",      "val":1, "valueType":"ADDITIVE_VALUE" },
+			"lich":        { "type":"IMPROVED_NECROMANCY", "subtype":"creature.lich",       "val":1, "valueType":"ADDITIVE_VALUE" }
+		}
+	},
+	"elixirOfLife": {
+		"index":131, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["ringOfVitality","ringOfLife","vialOfLifeblood"],
+		"bonuses": {
+			"health":      { "type":"CREATURE_HP",       "val":25, "valueType":"PERCENT_TO_BASE" },
+			"regeneration":{ "type":"HP_REGENERATION",   "val":50, "valueType":"ADDITIVE_VALUE"  }
+		}
+	},
+	"armorOfTheDamned": {
+		"index":132, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["blackshardOfTheDeadKnight","shieldOfTheYawningDead","skullHelmet","ribCage"],
+		"bonuses": {
+			"slow":       { "type":"OPENING_BATTLE_SPELL", "subtype":"spell.slow",       "val":50, "valueType":"ADDITIVE_VALUE" },
+			"curse":      { "type":"OPENING_BATTLE_SPELL", "subtype":"spell.curse",      "val":50, "valueType":"ADDITIVE_VALUE" },
+			"weakness":   { "type":"OPENING_BATTLE_SPELL", "subtype":"spell.weakness",   "val":50, "valueType":"ADDITIVE_VALUE" },
+			"misfortune": { "type":"OPENING_BATTLE_SPELL", "subtype":"spell.misfortune", "val":50, "valueType":"ADDITIVE_VALUE" }
+		}
+	},
+	"statueOfLegion": {
+		"index":133, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["legsOfLegion","loinsOfLegion","torsoOfLegion","armsOfLegion","headOfLegion"],
+		"bonuses": { "growth": { "type":"CREATURE_GROWTH_PERCENT", "val":50, "valueType":"PERCENT_TO_BASE", "propagator":"PLAYER" } }
+	},
+	"powerOfTheDragonFather": {
+		"index":134, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["quietEyeOfTheDragon","redDragonFlameTongue","dragonScaleShield","dragonScaleArmor","dragonboneGreaves","dragonWingTabard","necklaceOfDragonteeth","crownOfDragontooth","stillEyeOfTheDragon"],
+		"bonuses": {
+			"immunity": { "type":"LEVEL_SPELL_IMMUNITY", "val":4, "valueType":"INDEPENDENT_MAX" },
+			"attack":   { "type":"PRIMARY_SKILL", "subtype":"primarySkill.attack",    "val":6, "valueType":"BASE_NUMBER" },
+			"defence":  { "type":"PRIMARY_SKILL", "subtype":"primarySkill.defence",   "val":6, "valueType":"BASE_NUMBER" },
+			"spellpower":{ "type":"PRIMARY_SKILL","subtype":"primarySkill.spellpower","val":6, "valueType":"BASE_NUMBER" },
+			"knowledge":{ "type":"PRIMARY_SKILL", "subtype":"primarySkill.knowledge", "val":6, "valueType":"BASE_NUMBER" }
+		}
+	},
+	"titansThunder": {
+		"index":135, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["titansGladius","sentinelsShield","thunderHelmet","titansCuirass"],
+		"bonuses": { "titanBolt": { "type":"SPELLCASTER", "subtype":"spell.titanBolt", "val":3, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"admiralsHat": {
+		"index":136, "class":"SPECIAL", "slot":"COMBINED", "onlyOnWaterMap":true,
+		"components": ["necklaceOfOceanGuidance","seaCaptainsHat"],
+		"bonuses": { "boarding": { "type":"FREE_SHIP_BOARDING", "val":1, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"bowOfTheSharpshooter": {
+		"index":137, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["bowOfElvenCherrywood","bowstringOfTheUnicornsMane","angelFeatherArrows"],
+		"bonuses": {
+			"noDistPenalty": { "type":"NO_DISTANCE_PENALTY", "val":1, "valueType":"ADDITIVE_VALUE" },
+			"noWallPenalty":  { "type":"NO_WALL_PENALTY",     "val":1, "valueType":"ADDITIVE_VALUE" },
+			"freeShooting":   { "type":"FREE_SHOOTING",       "val":1, "valueType":"ADDITIVE_VALUE" }
+		}
+	},
+	"wizardsWell": {
+		"index":138, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["charmOfMana","talismanOfMana","mysticOrbOfMana"],
+		"bonuses": { "mana": { "type":"MANA_PERCENTAGE_REGENERATION", "val":100, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"ringOfTheMagi": {
+		"index":139, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["collarOfConjuring","ringOfConjuring","capeOfConjuring"],
+		"bonuses": { "duration": { "type":"SPELL_DURATION", "val":50, "valueType":"ADDITIVE_VALUE" } }
+	},
+	"cornucopia": {
+		"index":140, "class":"SPECIAL", "slot":"COMBINED",
+		"components": ["everflowingCrystalCloak","ringOfInfiniteGems","everpouringVialOfMercury","eversmokingRingOfSulfur"],
+		"bonuses": {
+			"crystal": { "type":"GENERATE_RESOURCE", "subtype":"resource.crystal", "val":4, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" },
+			"gems":    { "type":"GENERATE_RESOURCE", "subtype":"resource.gems",    "val":4, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" },
+			"mercury": { "type":"GENERATE_RESOURCE", "subtype":"resource.mercury", "val":4, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" },
+			"sulfur":  { "type":"GENERATE_RESOURCE", "subtype":"resource.sulfur",  "val":4, "valueType":"ADDITIVE_VALUE", "stacking":"ALWAYS" }
+		}
+	},
+
+	"unusedArtifact1": { "index":141, "class":"SPECIAL", "slot":"MISC" },
+	"unusedArtifact2": { "index":142, "class":"SPECIAL", "slot":"MISC" },
+	"unusedArtifact3": { "index":143, "class":"SPECIAL", "slot":"MISC" }
+}

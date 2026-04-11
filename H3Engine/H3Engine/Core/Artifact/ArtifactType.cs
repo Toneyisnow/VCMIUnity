@@ -3,6 +3,7 @@
 // Runtime state (which hero equips which copy) lives in ArtifactInstance / ArtifactSet.
 
 using H3Engine.Common;
+using H3Engine.Core.Bonus;
 using System.Collections.Generic;
 using H3Engine.Core.Constants;
 
@@ -176,7 +177,25 @@ namespace H3Engine.Core
             get; set;
         }
 
-        // 鈹€鈹€ Computed helpers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+        // ── Bonus definitions ─────────────────────────────────────────────────
+
+        /// <summary>
+        /// The bonuses this artifact type confers on its bearer when equipped.
+        /// Loaded from game data (h3m / JSON config); never mutated at runtime.
+        ///
+        /// Each element describes one modifier (e.g. "+2 Attack", "+600 movement",
+        /// "+10% magic resistance").  At runtime these are copied onto the
+        /// <see cref="ArtifactInstance"/> node so each worn copy has its own live
+        /// bonuses in the bonus tree.
+        ///
+        /// Corresponds to VCMI CArtifact::instanceBonuses.
+        /// </summary>
+        public List<Bonus> Bonuses
+        {
+            get; set;
+        }
+
+        // ── Computed helpers ──────────────────────────────────────────────────
 
         /// <summary>
         /// Returns true for MAJOR and RELIC class artifacts.

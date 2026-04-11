@@ -58,7 +58,8 @@
       "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/H3Engine -type f -name *ResourceLoader* -o -name *DataAccess*)",
       "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Prefabs -type f -name *.prefab)",
       "Bash(mkdir -p \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Resources/config/widgets\")",
-      "Bash(cp \"d:/SourceCode/Git/vcmi/vcmi/config/widgets/adventureMap.json\" \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Resources/config/widgets/adventureMap.json\")"
+      "Bash(cp \"d:/SourceCode/Git/vcmi/vcmi/config/widgets/adventureMap.json\" \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Resources/config/widgets/adventureMap.json\")",
+      "Bash(grep -r \"artifacts\\\\|Artifact\" /d/SourceCode/Git/toneyisnow/VCMIUnity/H3Engine/H3Engine/*.cs)"
     ]
   }
 }

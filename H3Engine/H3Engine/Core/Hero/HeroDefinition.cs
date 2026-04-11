@@ -1,5 +1,5 @@
-﻿// Migrated from VCMI lib/entities/hero/CHeroClass.h
-// Replaces the partial HeroClass definition previously in H3Hero.cs
+// Migrated from VCMI lib/entities/hero/CHeroClass.h
+// Renamed from HeroClass to HeroDefinition.
 
 using H3Engine.Common;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using H3Engine.Core.Constants;
 
 namespace H3Engine.Core
 {
-    public class HeroClass
+    public class HeroDefinition
     {
         public enum EClassAffinity
         {
@@ -114,5 +114,3 @@ namespace H3Engine.Core
         }
     }
 }
-
-

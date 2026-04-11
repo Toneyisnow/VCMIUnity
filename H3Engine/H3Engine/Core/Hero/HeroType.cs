@@ -96,7 +96,7 @@ namespace H3Engine.Core
         /// <summary>
         /// Reference to this hero's class (e.g. Knight, Ranger, Warlock鈥?.
         /// </summary>
-        public HeroClass HeroClass
+        public HeroDefinition HeroDefinition
         {
             get; set;
         }
