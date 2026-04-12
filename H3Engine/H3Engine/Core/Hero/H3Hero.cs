@@ -16,6 +16,7 @@ using H3Engine.Core.Bonus;
 using System;
 using System.Collections.Generic;
 using H3Engine.Core.Constants;
+using BonusItem = H3Engine.Core.Bonus.Bonus;
 
 namespace H3Engine.Core
 {
@@ -404,7 +405,7 @@ namespace H3Engine.Core
 
             if (percent == 0) return;
 
-            AddNewBonus(new Bonus
+            AddNewBonus(new BonusItem
             {
                 Type     = BonusType.MOVEMENT,
                 Subtype  = -1,

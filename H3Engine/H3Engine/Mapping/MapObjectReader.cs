@@ -523,7 +523,7 @@ namespace H3Engine.Mapping
                     if (disHero.HeroId == hero.SubId)
                     {
                         hero.Data.Name = disHero.Name;
-                        hero.Data.PortaitIndex = disHero.Portrait;
+                        hero.Data.PortraitIndex = disHero.Portrait;
                         break;
                     }
                 }
@@ -561,7 +561,7 @@ namespace H3Engine.Mapping
             bool hasPortrait = reader.ReadBoolean();
             if (hasPortrait)
             {
-                hero.Data.PortaitIndex = reader.ReadByte();
+                hero.Data.PortraitIndex = reader.ReadByte();
             }
 
             bool hasSecSkills = reader.ReadBoolean();

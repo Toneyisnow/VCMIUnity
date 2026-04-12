@@ -1,5 +1,7 @@
 ﻿using H3Engine.Campaign;
 using H3Engine.Common;
+using H3Engine.Core;
+using H3Engine.Core.Constants;
 using H3Engine.FileSystem;
 using H3Engine.GUI;
 using H3Engine.Mapping;
@@ -12,7 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using H3Engine.Core.Constants;
+using BonusItem = H3Engine.Core.Bonus.Bonus;
 
 namespace H3Engine.DataAccess
 {
@@ -25,6 +27,13 @@ namespace H3Engine.DataAccess
         private ResourceHandler resourceHandler = null;
 
         private ResourceUsage resourceUsage = null;
+
+        private readonly ArtifactHandler artifactHandler = new ArtifactHandler();
+
+        /// <summary>
+        /// Counter used to assign unique IDs to newly created ArtifactInstances.
+        /// </summary>
+        private int nextArtifactInstanceId = 1;
 
 
         public static H3DataAccess GetInstance()
@@ -256,6 +265,71 @@ namespace H3Engine.DataAccess
         public ImageData RetrieveRiverImage(ERiverType riverType, int riverDir)
         {
             return resourceUsage.RetrieveRiverImage(riverType, riverDir);
+        }
+
+        ////// Artifact Layer ///////
+
+        /// <summary>
+        /// Loads artifact type definitions from a JSON file (Config/artifacts.json format).
+        /// Must be called once at startup before any artifact queries.
+        /// </summary>
+        public void LoadArtifacts(string jsonPath)
+        {
+            var loaded = ArtifactDataLoader.LoadFromFile(jsonPath);
+            foreach (var art in loaded.Objects.Values)
+                artifactHandler.Register(art);
+            artifactHandler.FinalizeLoad();
+        }
+
+        /// <summary>
+        /// Returns the static type definition for the given artifact ID, or null if unknown.
+        /// </summary>
+        public ArtifactType GetArtifactType(EArtifactId id)
+        {
+            return artifactHandler.GetById(id);
+        }
+
+        /// <summary>
+        /// Creates and returns a new <see cref="ArtifactInstance"/> for the given artifact ID,
+        /// initialised with the static bonuses from its <see cref="ArtifactType"/>.
+        /// Returns null if the artifact type is not registered.
+        /// </summary>
+        public ArtifactInstance CreateArtifactInstance(EArtifactId id)
+        {
+            var type = artifactHandler.GetById(id);
+            if (type == null) return null;
+
+            var instance = new ArtifactInstance { InstanceId = nextArtifactInstanceId++ };
+            instance.InitFromType(type);
+            return instance;
+        }
+
+        /// <summary>
+        /// Convenience method: creates an <see cref="ArtifactInstance"/> for the given artifact
+        /// and equips it on the hero at the first valid hero slot defined in the artifact type.
+        /// Returns the equipped instance, or null if the artifact type is unknown or has no hero slots.
+        /// </summary>
+        public ArtifactInstance GiveArtifactToHero(H3Hero hero, EArtifactId id)
+        {
+            if (hero == null) throw new ArgumentNullException(nameof(hero));
+
+            var type = artifactHandler.GetById(id);
+            if (type == null) return null;
+
+            // Find the first valid hero slot.
+            EArtifactPosition slot = EArtifactPosition.PRE_FIRST;
+            if (type.PossibleSlots != null &&
+                type.PossibleSlots.TryGetValue(EArtBearer.HERO, out var heroSlots) &&
+                heroSlots != null && heroSlots.Count > 0)
+            {
+                slot = heroSlots[0];
+            }
+
+            if (slot == EArtifactPosition.PRE_FIRST) return null;
+
+            var instance = CreateArtifactInstance(id);
+            hero.EquipArtifact(instance, slot);
+            return instance;
         }
     }
 }

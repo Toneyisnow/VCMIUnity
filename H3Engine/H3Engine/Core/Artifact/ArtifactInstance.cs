@@ -8,6 +8,7 @@
 using H3Engine.Core.Bonus;
 using System.Collections.Generic;
 using H3Engine.Core.Constants;
+using BonusItem = H3Engine.Core.Bonus.Bonus;
 
 namespace H3Engine.Core
 {
@@ -144,7 +145,7 @@ namespace H3Engine.Core
             {
                 // Clone the bonus and stamp it with ARTIFACT_INSTANCE source + this
                 // artifact type's ID so callers can filter by source later.
-                var instBonus = new Bonus
+                var instBonus = new BonusItem
                 {
                     Type             = srcBonus.Type,
                     Subtype          = srcBonus.Subtype,

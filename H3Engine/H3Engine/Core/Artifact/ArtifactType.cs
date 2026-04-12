@@ -4,6 +4,7 @@
 
 using H3Engine.Common;
 using H3Engine.Core.Bonus;
+using BonusItem = H3Engine.Core.Bonus.Bonus;
 using System.Collections.Generic;
 using H3Engine.Core.Constants;
 
@@ -190,7 +191,7 @@ namespace H3Engine.Core
         ///
         /// Corresponds to VCMI CArtifact::instanceBonuses.
         /// </summary>
-        public List<Bonus> Bonuses
+        public List<BonusItem> Bonuses
         {
             get; set;
         }
