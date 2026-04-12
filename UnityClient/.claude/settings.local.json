@@ -59,7 +59,11 @@
       "Bash(find d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Prefabs -type f -name *.prefab)",
       "Bash(mkdir -p \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Resources/config/widgets\")",
       "Bash(cp \"d:/SourceCode/Git/vcmi/vcmi/config/widgets/adventureMap.json\" \"d:/SourceCode/Git/toneyisnow/VCMIUnity/UnityClient/Assets/Resources/config/widgets/adventureMap.json\")",
-      "Bash(grep -r \"artifacts\\\\|Artifact\" /d/SourceCode/Git/toneyisnow/VCMIUnity/H3Engine/H3Engine/*.cs)"
+      "Bash(grep -r \"artifacts\\\\|Artifact\" /d/SourceCode/Git/toneyisnow/VCMIUnity/H3Engine/H3Engine/*.cs)",
+      "Bash(where msbuild:*)",
+      "Read(//c/Program Files/Microsoft Visual Studio/**)",
+      "Bash(cmd /c \"dir /b /s \\\\\"C:\\\\\\\\Program Files\\\\\\\\Microsoft Visual Studio\\\\\\\\\\\\\" 2>nul | findstr /i msbuild.exe\")",
+      "Bash(cmd /c \"where msbuild 2>&1\")"
     ]
   }
 }

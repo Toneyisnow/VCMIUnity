@@ -446,12 +446,31 @@ namespace UnityClient.GUI.Scenes
                 yield break;
             }
 
+            // When the destination is a BLOCKING_VISIT node (e.g. an artifact), the hero
+            // stops at the tile BEFORE it and triggers the visit from there.
+            // We detect this upfront and reduce the physical movement index by 1.
+            bool destinationIsBlockingVisit =
+                currentPath[lastReachableIndex].NodeAction == MapPathNode.ENodeAction.BLOCKING_VISIT;
+
+            // The furthest tile the hero actually steps onto this turn.
+            // For blocking visits the hero halts one tile before the artifact.
+            int physicalLastIndex = destinationIsBlockingVisit
+                ? lastReachableIndex - 1
+                : lastReachableIndex;
+
+            if (physicalLastIndex < 1 && !destinationIsBlockingVisit)
+            {
+                print("Hero has no movement points remaining this turn.");
+                currentState = GameMapState.Idle;
+                yield break;
+            }
+
             // Track last movement direction for idle pose
             int lastDx = 0, lastDy = 1;
 
-            // Move along each segment of the path up to the last reachable tile
-            int stoppedAtIndex = lastReachableIndex; // will be updated if paused
-            for (int i = 1; i <= lastReachableIndex; i++)
+            // Move along each segment of the path up to the physical last tile
+            int stoppedAtIndex = (physicalLastIndex >= 1) ? physicalLastIndex : 0;
+            for (int i = 1; i <= physicalLastIndex; i++)
             {
                 int prevX = currentPath[i - 1].Position.PosX;
                 int prevY = currentPath[i - 1].Position.PosY;
@@ -487,7 +506,7 @@ namespace UnityClient.GUI.Scenes
                 heroGO.transform.position = endPos;
 
                 // Check if pause was requested
-                if (pauseMovementRequested && i < lastReachableIndex)
+                if (pauseMovementRequested && i < physicalLastIndex)
                 {
                     print(string.Format("[MoveHero] Pausing at path index {0} ({1}, {2})", i, targetX, targetY));
                     stoppedAtIndex = i;
@@ -498,20 +517,53 @@ namespace UnityClient.GUI.Scenes
             // Movement complete - idle in the last facing direction
             movePathResolver.SetHeroIdleAnimation(selectedHero, lastDx, lastDy);
 
+            // If this was a blocking-visit destination (artifact), trigger the pickup now.
+            // The hero stands at stoppedAtIndex (the adjacent tile); the artifact is at lastReachableIndex.
+            bool artifactPickedUp = false;
+            if (destinationIsBlockingVisit && stoppedAtIndex == physicalLastIndex && !pauseMovementRequested)
+            {
+                MapPathNode artifactNode = currentPath[lastReachableIndex];
+                int artX = artifactNode.Position.PosX;
+                int artY = artifactNode.Position.PosY;
+                H3Engine.MapObjects.CGArtifact artifact = mapComponent.GetArtifactAtTile(artX, artY);
+
+                if (artifact != null && !artifact.IsPickedUp)
+                {
+                    artifact.OnHeroVisit(selectedHero);
+                    mapComponent.GameMap.RemoveObject(artifact);
+                    mapComponent.RemoveArtifactGameObject(artifact.Identifier);
+
+                    // Remove the last path-arrow (the one pointing at the artifact tile)
+                    movePathResolver.RemovePathArrowAtIndex(lastReachableIndex - 1);
+
+                    artifactPickedUp = true;
+
+                    print(string.Format("[MoveHero] Hero picked up artifact {0} at ({1}, {2}). Backpack size: {3}",
+                        artifact.ArtifactId,
+                        artX, artY,
+                        selectedHero.Data?.Artifacts?.ArtifactsInBackpack?.Count ?? -1));
+                }
+            }
+
+            // Use the physical stop node for hero position and move points.
+            // For blocking visits the stop node is the adjacent tile, not the artifact tile.
             MapPathNode stopNode = currentPath[stoppedAtIndex];
             int finalX = stopNode.Position.PosX;
             int finalY = stopNode.Position.PosY;
             mapComponent.UpdateHeroPosition(selectedHero, finalX, finalY);
 
-            // Update remaining movement points from the pathfinder node's actual value
+            // Update remaining movement points from the pathfinder node's actual value.
+            // For a blocking visit, deduct cost as if hero moved to the adjacent tile only.
             selectedHero.RestMovePoint = stopNode.MoveRemains;
 
-            // Invalidate cached paths for this hero
+            // Invalidate cached paths for this hero (map state may have changed due to pickup)
             pathFinderCache.Invalidate(selectedHero.Identifier);
             pathFinderCache.NextGameStateVersion();
 
-            bool wasPaused = pauseMovementRequested && stoppedAtIndex < lastReachableIndex;
-            bool hasRemainingPath = stoppedAtIndex < currentPath.Count - 1;
+            bool wasPaused = pauseMovementRequested && stoppedAtIndex < physicalLastIndex;
+            // After a pickup there are no further tiles to visit — treat as destination reached
+            bool hasRemainingPath = !artifactPickedUp &&
+                                    stoppedAtIndex < currentPath.Count - 1;
             pauseMovementRequested = false;
 
             if (wasPaused || hasRemainingPath)
@@ -528,7 +580,7 @@ namespace UnityClient.GUI.Scenes
             }
             else
             {
-                // Reached final destination
+                // Reached final destination (or just picked up an artifact)
                 print(string.Format("Hero reached destination at ({0}, {1}), restMP={2}",
                     finalX, finalY, selectedHero.RestMovePoint));
 

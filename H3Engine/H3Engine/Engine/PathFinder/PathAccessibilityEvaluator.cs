@@ -34,6 +34,13 @@ namespace H3Engine.Engine.PathFinder
             /// <summary>True if a visit mask covers this tile (hero steps here to interact).</summary>
             public bool IsVisitable;
 
+            /// <summary>
+            /// True if the visitable object has BlockVisit=true, meaning the hero visits from
+            /// an adjacent tile and never stands on this tile (BLOCKVISIT / BLOCKING_VISIT).
+            /// Mirrors VCMI CGObjectInstance::blockVisit.
+            /// </summary>
+            public bool IsBlockVisit;
+
             /// <summary>True if the covering object is a roaming monster (CGCreature).</summary>
             public bool IsMonster;
 
@@ -90,7 +97,8 @@ namespace H3Engine.Engine.PathFinder
                 int maskLen  = Math.Max(blockLen, visitLen);
                 if (maskLen == 0) continue;
 
-                bool isMonster = obj is CGCreature;
+                bool isMonster    = obj is CGCreature;
+                bool isBlockVisit = obj.BlockVisit;
 
                 for (int i = 0; i < maskLen; i++)
                 {
@@ -113,11 +121,12 @@ namespace H3Engine.Engine.PathFinder
                     if (isVisit)
                     {
                         // Visit point wins over a pure block on the same tile
-                        info.IsVisitable  = true;
-                        info.IsBlocked    = false;
-                        info.ObjectType   = obj.ObjectType;
-                        info.ObjectOwner  = obj.CurrentOwner;
-                        info.IsMonster    = isMonster;
+                        info.IsVisitable   = true;
+                        info.IsBlocked     = false;
+                        info.IsBlockVisit  = isBlockVisit;
+                        info.ObjectType    = obj.ObjectType;
+                        info.ObjectOwner   = obj.CurrentOwner;
+                        info.IsMonster     = isMonster;
                     }
                     else if (!info.IsVisitable)
                     {
@@ -188,7 +197,13 @@ namespace H3Engine.Engine.PathFinder
                     return MapPathNode.ENodeAccessibility.BLOCKED;
 
                 if (objInfo.IsVisitable)
-                    return MapPathNode.ENodeAccessibility.VISITABLE;
+                {
+                    // BlockVisit objects (e.g. artifacts) are visited from an adjacent tile;
+                    // the hero never stands on this tile.
+                    return objInfo.IsBlockVisit
+                        ? MapPathNode.ENodeAccessibility.BLOCKVISIT
+                        : MapPathNode.ENodeAccessibility.VISITABLE;
+                }
             }
 
             return MapPathNode.ENodeAccessibility.ACCESSIBLE;
@@ -214,8 +229,12 @@ namespace H3Engine.Engine.PathFinder
 
             // Static object
             if (staticTileInfo.TryGetValue(key, out var objInfo) && objInfo.IsVisitable)
+            {
+                if (objInfo.IsBlockVisit)
+                    return MapPathNode.ENodeAction.BLOCKING_VISIT;
                 return objInfo.IsMonster ? MapPathNode.ENodeAction.BATTLE
                                         : MapPathNode.ENodeAction.VISIT;
+            }
 
             return MapPathNode.ENodeAction.NORMAL;
         }
@@ -246,8 +265,8 @@ namespace H3Engine.Engine.PathFinder
 
                     if (staticTileInfo.TryGetValue(key, out var objInfo))
                     {
-                        if (objInfo.IsBlocked) extra += string.Format(" obj.BLOCKED({0})", objInfo.ObjectType);
-                        if (objInfo.IsVisitable) extra += string.Format(" obj.VISIT({0})", objInfo.ObjectType);
+                        if (objInfo.IsBlocked)    extra += string.Format(" obj.BLOCKED({0})", objInfo.ObjectType);
+                        if (objInfo.IsVisitable)  extra += string.Format(" obj.VISIT({0}{1})", objInfo.ObjectType, objInfo.IsBlockVisit ? ",BLOCKVISIT" : "");
                     }
 
                     string marker = (dx == 0 && dy == 0) ? " [HERO]" : "";

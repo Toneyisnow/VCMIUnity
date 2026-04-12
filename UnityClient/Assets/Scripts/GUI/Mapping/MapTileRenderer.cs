@@ -1,4 +1,5 @@
 using H3Engine.Common;
+using H3Engine.Core.Constants;
 using H3Engine.Engine;
 using H3Engine.Core;
 using H3Engine.GUI;
@@ -169,7 +170,15 @@ namespace UnityClient.GUI.Mapping
                 if (template.Type == EObjectType.ARTIFACT)
                 {
                     Sprite[] sprites = mapTextureManager.LoadArtifactSprites(template.AnimationFile);
-                    mapComponent.CreateSubChildAnimatedObject("Artifacts", MapComponent.GetMapPosition(position.PosX, position.PosY), sprites, MapComponent.SortOrder_Artifact);
+                    string artGoName = "Artifact_" + obj.Identifier;
+                    GameObject artGO = mapComponent.CreateSubChildAnimatedObject(
+                        "Artifacts",
+                        MapComponent.GetMapPosition(position.PosX, position.PosY),
+                        sprites,
+                        MapComponent.SortOrder_Artifact,
+                        artGoName);
+                    // Register so it can be destroyed on pickup
+                    mapComponent.artifactGameObjects[obj.Identifier] = artGO;
                 }
                 else if (MapObjectHelper.IsDecorationObject(template.Type))
                 {

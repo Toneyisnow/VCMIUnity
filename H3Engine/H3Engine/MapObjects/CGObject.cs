@@ -61,6 +61,16 @@ namespace H3Engine.MapObjects
             get; set;
         }
 
+        /// <summary>
+        /// When true the hero cannot stand on this object's tile; it is visited from an
+        /// adjacent tile instead (BLOCKING_VISIT / BLOCKVISIT behaviour).
+        /// Mirrors VCMI CGObjectInstance::blockVisit.
+        /// </summary>
+        public bool BlockVisit
+        {
+            get; set;
+        }
+
         public MapPosition GetSightCenter()
         {
             return null;

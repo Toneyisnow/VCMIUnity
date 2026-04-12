@@ -128,6 +128,18 @@ namespace H3Engine.Engine
         }
 
         /// <summary>
+        /// Removes a map object from the Objects list (and VisitableObjects if present).
+        /// Call this after a hero picks up an artifact or otherwise consumes a map object.
+        /// The pathfinder cache must be invalidated by the caller after calling this method.
+        /// Corresponds to VCMI CGameHandler::removeObject().
+        /// </summary>
+        public void RemoveObject(CGObject obj)
+        {
+            Objects?.Remove(obj);
+            VisitableObjects?.Remove(obj);
+        }
+
+        /// <summary>
         /// Resolves RANDOM_MONSTER / RANDOM_MONSTER_L1~L7 placeholders into actual monsters.
         /// </summary>
         private static void RandomizeMonsters(H3Map h3Map, Random random)

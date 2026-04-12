@@ -67,9 +67,51 @@ namespace H3Engine.MapObjects
 
     public class CGArtifact : ArmedInstance
     {
+        /// <summary>
+        /// The artifact type placed on the map.
+        /// Corresponds to CGArtifact::storedArtifact (ArtifactInstanceID).
+        /// </summary>
+        public EArtifactId ArtifactId
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Set to true once the artifact has been picked up; prevents double-pickup.
+        /// </summary>
+        public bool IsPickedUp
+        {
+            get; set;
+        }
+
         public CGArtifact(EArtifactId artId)
         {
+            ArtifactId = artId;
+            // Artifacts are visited from an adjacent tile — hero never steps on the artifact tile.
+            // Mirrors VCMI CGArtifact::initObj() setting blockVisit = true.
+            BlockVisit = true;
+        }
 
+        /// <summary>
+        /// Called when a hero visits (steps adjacent to) this artifact.
+        /// Adds the artifact to the hero's backpack and marks it as picked up.
+        /// The artifact object must be removed from the map by the caller.
+        ///
+        /// Placeholder for future event hooks (guards, triggered events, etc.).
+        /// Corresponds to VCMI CGArtifact::onHeroVisit() → pick().
+        /// </summary>
+        public void OnHeroVisit(H3Engine.MapObjects.HeroInstance hero)
+        {
+            if (IsPickedUp) return;
+            IsPickedUp = true;
+
+            // TODO: placeholder for artifact-specific events (guards, messages, etc.)
+
+            // Add to hero's backpack
+            if (hero?.Data?.Artifacts != null)
+            {
+                hero.Data.Artifacts.AddToBackpack(ArtifactId);
+            }
         }
     }
 

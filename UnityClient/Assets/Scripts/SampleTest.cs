@@ -11,6 +11,7 @@ using H3Engine.Mapping;
 using H3Engine.Campaign;
 using H3Engine.MapObjects;
 using H3Engine.Core;
+using H3Engine.Core.Constants;
 using UnityEngine.U2D;
 using H3Engine.Common;
 using UnityClient.GUI.Rendering;
@@ -317,7 +318,7 @@ public class SampleTest : MonoBehaviour
         }
     }
 
-    private void RenderTileMapByRoadType(H3Map map, H3Engine.Common.ERoadType roadType)
+    private void RenderTileMapByRoadType(H3Map map, ERoadType roadType)
     {
         int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
         for (int level = 0; level < 1; level++)
@@ -352,7 +353,7 @@ public class SampleTest : MonoBehaviour
         }
     }
 
-    private void RenderTileMapByRiverType(H3Map map, H3Engine.Common.ERiverType riverType)
+    private void RenderTileMapByRiverType(H3Map map, ERiverType riverType)
     {
         int levelCount = (map.Header.IsTwoLevel ? 2 : 1);
         for (int level = 0; level < 1; level++)
@@ -419,13 +420,13 @@ public class SampleTest : MonoBehaviour
 
                 BundleImageDefinition bundleImage = engine.RetrieveBundleImage(template.AnimationFile);
 
-                if (template.Type == H3Engine.Common.EObjectType.MONSTER
-                    || template.Type == H3Engine.Common.EObjectType.CAMPFIRE
-                    || template.Type == H3Engine.Common.EObjectType.LEARNING_STONE
-                    || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR1
-                    || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR2
-                    || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR3
-                    || template.Type == H3Engine.Common.EObjectType.CREATURE_GENERATOR4
+                if (template.Type == EObjectType.MONSTER
+                    || template.Type == EObjectType.CAMPFIRE
+                    || template.Type == EObjectType.LEARNING_STONE
+                    || template.Type == EObjectType.CREATURE_GENERATOR1
+                    || template.Type == EObjectType.CREATURE_GENERATOR2
+                    || template.Type == EObjectType.CREATURE_GENERATOR3
+                    || template.Type == EObjectType.CREATURE_GENERATOR4
                     )
                 {
                     // Load Animation

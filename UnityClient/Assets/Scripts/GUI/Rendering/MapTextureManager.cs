@@ -5,6 +5,7 @@ using UnityEngine;
 
 using H3Engine.DataAccess;
 using H3Engine.Common;
+using H3Engine.Core.Constants;
 using H3Engine.Mapping;
 using H3Engine.FileSystem;
 using H3Engine.MapObjects;

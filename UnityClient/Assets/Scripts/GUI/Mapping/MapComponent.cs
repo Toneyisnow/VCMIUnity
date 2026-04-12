@@ -47,6 +47,10 @@ namespace UnityClient.GUI.Mapping
         internal Dictionary<uint, string>     heroDefFileNames   = new Dictionary<uint, string>();
         internal Dictionary<uint, Sprite[]>   heroOriginalSprites = new Dictionary<uint, Sprite[]>();
 
+        // Artifact tracking: maps CGObject.Identifier -> artifact GameObject on the map.
+        // Populated by MapTileRenderer during RenderMap; entries removed on pickup.
+        internal Dictionary<uint, GameObject> artifactGameObjects = new Dictionary<uint, GameObject>();
+
         private MapTileRenderer mapTileRenderer = null;
         private MovePathResolver movePathResolver = null;
 
@@ -110,6 +114,43 @@ namespace UnityClient.GUI.Mapping
             if (hero == null) return null;
             heroGameObjects.TryGetValue(hero.Identifier, out GameObject go);
             return go;
+        }
+
+        // -----------------------------------------------------------------------
+        // Artifact queries / mutations
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Returns the CGArtifact map object whose visit tile is at (tileX, tileY), or null.
+        /// Searches gameMap.Objects for a CGArtifact positioned at the given coordinates.
+        /// </summary>
+        public H3Engine.MapObjects.CGArtifact GetArtifactAtTile(int tileX, int tileY)
+        {
+            if (gameMap?.Objects == null) return null;
+            foreach (var obj in gameMap.Objects)
+            {
+                if (obj is H3Engine.MapObjects.CGArtifact artifact &&
+                    !artifact.IsPickedUp &&
+                    obj.Position != null &&
+                    obj.Position.PosX == tileX && obj.Position.PosY == tileY)
+                {
+                    return artifact;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Destroys and unregisters the Unity GameObject for the given artifact identifier.
+        /// Call this after the artifact has been removed from the GameMap.
+        /// </summary>
+        public void RemoveArtifactGameObject(uint artifactIdentifier)
+        {
+            if (artifactGameObjects.TryGetValue(artifactIdentifier, out GameObject go))
+            {
+                if (go != null) Destroy(go);
+                artifactGameObjects.Remove(artifactIdentifier);
+            }
         }
 
         /// <summary>
