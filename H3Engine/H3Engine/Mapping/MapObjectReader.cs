@@ -268,6 +268,9 @@ namespace H3Engine.Mapping
                 case EObjectType.PANDORAS_BOX:
                     return new CGPandoraBoxReader();
 
+                case EObjectType.TREASURE_CHEST:
+                    return new CGTreasureChestReader();
+
                 case EObjectType.GRAIL:
                     return new CGGrailReader();
 
@@ -1268,6 +1271,21 @@ namespace H3Engine.Mapping
             reader.Skip(8);
 
             return box;
+        }
+    }
+
+    /// <summary>
+    /// Treasure chests carry no extra binary data in the H3M format.
+    /// All reward data (gold / experience amounts) is derived from the object
+    /// identifier at runtime, matching VCMI's rewardablePickable.json tiers.
+    /// </summary>
+    public class CGTreasureChestReader : MapObjectReader
+    {
+        public override CGObject ReadObject(BinaryReader reader, int objectId, MapPosition objectPosition)
+        {
+            CGTreasureChest chest = new CGTreasureChest((uint)objectId);
+            chest.Position = objectPosition;
+            return chest;
         }
     }
 

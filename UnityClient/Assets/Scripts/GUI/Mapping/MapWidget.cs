@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using H3Engine.DataAccess;
 using H3Engine.FileSystem;
@@ -20,13 +21,30 @@ namespace UnityClient.GUI.Mapping
     ///   Solution: all UI GameObjects are created as children of Camera.main so
     ///   they move with the camera and always appear at the same screen position.
     ///   Positions are set via transform.localPosition using PixelToLocal(), which
-    ///   returns offsets relative to the camera's viewport centre — those are
-    ///   constant regardless of where the camera is in world space.
+    ///   converts 800×600 pixel references to camera-local world units.
+    ///
+    /// COORDINATE SYSTEM:
+    ///   GameMapScene.Start() sets  Camera.main.orthographicSize = Screen.height / (2·PPU)
+    ///   so that 1 screen pixel = 1/PPU world units in both axes.
+    ///   PixelToLocal therefore uses Screen.width/Screen.height directly —
+    ///   avoiding camera.aspect which may not be initialised until the next frame.
+    ///
+    ///   X — RIGHT-ANCHORED (fixed pixels from the right screen edge):
+    ///     halfW = Screen.width  / (2·PPU)   — actual right-edge world coordinate
+    ///     x     = halfW  −  (SCREEN_W − px) / PPU
+    ///     e.g. px=800 → x=halfW (right edge); px=600 → x=halfW−2 (200px from right)
+    ///
+    ///   Y — TOP-ANCHORED (fixed pixels from the top screen edge):
+    ///     halfH = Screen.height / (2·PPU)   — actual top-edge world coordinate
+    ///     y     = halfH  −  py / PPU
+    ///     e.g. py=0 → y=halfH (top edge); py=600 → y=halfH−6 (=−halfH at 600px)
     ///
     /// Layout constants below are derived from
     ///   Assets/Resources/config/widgets/adventureMap.json
     /// for the standard 800×600 base resolution.
     /// </summary>
+    // Run before GameMapScene so UIClickConsumed is set before the map processes the same click.
+    [DefaultExecutionOrder(-1)]
     public class MapWidget : MonoBehaviour
     {
         // -----------------------------------------------------------------------
@@ -36,12 +54,20 @@ namespace UnityClient.GUI.Mapping
         // Screen reference dimensions used by PixelToLocal()
         private const float SCREEN_W = 800f;
         private const float SCREEN_H = 600f;
-        private const float PPU      = 100f;  // pixels per world unit
+        private const float PPU      = 100f;  // pixels per world unit (matches GameMapScene)
 
-        // Right panel: 25 % of screen width, full height
+        // Right panel: rightmost 200 px, full height
         //   JSON: backgroundRightMinimap  area { right:0, top:0, width:199 }
-        private const int RightPanelWidth = 200;                          // ~25 % of 800
+        private const int RightPanelWidth = 200;
         private const int RightPanelLeft  = (int)SCREEN_W - RightPanelWidth; // 600
+
+        // Underground / surface toggle button
+        //   JSON: buttonsContainer  area { top:196, right:57, width:64 }
+        //   toggle button inside: top=0, left=32, width=32, height=32
+        //   Absolute pixel: left = 800 - 57 - 64 + 32 = 711, top = 196
+        private const int ToggleBtnPixelX    = 711;
+        private const int ToggleBtnPixelY    = 196;
+        private const int ToggleBtnPixelSize = 32;
 
         // Info bar (inside container)
         //   JSON: infoBarContainer  area { bottom:0, right:0, width:199, height:210 }
@@ -71,7 +97,9 @@ namespace UnityClient.GUI.Mapping
         private H3DataAccess dataAccess;
         private MapComponent mapComponent;
 
-        // Root attached to Camera.main — makes all children screen-fixed
+        // Root attached to Camera.main — makes all children screen-fixed.
+        // Camera.main may be scrolled by MapCamera, but children always
+        // appear at the same localPosition relative to the camera's viewport.
         private GameObject uiRoot;
 
         // Info bar sub-objects
@@ -79,6 +107,23 @@ namespace UnityClient.GUI.Mapping
         private SpriteRenderer heroPortraitRenderer;
         private TextMesh       heroNameText;
         private TextMesh       heroStatsText;
+
+        // Underground toggle button
+        private GameObject     toggleBtnGO;
+        private SpriteRenderer toggleBtnRenderer;
+        private Sprite         spriteGoUnderground; // IAM010.DEF — shown on surface, click → go underground
+        private Sprite         spriteGoSurface;     // IAM003.DEF — shown underground, click → go surface
+        private bool           hasUnderground  = false; // true once underground map is ready
+        private int            currentMapLevel = 0;     // 0 = surface, 1 = underground
+
+        /// <summary>Fired when the underground/surface toggle button is clicked.</summary>
+        public Action OnToggleMapLevel { get; set; }
+
+        /// <summary>
+        /// True during the frame a UI button consumed a mouse click.
+        /// GameMapScene must check this and skip map-tile click processing when set.
+        /// </summary>
+        public bool UIClickConsumed { get; private set; }
 
         // -----------------------------------------------------------------------
         // Public API
@@ -99,8 +144,17 @@ namespace UnityClient.GUI.Mapping
             uiRoot.transform.SetParent(Camera.main.transform, worldPositionStays: false);
             uiRoot.transform.localPosition = Vector3.zero;
 
+            // Log key layout values once for diagnostics.
+            float halfW = Screen.width  / (2f * PPU);
+            float halfH = Screen.height / (2f * PPU);
+            Debug.Log(string.Format(
+                "[MapWidget] Init — Screen={0}×{1}, halfW={2:F3}, halfH={3:F3}, panelLocalX={4:F3}",
+                Screen.width, Screen.height, halfW, halfH,
+                halfW - RightPanelWidth / PPU));
+
             BuildRightPanelBackground();
             BuildInfoBar();
+            BuildToggleButton();
             ShowEmptyInfo();
         }
 
@@ -114,13 +168,11 @@ namespace UnityClient.GUI.Mapping
 
             infoPanelRoot.SetActive(true);
 
-            // Hero name
             string name = hero.Data?.Name;
             if (string.IsNullOrEmpty(name))
                 name = "Hero #" + hero.Identifier;
             heroNameText.text = name;
 
-            // Movement points
             int cur = hero.GetCurrentMovePoint();
             int max = hero.GetEffectiveMovePoint();
             heroStatsText.text = string.Format("Move: {0} / {1}", cur, max);
@@ -143,45 +195,99 @@ namespace UnityClient.GUI.Mapping
                 heroPortraitRenderer.sprite = null;
         }
 
+        /// <summary>
+        /// Signal that the underground map is ready. The toggle button becomes functional
+        /// and its icon becomes active. Call once underground rendering is complete.
+        /// </summary>
+        public void EnableUndergroundToggle()
+        {
+            hasUnderground = true;
+            UpdateToggleBtnSprite();
+            Debug.Log("[MapWidget] Underground toggle enabled.");
+        }
+
+        /// <summary>
+        /// Refresh the toggle button icon to match the currently active map level.
+        /// 0 = surface (show "go underground" icon), 1 = underground (show "go surface" icon).
+        /// </summary>
+        public void SetMapLevel(int level)
+        {
+            currentMapLevel = level;
+            UpdateToggleBtnSprite();
+        }
+
+        // -----------------------------------------------------------------------
+        // Unity lifecycle
+        // -----------------------------------------------------------------------
+
+        void Update()
+        {
+            UIClickConsumed = false;
+
+            // The button is visible regardless; clicks only fire when underground exists.
+            if (!Input.GetMouseButtonDown(0)) return;
+
+            // Convert actual screen mouse position to 800×600 reference pixel space.
+            // Input.mousePosition has y=0 at bottom; reference has y=0 at top.
+            float refX = Input.mousePosition.x / Screen.width  * SCREEN_W;
+            float refY = (1f - Input.mousePosition.y / Screen.height) * SCREEN_H;
+
+            bool overButton = refX >= ToggleBtnPixelX &&
+                              refX <= ToggleBtnPixelX + ToggleBtnPixelSize &&
+                              refY >= ToggleBtnPixelY &&
+                              refY <= ToggleBtnPixelY + ToggleBtnPixelSize;
+
+            if (!overButton) return;
+
+            UIClickConsumed = true; // prevent map click falling through
+
+            if (!hasUnderground)
+            {
+                Debug.Log("[MapWidget] Toggle button clicked but map has no underground layer.");
+                return;
+            }
+
+            Debug.Log("[MapWidget] Toggle button clicked — switching map level.");
+            OnToggleMapLevel?.Invoke();
+        }
+
         // -----------------------------------------------------------------------
         // Build helpers
         // -----------------------------------------------------------------------
 
         /// <summary>
-        /// Renders the right-side panel background (25 % screen width, full height).
+        /// Renders the right-side panel background (200 px wide, full height).
         ///
-        /// A solid-colour quad is always created first so the panel is guaranteed
-        /// to be visible even if AdvMap.pcx is unavailable or has unexpected
-        /// dimensions.  The PCX is then overlaid on top when it can be loaded.
+        /// The panel is RIGHT-ANCHORED: its right edge is always flush with the
+        /// screen right edge, and its width is exactly RightPanelWidth pixels,
+        /// regardless of the screen's actual resolution.
         ///
-        /// Z NOTE: all camera-child objects must use a POSITIVE local z so their
-        /// world z > camera world z (-10), keeping them inside the view frustum.
-        /// We use localZ = 1 → worldZ = -9, which is in front of the camera and
-        /// above the default near-clip plane (0.3).  SortingOrder still controls
-        /// which sprite renders on top.
+        /// The solid-colour quad is created first so the panel is always visible
+        /// even if AdvMap.pcx is unavailable.  The PCX overlay is drawn on top.
+        ///
+        /// Z: Camera.main is at z=-10; children at localZ > 0 have world z > -10,
+        /// placing them in front of the camera (above near-clip plane 0.3).
+        /// SortingOrder controls which sprite appears on top within that space.
         /// </summary>
         private void BuildRightPanelBackground()
         {
-            Camera cam      = Camera.main;
-            float  viewH    = cam.orthographicSize * 2f;
-            float  sc       = viewH / (SCREEN_H / PPU);   // 1.0 at 800×600
-            float  worldW   = RightPanelWidth / PPU * sc; // 2.0 at 800×600
-            float  worldH   = SCREEN_H        / PPU * sc; // 6.0 at 800×600
+            float worldW = RightPanelWidth / PPU;   // 2.0 wu = 200 reference px
+            float worldH = SCREEN_H        / PPU;   // 6.0 wu = 600 reference px
 
             // ---- Solid dark-brown background (always visible) ----
             Texture2D solidTex = new Texture2D(1, 1);
             solidTex.SetPixel(0, 0, new Color(0.18f, 0.13f, 0.08f, 1f));
             solidTex.Apply();
 
-            // PPU = 1 → sprite is 1×1 world unit; scale the GO to fill the panel.
+            // pixelsPerUnit=1 → sprite is 1×1 wu; scale the GO to fill the panel.
             Sprite solidSprite = Sprite.Create(solidTex,
                 new Rect(0, 0, 1, 1), new Vector2(0f, 1f), pixelsPerUnit: 1f);
 
             GameObject panelGO = new GameObject("RightPanelBackground");
             panelGO.transform.SetParent(uiRoot.transform, worldPositionStays: false);
-            SpriteRenderer sr   = panelGO.AddComponent<SpriteRenderer>();
-            sr.sprite            = solidSprite;
-            sr.sortingOrder      = 109;
+            SpriteRenderer sr = panelGO.AddComponent<SpriteRenderer>();
+            sr.sprite       = solidSprite;
+            sr.sortingOrder = 109;
             panelGO.transform.localPosition = PixelToLocal(RightPanelLeft, 0f, 1f);
             panelGO.transform.localScale    = new Vector3(worldW, worldH, 1f);
 
@@ -202,12 +308,14 @@ namespace UnityClient.GUI.Mapping
                 return;
             }
 
-            // Clip the right RightPanelWidth columns, full height.
-            // LoadFromData y-flips the image (y=0 = texture bottom = visual top),
-            // so Rect(x, 0, w, tex.height) covers the full strip correctly.
-            int  srcX      = pcxTex.width - RightPanelWidth;
-            Rect clipRect  = new Rect(srcX, 0, RightPanelWidth, pcxTex.height);
+            // Clip the rightmost RightPanelWidth columns, full height.
+            int    srcX     = pcxTex.width - RightPanelWidth;
+            Rect   clipRect = new Rect(srcX, 0, RightPanelWidth, pcxTex.height);
             Sprite pcxSprite = Sprite.Create(pcxTex, clipRect, new Vector2(0f, 1f), PPU);
+
+            // Natural world size of the clipped sprite at PPU
+            float natW = RightPanelWidth / PPU;   // = 2.0 wu
+            float natH = pcxTex.height   / PPU;
 
             GameObject pcxGO = new GameObject("RightPanelPCX");
             pcxGO.transform.SetParent(uiRoot.transform, worldPositionStays: false);
@@ -215,6 +323,8 @@ namespace UnityClient.GUI.Mapping
             pcxSr.sprite       = pcxSprite;
             pcxSr.sortingOrder = 110;
             pcxGO.transform.localPosition = PixelToLocal(RightPanelLeft, 0f, 0.9f);
+            // Scale to fill worldW × worldH exactly
+            pcxGO.transform.localScale = new Vector3(worldW / natW, worldH / natH, 1f);
         }
 
         /// <summary>
@@ -297,21 +407,103 @@ namespace UnityClient.GUI.Mapping
             BundleImageDefinition def = dataAccess.RetrieveBundleImage(defFile);
             if (def == null) { heroPortraitRenderer.sprite = null; return; }
 
-            // Group 0, frame 0 = standing south — used as portrait stand-in
             ImageData frame = def.GetImageData(0, 0);
             if (frame == null) { heroPortraitRenderer.sprite = null; return; }
 
             Texture2D tex = Texture2DExtension.LoadFromData(frame);
             heroPortraitRenderer.sprite = Texture2DExtension.CreateSpriteFromTexture(tex, new Vector2(0f, 1f));
 
-            // Scale so the portrait fits within PortraitSize × PortraitSize pixels
-            float viewH   = Camera.main.orthographicSize * 2f;
-            float scale   = viewH / (SCREEN_H / PPU);
-            float maxWorld = PortraitSize / PPU * scale;
+            // Scale portrait to fit within PortraitSize × PortraitSize pixels.
+            // 1 world unit = PPU screen pixels, so PortraitSize px = PortraitSize/PPU wu.
+            float maxWorld = PortraitSize / PPU;
             float spriteW  = frame.Width  / PPU;
             float spriteH  = frame.Height / PPU;
             float fit      = Mathf.Min(maxWorld / spriteW, maxWorld / spriteH);
             heroPortraitRenderer.transform.localScale = new Vector3(fit, fit, 1f);
+        }
+
+        /// <summary>
+        /// Creates the underground/surface toggle button at its fixed panel position.
+        /// Loads IAM010.DEF (go-underground icon) and IAM003.DEF (go-surface icon).
+        /// The button is always visible; it becomes functional once EnableUndergroundToggle()
+        /// is called after the underground map has been rendered.
+        /// </summary>
+        private void BuildToggleButton()
+        {
+            spriteGoUnderground = LoadDefSprite("IAM010.DEF");
+            spriteGoSurface     = LoadDefSprite("IAM003.DEF");
+
+            if (spriteGoUnderground == null)
+                Debug.LogWarning("[MapWidget] IAM010.DEF not found — toggle button will use fallback colour.");
+            if (spriteGoSurface == null)
+                Debug.LogWarning("[MapWidget] IAM003.DEF not found — toggle button will use fallback colour.");
+
+            toggleBtnGO = new GameObject("ToggleUndergroundBtn");
+            toggleBtnGO.transform.SetParent(uiRoot.transform, worldPositionStays: false);
+            toggleBtnGO.transform.localPosition = PixelToLocal(ToggleBtnPixelX, ToggleBtnPixelY, 0.85f);
+
+            toggleBtnRenderer              = toggleBtnGO.AddComponent<SpriteRenderer>();
+            toggleBtnRenderer.sortingOrder = 111;
+
+            // Always start visible so it can be seen/clicked even before underground is loaded.
+            UpdateToggleBtnSprite();
+        }
+
+        private void UpdateToggleBtnSprite()
+        {
+            if (toggleBtnGO == null) return;
+
+            // Choose icon: surface view → go-underground icon; underground view → go-surface icon.
+            Sprite icon = (currentMapLevel == 0) ? spriteGoUnderground : spriteGoSurface;
+
+            if (icon != null)
+            {
+                toggleBtnRenderer.sprite = icon;
+
+                // Scale to fit exactly ToggleBtnPixelSize × ToggleBtnPixelSize in reference pixels.
+                float targetWorld = ToggleBtnPixelSize / PPU;
+                float spriteW     = icon.texture.width  / PPU;
+                float spriteH     = icon.texture.height / PPU;
+                float fit         = Mathf.Min(targetWorld / spriteW, targetWorld / spriteH);
+                toggleBtnGO.transform.localScale = new Vector3(fit, fit, 1f);
+            }
+            else
+            {
+                // DEF not available — render a small coloured square as fallback.
+                toggleBtnRenderer.sprite = MakeSolidSprite(
+                    hasUnderground ? new Color(0.2f, 0.4f, 0.8f) : new Color(0.3f, 0.3f, 0.3f));
+                float size = ToggleBtnPixelSize / PPU;
+                toggleBtnGO.transform.localScale = new Vector3(size, size, 1f);
+            }
+        }
+
+        /// <summary>Creates a 1×1 solid-colour sprite (pivot top-left) for use as a fallback.</summary>
+        private static Sprite MakeSolidSprite(Color color)
+        {
+            Texture2D tex = new Texture2D(1, 1);
+            tex.SetPixel(0, 0, color);
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0f, 1f), pixelsPerUnit: 1f);
+        }
+
+        /// <summary>
+        /// Load the first frame (group 0, frame 0) of a DEF file as a sprite with pivot (0, 1).
+        /// Returns null if the file is not found or empty.
+        /// </summary>
+        private Sprite LoadDefSprite(string defFile)
+        {
+            BundleImageDefinition def = dataAccess?.RetrieveBundleImage(defFile);
+            if (def == null)
+            {
+                Debug.LogWarning("[MapWidget] DEF not found: " + defFile);
+                return null;
+            }
+
+            ImageData imgData = def.GetImageData(0, 0);
+            if (imgData == null) return null;
+
+            Texture2D tex = Texture2DExtension.LoadFromData(imgData);
+            return Texture2DExtension.CreateSpriteFromTexture(tex, new Vector2(0f, 1f));
         }
 
         // -----------------------------------------------------------------------
@@ -320,24 +512,47 @@ namespace UnityClient.GUI.Mapping
 
         /// <summary>
         /// Convert pixel coordinates (top-left origin, 800×600 reference) to a
-        /// position in camera-local space.
+        /// localPosition inside Camera.main's coordinate space.
         ///
-        /// Because all UI GameObjects are children of Camera.main, setting
-        /// transform.localPosition with the value returned here keeps the object
-        /// at a constant screen position even when the camera moves.
+        /// Because Camera.main has no rotation, localPosition == world-offset from
+        /// the camera's position.  Setting transform.localPosition with the value
+        /// returned here keeps the object at a constant screen position even when
+        /// the camera is scrolled by MapCamera.
         ///
-        /// The maths is identical to the PixelToWorld() helper in GameMapScene —
-        /// the key difference is that the result is used as localPosition (not
-        /// world position), which is correct when the parent is Camera.main.
+        /// X — RIGHT-ANCHORED, fixed pixels from the actual right screen edge:
+        ///   halfW = Screen.width / (2·PPU)          — right-edge world coord
+        ///   x     = halfW − (SCREEN_W − px) / PPU
+        ///   px=SCREEN_W → x = halfW  (right screen edge)
+        ///   px=600      → x = halfW − 2.0  (200 px / PPU from right)
+        ///
+        /// Y — TOP-ANCHORED, fixed pixels from the actual top screen edge:
+        ///   halfH = Screen.height / (2·PPU)          — top-edge world coord
+        ///   y     = halfH − py / PPU
+        ///   py=0        → y = halfH (top screen edge)
+        ///   py=600      → y = halfH − 6.0 (= −halfH at Screen.height=600)
+        ///
+        /// Uses Screen.width/Screen.height instead of camera.aspect to avoid a
+        /// Unity initialisation quirk where aspect is not yet set on a freshly
+        /// created Camera component.
         /// </summary>
         private static Vector3 PixelToLocal(float px, float py, float z = -1f)
         {
-            Camera cam       = Camera.main;
-            float viewHeight = cam.orthographicSize * 2f;
-            float scale      = viewHeight / (SCREEN_H / PPU);
-            float halfW      = SCREEN_W / PPU * scale / 2f;
-            float halfH      = SCREEN_H / PPU * scale / 2f;
-            return new Vector3(px / PPU * scale - halfW, halfH - py / PPU * scale, z);
+            // Use the FIXED 800×600 reference dimensions — NOT Screen.width/height.
+            //
+            // The H3 game content is always laid out in an 800×600 pixel reference
+            // space. In camera-local world units (PPU=100), this maps to:
+            //   X: −4.0 (left edge) … +4.0 (right edge)  i.e. halfW = 4.0
+            //   Y: −3.0 (bottom)    … +3.0 (top edge)    i.e. halfH = 3.0
+            //
+            // Using Screen.width/Screen.height instead would scale positions with
+            // the actual Game View size, shifting the panel outside the game content
+            // area on any screen that is not exactly 800×600.
+            float halfW = SCREEN_W / (2f * PPU);   // 4.0 wu — fixed reference right edge
+            float halfH = SCREEN_H / (2f * PPU);   // 3.0 wu — fixed reference top edge
+
+            float x = halfW - (SCREEN_W - px) / PPU;   // right-anchored, fixed px
+            float y = halfH - py / PPU;                 // top-anchored,   fixed px
+            return new Vector3(x, y, z);
         }
     }
 }

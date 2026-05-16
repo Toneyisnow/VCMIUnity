@@ -8,6 +8,72 @@ using System.Threading.Tasks;
 
 namespace H3Engine.MapObjects
 {
+    /// <summary>
+    /// Reward tier for a treasure chest: pairs of gold and experience amounts.
+    /// Mirrors VCMI rewardablePickable.json tiers for TREASURE_CHEST.
+    /// </summary>
+    public struct TreasureChestReward
+    {
+        public int Gold;
+        public int Experience;
+    }
+
+    /// <summary>
+    /// Treasure chest on the adventure map (EObjectType.TREASURE_CHEST = 101).
+    ///
+    /// When a hero visits the chest the player is shown a dialog to choose
+    /// either a gold reward or an experience reward.  The chest disappears
+    /// after the player makes their choice.
+    ///
+    /// Reward tiers (matching VCMI rewardablePickable.json weights):
+    ///   Tier 1 – 1 000 gold  or  500 experience
+    ///   Tier 2 – 1 500 gold  or  1 000 experience
+    ///   Tier 3 – 2 000 gold  or  1 500 experience
+    ///
+    /// Corresponds to VCMI CRewardableObject / Rewardable::Interface with
+    /// selectMode = SELECT_PLAYER.
+    /// </summary>
+    public class CGTreasureChest : CGObject
+    {
+        private static readonly TreasureChestReward[] RewardTiers = new TreasureChestReward[]
+        {
+            new TreasureChestReward { Gold = 1000, Experience = 500  },
+            new TreasureChestReward { Gold = 1500, Experience = 1000 },
+            new TreasureChestReward { Gold = 2000, Experience = 1500 },
+        };
+
+        /// <summary>
+        /// True once the chest has been picked up; prevents double-pickup.
+        /// </summary>
+        public bool IsPickedUp { get; set; }
+
+        /// <summary>
+        /// Gold the player may choose when opening this chest.
+        /// </summary>
+        public int RewardGold { get; private set; }
+
+        /// <summary>
+        /// Experience the player may choose when opening this chest.
+        /// </summary>
+        public int RewardExperience { get; private set; }
+
+        /// <param name="identifier">
+        /// CGObject identifier used as PRNG seed so the same chest always
+        /// offers the same tier on every game load.
+        /// </param>
+        public CGTreasureChest(uint identifier)
+        {
+            // Hero visits from an adjacent tile — chest tile blocks movement.
+            BlockVisit = true;
+
+            // Deterministic tier selection seeded by object identifier.
+            int tier = (int)(identifier % (uint)RewardTiers.Length);
+            RewardGold       = RewardTiers[tier].Gold;
+            RewardExperience = RewardTiers[tier].Experience;
+        }
+    }
+
+
     public class ITeamVisited : CGObject
     {
 
@@ -120,6 +186,45 @@ namespace H3Engine.MapObjects
         public int Amount
         {
             get; set;
+        }
+
+        /// <summary>
+        /// Set to true once the resource has been picked up; prevents double-pickup.
+        /// </summary>
+        public bool IsPickedUp
+        {
+            get; set;
+        }
+
+        public CGResource()
+        {
+            // Resources are visited from an adjacent tile — hero never steps on the resource tile.
+            // Mirrors VCMI CGResource::initObj() setting blockVisit = true.
+            BlockVisit = true;
+        }
+
+        /// <summary>
+        /// The resource type derived from the object template's SubId (set after map loading).
+        /// </summary>
+        public EResourceType ResourceType =>
+            Template != null ? (EResourceType)Template.SubId : EResourceType.GOLD;
+
+        /// <summary>
+        /// Called when a hero visits (steps adjacent to) this resource.
+        /// Adds the resource amount to the hero's collected resources and marks it as picked up.
+        /// The resource object must be removed from the map by the caller.
+        ///
+        /// Corresponds to VCMI CGResource::onHeroVisit() → collectRes().
+        /// </summary>
+        public void OnHeroVisit(H3Engine.MapObjects.HeroInstance hero)
+        {
+            if (IsPickedUp) return;
+            IsPickedUp = true;
+
+            if (hero?.Data != null)
+            {
+                hero.Data.Resources.AddAmount(ResourceType, Amount);
+            }
         }
     }
 

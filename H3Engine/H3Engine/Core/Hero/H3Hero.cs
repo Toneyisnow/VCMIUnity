@@ -150,6 +150,12 @@ namespace H3Engine.Core
         }
 
         /// <summary>
+        /// Resources collected by this hero (and carried on behalf of their player).
+        /// Corresponds to VCMI's player-level TResources, simplified here per-hero.
+        /// </summary>
+        public ResourceSet Resources { get; set; } = new ResourceSet();
+
+        /// <summary>
         /// Maps each equipped position to the live ArtifactInstance whose bonus
         /// node has been attached to this hero's bonus tree.
         /// Populated by <see cref="EquipArtifact"/>, cleared by
@@ -284,7 +290,8 @@ namespace H3Engine.Core
         ///   Speed 0-4: 1500, Speed 5: 1560, Speed 6: 1630, Speed 7: 1700,
         ///   Speed 8: 1760, Speed 9: 1830, Speed 10: 1900, Speed 11+: 2000.
         /// </summary>
-        public int MovePoint { get; set; } = 1500;
+        // TODO: TEMP — inflated to 15000 for testing; restore to 1500 before shipping.
+        public int MovePoint { get; set; } = 15000;
 
         /// <summary>
         /// Base movement-point values indexed by lowest creature speed in hero's army.
@@ -361,6 +368,23 @@ namespace H3Engine.Core
 
             // ── Step 5: Final result ──────────────────────────────────────────
             return afterPercent + flatBonus;
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  Experience / level
+        // ══════════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Adds <paramref name="amount"/> experience to the hero.
+        /// Level-up logic is intentionally deferred to the game/UI layer for now;
+        /// this method only increments the raw Experience counter.
+        ///
+        /// Corresponds to VCMI grantRewardBeforeLevelup() → experience handling.
+        /// </summary>
+        public void AddExperience(long amount)
+        {
+            if (amount <= 0) return;
+            Experience += amount;
         }
 
         // ══════════════════════════════════════════════════════════════════════

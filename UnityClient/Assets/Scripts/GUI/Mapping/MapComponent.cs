@@ -51,6 +51,14 @@ namespace UnityClient.GUI.Mapping
         // Populated by MapTileRenderer during RenderMap; entries removed on pickup.
         internal Dictionary<uint, GameObject> artifactGameObjects = new Dictionary<uint, GameObject>();
 
+        // Resource tracking: maps CGObject.Identifier -> resource GameObject on the map.
+        // Populated by MapTileRenderer during RenderMap; entries removed on pickup.
+        internal Dictionary<uint, GameObject> resourceGameObjects = new Dictionary<uint, GameObject>();
+
+        // Treasure chest tracking: maps CGObject.Identifier -> chest GameObject on the map.
+        // Populated by MapTileRenderer during RenderMap; entries removed on pickup.
+        internal Dictionary<uint, GameObject> treasureChestGameObjects = new Dictionary<uint, GameObject>();
+
         private MapTileRenderer mapTileRenderer = null;
         private MovePathResolver movePathResolver = null;
 
@@ -150,6 +158,78 @@ namespace UnityClient.GUI.Mapping
             {
                 if (go != null) Destroy(go);
                 artifactGameObjects.Remove(artifactIdentifier);
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        // Resource queries / mutations
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Returns the CGResource map object whose visit tile is at (tileX, tileY), or null.
+        /// </summary>
+        public H3Engine.MapObjects.CGResource GetResourceAtTile(int tileX, int tileY)
+        {
+            if (gameMap?.Objects == null) return null;
+            foreach (var obj in gameMap.Objects)
+            {
+                if (obj is H3Engine.MapObjects.CGResource resource &&
+                    !resource.IsPickedUp &&
+                    obj.Position != null &&
+                    obj.Position.PosX == tileX && obj.Position.PosY == tileY)
+                {
+                    return resource;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Destroys and unregisters the Unity GameObject for the given resource identifier.
+        /// Call this after the resource has been removed from the GameMap.
+        /// </summary>
+        public void RemoveResourceGameObject(uint resourceIdentifier)
+        {
+            if (resourceGameObjects.TryGetValue(resourceIdentifier, out GameObject go))
+            {
+                if (go != null) Destroy(go);
+                resourceGameObjects.Remove(resourceIdentifier);
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        // Treasure chest queries / mutations
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Returns the CGTreasureChest map object whose visit tile is at (tileX, tileY), or null.
+        /// </summary>
+        public H3Engine.MapObjects.CGTreasureChest GetTreasureChestAtTile(int tileX, int tileY)
+        {
+            if (gameMap?.Objects == null) return null;
+            foreach (var obj in gameMap.Objects)
+            {
+                if (obj is H3Engine.MapObjects.CGTreasureChest chest &&
+                    !chest.IsPickedUp &&
+                    obj.Position != null &&
+                    obj.Position.PosX == tileX && obj.Position.PosY == tileY)
+                {
+                    return chest;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Destroys and unregisters the Unity GameObject for the given treasure chest identifier.
+        /// Call this after the chest has been removed from the GameMap.
+        /// </summary>
+        public void RemoveTreasureChestGameObject(uint chestIdentifier)
+        {
+            if (treasureChestGameObjects.TryGetValue(chestIdentifier, out GameObject go))
+            {
+                if (go != null) Destroy(go);
+                treasureChestGameObjects.Remove(chestIdentifier);
             }
         }
 

@@ -20,6 +20,7 @@ using H3Engine.GUI;
 using H3Engine.FileSystem;
 using H3Engine.Engine.PathFinder;
 using UnityClient.GUI.Rendering;
+using UnityClient.GUI.Dialogs;
 
 namespace UnityClient.GUI.Scenes
 {
@@ -29,6 +30,11 @@ namespace UnityClient.GUI.Scenes
         HeroSelected,
         DestinationSelected,
         HeroMoving,
+        /// <summary>
+        /// A modal dialog (e.g. treasure-chest choice) is open.
+        /// All map input is blocked until the dialog is dismissed.
+        /// </summary>
+        WaitingForDialog,
     }
 
     /// <summary>
@@ -49,7 +55,10 @@ namespace UnityClient.GUI.Scenes
 
         private MenuControl menuControl = null;
 
-        private MapComponent mapComponent = null;
+        private MapComponent mapComponent = null;          // active map component (surface or underground)
+        private MapComponent mapComponentSurface = null;   // level 0 map
+        private MapComponent mapComponentUnderground = null; // level 1 map (null if not two-level)
+        private int          currentMapLevel = 0;           // 0 = surface, 1 = underground
         private MovePathResolver movePathResolver = null;
 
         private MapCamera mapCamera = null;
@@ -85,6 +94,9 @@ namespace UnityClient.GUI.Scenes
 
         // Pause movement flag: set when user clicks during HeroMoving
         private bool pauseMovementRequested = false;
+
+        // Active treasure-chest dialog (non-null while WaitingForDialog).
+        private TreasureChestDialog treasureChestDialog = null;
 
         // Loading overlay state
         private bool isInitializing = true;
@@ -145,16 +157,45 @@ namespace UnityClient.GUI.Scenes
             GameMap gameMap = playerInterface.GameData.MapAtLevel(0);
 
             GameObject gameMapUI = GameObject.Find("GameMap");
-            mapComponent = gameMapUI.GetComponent<MapComponent>();
-            mapComponent.Initialize(gameMap);
+            mapComponentSurface = gameMapUI.GetComponent<MapComponent>();
+            mapComponentSurface.Initialize(gameMap);
+            mapComponent    = mapComponentSurface;
             movePathResolver = mapComponent.PathResolver;
 
-            // Show loading overlay and render map with progress
+            // Show loading overlay and render surface map with progress
             ShowLoadingOverlay(dataAccess);
             renderProgress = new LoadProgress();
             yield return null; // Let overlay render one frame
 
             yield return StartCoroutine(mapComponent.RenderMapCoroutine(renderProgress));
+
+            // Render underground map (level 1) if the map is two-level
+            Debug.Log("[GameMapScene] MapLevelCount=" + playerInterface.GameData.MapLevelCount +
+                      " — " + (playerInterface.GameData.MapLevelCount > 1 ? "two-level map, rendering underground." : "single-level map, no underground."));
+            if (playerInterface.GameData.MapLevelCount > 1)
+            {
+                UpdateLoadingStatus("Rendering underground...");
+                yield return null;
+
+                GameMap undergroundGameMap = playerInterface.GameData.MapAtLevel(1);
+                GameObject undergroundGO = new GameObject("UndergroundMap");
+                mapComponentUnderground = undergroundGO.AddComponent<MapComponent>();
+                mapComponentUnderground.Initialize(undergroundGameMap);
+
+                LoadProgress ugProgress = new LoadProgress();
+                yield return StartCoroutine(mapComponentUnderground.RenderMapCoroutine(ugProgress));
+
+                // Populate heroes list for the underground map
+                undergroundGameMap.Heroes = new List<HeroInstance>();
+                foreach (var obj in undergroundGameMap.Objects)
+                {
+                    if (obj is HeroInstance hero)
+                        undergroundGameMap.Heroes.Add(hero);
+                }
+
+                // Hide underground layer until the player toggles to it
+                undergroundGO.SetActive(false);
+            }
 
             DestroyLoadingOverlay();
             isInitializing = false;
@@ -163,6 +204,13 @@ namespace UnityClient.GUI.Scenes
             mapWidget = gameMapUI.AddComponent<MapWidget>();
             mapWidget.Initialize(dataAccess, mapComponent);
             mapInterface = new MapInterface(mapWidget);
+
+            // Wire up the underground toggle button
+            if (mapComponentUnderground != null)
+            {
+                mapWidget.OnToggleMapLevel = SwitchMapLevel;
+                mapWidget.EnableUndergroundToggle();
+            }
 
             // Initialize pathfinder (cache + Dijkstra engine)
             pathFinderCache = new PathfinderCache();
@@ -204,6 +252,14 @@ namespace UnityClient.GUI.Scenes
                 }
                 return;
             }
+
+            // Block all map input while a modal dialog is open (e.g. treasure chest choice).
+            if (currentState == GameMapState.WaitingForDialog)
+                return;
+
+            // Let MapWidget handle panel button clicks first; skip map click if consumed.
+            if (mapWidget != null && mapWidget.UIClickConsumed)
+                return;
 
             if (mapCamera == null || !mapCamera.WasClick)
                 return;
@@ -322,6 +378,41 @@ namespace UnityClient.GUI.Scenes
         }
 
         #region State Transitions
+
+        /// <summary>
+        /// Toggle the visible map between surface (level 0) and underground (level 1).
+        /// Deselects any active hero and swaps which MapComponent is active in the scene.
+        /// </summary>
+        private void SwitchMapLevel()
+        {
+            if (mapComponentUnderground == null) return;
+
+            // Deselect any active hero — they live on a specific level.
+            if (selectedHero != null) DeselectHero();
+
+            currentMapLevel = 1 - currentMapLevel; // 0 ↔ 1
+
+            if (currentMapLevel == 0)
+            {
+                mapComponentSurface.gameObject.SetActive(true);
+                mapComponentUnderground.gameObject.SetActive(false);
+                mapComponent = mapComponentSurface;
+            }
+            else
+            {
+                mapComponentSurface.gameObject.SetActive(false);
+                mapComponentUnderground.gameObject.SetActive(true);
+                mapComponent = mapComponentUnderground;
+            }
+
+            movePathResolver = mapComponent.PathResolver;
+            pathFinderCache.NextGameStateVersion();
+
+            mapWidget.SetMapLevel(currentMapLevel);
+
+            Debug.Log("[GameMapScene] Switched to map level " + currentMapLevel +
+                      (currentMapLevel == 0 ? " (surface)" : " (underground)"));
+        }
 
         private void SelectHero(HeroInstance hero)
         {
@@ -517,16 +608,19 @@ namespace UnityClient.GUI.Scenes
             // Movement complete - idle in the last facing direction
             movePathResolver.SetHeroIdleAnimation(selectedHero, lastDx, lastDy);
 
-            // If this was a blocking-visit destination (artifact), trigger the pickup now.
-            // The hero stands at stoppedAtIndex (the adjacent tile); the artifact is at lastReachableIndex.
-            bool artifactPickedUp = false;
+            // If this was a blocking-visit destination (artifact / resource / treasure chest),
+            // trigger the pickup now.  The hero stands at stoppedAtIndex (the adjacent tile);
+            // the object is at lastReachableIndex.
+            bool artifactPickedUp     = false;
+            bool resourcePickedUp     = false;
+            bool treasureChestPickedUp = false;
             if (destinationIsBlockingVisit && stoppedAtIndex == physicalLastIndex && !pauseMovementRequested)
             {
-                MapPathNode artifactNode = currentPath[lastReachableIndex];
-                int artX = artifactNode.Position.PosX;
-                int artY = artifactNode.Position.PosY;
-                H3Engine.MapObjects.CGArtifact artifact = mapComponent.GetArtifactAtTile(artX, artY);
+                MapPathNode blockNode = currentPath[lastReachableIndex];
+                int blockX = blockNode.Position.PosX;
+                int blockY = blockNode.Position.PosY;
 
+                H3Engine.MapObjects.CGArtifact artifact = mapComponent.GetArtifactAtTile(blockX, blockY);
                 if (artifact != null && !artifact.IsPickedUp)
                 {
                     artifact.OnHeroVisit(selectedHero);
@@ -540,13 +634,54 @@ namespace UnityClient.GUI.Scenes
 
                     print(string.Format("[MoveHero] Hero picked up artifact {0} at ({1}, {2}). Backpack size: {3}",
                         artifact.ArtifactId,
-                        artX, artY,
+                        blockX, blockY,
                         selectedHero.Data?.Artifacts?.ArtifactsInBackpack?.Count ?? -1));
+                }
+
+                if (!artifactPickedUp)
+                {
+                    H3Engine.MapObjects.CGResource resource = mapComponent.GetResourceAtTile(blockX, blockY);
+                    if (resource != null && !resource.IsPickedUp)
+                    {
+                        resource.OnHeroVisit(selectedHero);
+                        mapComponent.GameMap.RemoveObject(resource);
+                        mapComponent.RemoveResourceGameObject(resource.Identifier);
+
+                        // Remove the last path-arrow (the one pointing at the resource tile)
+                        movePathResolver.RemovePathArrowAtIndex(lastReachableIndex - 1);
+
+                        resourcePickedUp = true;
+
+                        print(string.Format("[MoveHero] Hero picked up resource {0} x{1} at ({2}, {3}). Total {0}: {4}",
+                            resource.ResourceType,
+                            resource.Amount,
+                            blockX, blockY,
+                            selectedHero.Data?.Resources?.GetAmount(resource.ResourceType) ?? -1));
+                    }
+                }
+
+                if (!artifactPickedUp && !resourcePickedUp)
+                {
+                    H3Engine.MapObjects.CGTreasureChest chest = mapComponent.GetTreasureChestAtTile(blockX, blockY);
+                    if (chest != null && !chest.IsPickedUp)
+                    {
+                        // Mark picked-up immediately to prevent re-entry.
+                        chest.IsPickedUp = true;
+
+                        // Remove path-arrow pointing at the chest tile.
+                        movePathResolver.RemovePathArrowAtIndex(lastReachableIndex - 1);
+
+                        // Show dialog and wait for player's choice.
+                        yield return StartCoroutine(
+                            ShowTreasureChestDialog(chest, selectedHero, blockX, blockY));
+
+                        treasureChestPickedUp = true;
+                    }
                 }
             }
 
             // Use the physical stop node for hero position and move points.
-            // For blocking visits the stop node is the adjacent tile, not the artifact tile.
+            // For blocking visits the stop node is the adjacent tile, not the object tile.
             MapPathNode stopNode = currentPath[stoppedAtIndex];
             int finalX = stopNode.Position.PosX;
             int finalY = stopNode.Position.PosY;
@@ -562,7 +697,7 @@ namespace UnityClient.GUI.Scenes
 
             bool wasPaused = pauseMovementRequested && stoppedAtIndex < physicalLastIndex;
             // After a pickup there are no further tiles to visit — treat as destination reached
-            bool hasRemainingPath = !artifactPickedUp &&
+            bool hasRemainingPath = !artifactPickedUp && !resourcePickedUp && !treasureChestPickedUp &&
                                     stoppedAtIndex < currentPath.Count - 1;
             pauseMovementRequested = false;
 
@@ -580,7 +715,7 @@ namespace UnityClient.GUI.Scenes
             }
             else
             {
-                // Reached final destination (or just picked up an artifact)
+                // Reached final destination (or just picked up an artifact/resource)
                 print(string.Format("Hero reached destination at ({0}, {1}), restMP={2}",
                     finalX, finalY, selectedHero.RestMovePoint));
 
@@ -590,6 +725,68 @@ namespace UnityClient.GUI.Scenes
                 selectedHero = null;
                 currentState = GameMapState.Idle;
             }
+        }
+
+        /// <summary>
+        /// Shows the treasure-chest choice dialog, waits for the player to choose
+        /// gold or experience, applies the reward, then removes the chest from the map.
+        ///
+        /// The coroutine transitions to <see cref="GameMapState.WaitingForDialog"/> so
+        /// that all map input is suppressed until the dialog is dismissed.
+        /// </summary>
+        private IEnumerator ShowTreasureChestDialog(
+            H3Engine.MapObjects.CGTreasureChest chest,
+            HeroInstance hero,
+            int chestTileX, int chestTileY)
+        {
+            // Enter dialog-wait state so Update() blocks map input.
+            GameMapState stateBeforeDialog = currentState;
+            currentState = GameMapState.WaitingForDialog;
+
+            // Create dialog component on this GameObject.
+            treasureChestDialog = gameObject.AddComponent<TreasureChestDialog>();
+            treasureChestDialog.Show(chest.RewardGold, chest.RewardExperience);
+
+            // Wait until the player clicks a button.
+            while (!treasureChestDialog.IsAnswered)
+                yield return null;
+
+            // Apply the chosen reward.
+            TreasureChestChoice choice = treasureChestDialog.SelectedChoice;
+            if (hero?.Data != null)
+            {
+                if (choice == TreasureChestChoice.Gold)
+                {
+                    hero.Data.Resources.AddAmount(H3Engine.Core.Constants.EResourceType.GOLD, chest.RewardGold);
+                    print(string.Format(
+                        "[TreasureChest] Hero took {0} gold at ({1},{2}). Total gold: {3}",
+                        chest.RewardGold, chestTileX, chestTileY,
+                        hero.Data.Resources.GetAmount(H3Engine.Core.Constants.EResourceType.GOLD)));
+                }
+                else if (choice == TreasureChestChoice.Experience)
+                {
+                    hero.Data.AddExperience(chest.RewardExperience);
+                    print(string.Format(
+                        "[TreasureChest] Hero took {0} experience at ({1},{2}). Total XP: {3}",
+                        chest.RewardExperience, chestTileX, chestTileY,
+                        hero.Data.Experience));
+                }
+            }
+
+            // Remove dialog.
+            treasureChestDialog.Dismiss();
+            Destroy(treasureChestDialog);
+            treasureChestDialog = null;
+
+            // Remove chest from map.
+            mapComponent.GameMap.RemoveObject(chest);
+            mapComponent.RemoveTreasureChestGameObject(chest.Identifier);
+
+            // Restore state.
+            currentState = GameMapState.Idle;
+            selectedHero = null;
+            currentPath  = null;
+            movePathResolver.ClearPath();
         }
 
         #endregion

@@ -63,7 +63,16 @@
       "Bash(where msbuild:*)",
       "Read(//c/Program Files/Microsoft Visual Studio/**)",
       "Bash(cmd /c \"dir /b /s \\\\\"C:\\\\\\\\Program Files\\\\\\\\Microsoft Visual Studio\\\\\\\\\\\\\" 2>nul | findstr /i msbuild.exe\")",
-      "Bash(cmd /c \"where msbuild 2>&1\")"
+      "Bash(cmd /c \"where msbuild 2>&1\")",
+      "Bash(where dotnet:*)",
+      "Read(//c/Program Files/dotnet/**)",
+      "Read(//c/Program Files \\(x86\\)/dotnet/**)",
+      "Read(//c/Windows/Microsoft.NET/Framework64//**)",
+      "Read(//c/Windows/Microsoft.NET/Framework//**)",
+      "Bash(cmd /c \"where dotnet\")",
+      "Bash(powershell.exe -Command \"Get-Command dotnet -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source; if \\(-not \\(Get-Command dotnet -ErrorAction SilentlyContinue\\)\\) { Get-Command msbuild -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source }\")",
+      "Bash(\"/c/Program Files/dotnet/dotnet\" build \"d:/SourceCode/Git/toneyisnow/VCMIUnity/H3Engine/H3Engine.sln\")",
+      "Bash(find \"d:/SourceCode/Git/vcmi/vcmi\" -type f \\\\\\( -name \"*.h\" -o -name \"*.cpp\" \\\\\\) -exec grep -l \"Obj::\" {} \\\\;)"
     ]
   }
 }

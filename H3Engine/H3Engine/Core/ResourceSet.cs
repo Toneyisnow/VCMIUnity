@@ -27,6 +27,11 @@ namespace H3Engine.Core
         {
             Resources[type] = amount;
         }
+
+        public void AddAmount(EResourceType type, int amount)
+        {
+            Resources[type] = GetAmount(type) + amount;
+        }
     }
 }
 

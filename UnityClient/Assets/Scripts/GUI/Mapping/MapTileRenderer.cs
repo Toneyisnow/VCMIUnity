@@ -193,7 +193,18 @@ namespace UnityClient.GUI.Mapping
                 else if (template.Type == EObjectType.RESOURCE)
                 {
                     Sprite[] sprites = mapTextureManager.LoadResourceSprites(template.AnimationFile);
-                    mapComponent.CreateSubChildAnimatedObject("Resources", MapComponent.GetMapPosition(position.PosX, position.PosY), sprites, MapComponent.SortOrder_Resource, "Resource_" + template.SubId);
+                    string resGoName = "Resource_" + obj.Identifier;
+                    GameObject resGO = mapComponent.CreateSubChildAnimatedObject("Resources", MapComponent.GetMapPosition(position.PosX, position.PosY), sprites, MapComponent.SortOrder_Resource, resGoName);
+                    mapComponent.resourceGameObjects[obj.Identifier] = resGO;
+                }
+                else if (template.Type == EObjectType.TREASURE_CHEST)
+                {
+                    // Treasure chests use the same animated-object rendering path,
+                    // but are tracked separately so pickup can remove them from the map.
+                    Sprite[] sprites = mapTextureManager.LoadSingleBundleImageSprites(template.AnimationFile);
+                    string chestGoName = "TreasureChest_" + obj.Identifier;
+                    GameObject chestGO = mapComponent.CreateSubChildAnimatedObject("TreasureChests", MapComponent.GetMapPosition(position.PosX, position.PosY), sprites, MapComponent.SortOrder_Resource, chestGoName);
+                    mapComponent.treasureChestGameObjects[obj.Identifier] = chestGO;
                 }
                 else if (template.Type == EObjectType.TOWN || template.Type == EObjectType.RANDOM_TOWN)
                 {
